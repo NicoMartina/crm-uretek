@@ -15,7 +15,11 @@ public class MaterialUsage {
     @JoinColumn(name = "job_id")
     private Job job;
 
-    private Double ISOQuantity; // ISO
-    private Double ResinaQuantity; // RESINA
-    private String unitOfMeasure;  // KILO
+    private Double ISOQuantity;
+    private Double ResinaQuantity;
+
+    private String unitOfMeasure;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 }
