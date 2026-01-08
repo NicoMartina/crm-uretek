@@ -3,6 +3,7 @@ package com.crmuretek.crmuretek;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.repositories.CustomerRepository;
+import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import com.crmuretek.crmuretek.services.VisitService;
 import org.springframework.boot.CommandLineRunner;
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Scanner;
 
 @SpringBootApplication
 public class CrmuretekApplication {
@@ -20,16 +22,57 @@ public class CrmuretekApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demo(VisitService visitService, VisitRepository visitRepository){
+	public CommandLineRunner demo(
+			CustomerRepository customerRepository,
+			VisitService visitService,
+			JobRepository jobRepository) {
 		return (args) -> {
-			Visit visit = new Visit();
-			visit.setHasPaidVisitFee(false);
-			visitRepository.save(visit);
+			Scanner scanner = new Scanner(System.in);
+			boolean running = true;
 
-			// Ask the service for the report
-			List<Visit> debtors = visitService.getUnpaidVisits();
+			System.out.println("--- WELCOME TO CRM URETEK v1.0 ---");
 
-			System.out.println("ALERTA: You have " + debtors.size()	+ " unpaid visits");
+			while(running) {
+				System.out.println("\n******************************");
+				System.out.println("1. [REPORT] View Unpaid Visits");
+				System.out.println("2. [DATA] Add New Customer");
+				System.out.println("3. [DATA] View All Customers");
+				System.out.println("4. [EXIT] Close System");
+				System.out.print("Select an option: ");
+
+				String input = scanner.nextLine();
+
+				switch (input) {
+					case "1" -> {
+						var unpaid = visitService.getUnpaidVisits();
+						System.out.println("\n>>> UNPAID VISITS REPORTS <<<");
+						if (unpaid.isEmpty()){
+							System.out.println("Great news! All visits have been paid");
+						} else {
+							unpaid.forEach(v -> System.out.println("Visit ID: " + v.getId() + " | Date: " + v.getVisitDate()));
+							System.out.println("Total pending: " + unpaid.size());
+						}
+					}
+					case "2" -> {
+						System.out.println("Enter Customer Name: ");
+						String name = scanner.nextLine();
+						Customer c = new Customer();
+						c.setName(name);
+						customerRepository.save(c);
+						System.out.println("SUCCESS: " + name + " saved to database.");
+					}
+					case "3" -> {
+						System.out.println("\n>>> CUSTOMER LIST <<<");
+						customerRepository.findAll().forEach(c -> System.out.println("ID: " + c.getId() + " | Name: " + c.getName()));
+					}
+					case "4" -> {
+						System.out.println("Shutting down... bye!");
+						running = false;
+					}
+					default -> System.out.println("Invalid action. Please try again.");
+
+				}
+			}
 		};
 	}
 }

@@ -22,4 +22,6 @@ public class MaterialUsage {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+
 }
