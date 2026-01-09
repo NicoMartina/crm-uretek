@@ -1,9 +1,12 @@
 package com.crmuretek.crmuretek;
 
 import com.crmuretek.crmuretek.models.Customer;
+import com.crmuretek.crmuretek.models.Job;
+import com.crmuretek.crmuretek.models.MaterialUsage;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.repositories.CustomerRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
+import com.crmuretek.crmuretek.repositories.MaterialUsageRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import com.crmuretek.crmuretek.services.VisitService;
 import org.springframework.boot.CommandLineRunner;
@@ -12,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -25,7 +29,8 @@ public class CrmuretekApplication {
 	public CommandLineRunner demo(
 			CustomerRepository customerRepository,
 			VisitService visitService,
-			JobRepository jobRepository) {
+			JobRepository jobRepository,
+			MaterialUsageRepository materialUsageRepository) {
 		return (args) -> {
 			Scanner scanner = new Scanner(System.in);
 			boolean running = true;
@@ -37,7 +42,8 @@ public class CrmuretekApplication {
 				System.out.println("1. [REPORT] View Unpaid Visits");
 				System.out.println("2. [DATA] Add New Customer");
 				System.out.println("3. [DATA] View All Customers");
-				System.out.println("4. [EXIT] Close System");
+				System.out.println("4. [DATA] MATERIAL USAGE");
+				System.out.println("5. [EXIT] Close System");
 				System.out.print("Select an option: ");
 
 				String input = scanner.nextLine();
@@ -66,6 +72,30 @@ public class CrmuretekApplication {
 						customerRepository.findAll().forEach(c -> System.out.println("ID: " + c.getId() + " | Name: " + c.getName()));
 					}
 					case "4" -> {
+						System.out.println("\n>>> RECORD MATERIAL USAGE <<<");
+						System.out.print("Enter Job ID: ");
+						Long jobId = Long.parseLong(scanner.nextLine());
+
+						Optional<Job> jobOpt = jobRepository.findById(jobId);
+
+						if (jobOpt.isPresent()) {
+							MaterialUsage usage = new MaterialUsage();
+							usage.setJob(jobOpt.get());
+
+							System.out.println("Quantity of ISO: ");
+							usage.setISOQuantity(Double.parseDouble(scanner.nextLine()));
+
+							System.out.println("Quantity of Resina: ");
+							usage.setResinaQuantity(Double.parseDouble(scanner.nextLine()));
+
+							materialUsageRepository.save(usage);
+							System.out.println("SUCCESS: Materials recorded for Job #" + jobId);
+
+						} else {
+							System.out.println("Error: Job ID not found.");
+						}
+					}
+					case "5" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
