@@ -42,8 +42,10 @@ public class CrmuretekApplication {
 				System.out.println("1. [REPORT] View Unpaid Visits");
 				System.out.println("2. [DATA] Add New Customer");
 				System.out.println("3. [DATA] View All Customers");
-				System.out.println("4. [DATA] MATERIAL USAGE");
-				System.out.println("5. [EXIT] Close System");
+				System.out.println("4. [DATA] Add  New Job");
+				System.out.println("5. [DATA] View All Jobs");
+				System.out.println("6. [DATA] Material Usage");
+				System.out.println("7. [EXIT] Close System");
 				System.out.print("Select an option: ");
 
 				String input = scanner.nextLine();
@@ -72,6 +74,27 @@ public class CrmuretekApplication {
 						customerRepository.findAll().forEach(c -> System.out.println("ID: " + c.getId() + " | Name: " + c.getName()));
 					}
 					case "4" -> {
+						System.out.println("\n>>> ADD NEW JOB <<<");
+						System.out.print("Enter Customer ID for this job: ");
+						Long customerId = Long.parseLong(scanner.nextLine());
+
+						customerRepository.findById(customerId).ifPresentOrElse(customer -> {
+							Job job = new Job();
+							job.setCustomer(customer);
+
+							System.out.print("Total Budget Amount: ");
+							job.setTotalBudgetAmount(Double.parseDouble(scanner.nextLine()));
+
+							jobRepository.save(job);
+							System.out.println("SUCCESS: Job created with ID: " + job.getId());
+						}, () -> System.out.println("ERROR: Customer ID not found"));
+					}
+					case "5" -> {
+						System.out.println("\n>>> JOB LIST <<<");
+						jobRepository.findAll().forEach(c -> System.out.println("ID: " + c.getId() + " | Job Status: " + c.getJobStatus()));
+					}
+
+					case "6" -> {
 						System.out.println("\n>>> RECORD MATERIAL USAGE <<<");
 						System.out.print("Enter Job ID: ");
 						Long jobId = Long.parseLong(scanner.nextLine());
@@ -95,7 +118,7 @@ public class CrmuretekApplication {
 							System.out.println("Error: Job ID not found.");
 						}
 					}
-					case "5" -> {
+					case "7" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
