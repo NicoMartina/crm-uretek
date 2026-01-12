@@ -45,7 +45,8 @@ public class CrmuretekApplication {
 				System.out.println("4. [DATA] Add  New Job");
 				System.out.println("5. [DATA] View All Jobs");
 				System.out.println("6. [DATA] Material Usage");
-				System.out.println("7. [EXIT] Close System");
+				System.out.println("7. [DATA] Update Customer Details");
+				System.out.println("8. [EXIT] Close System");
 				System.out.print("Select an option: ");
 
 				String input = scanner.nextLine();
@@ -62,12 +63,20 @@ public class CrmuretekApplication {
 						}
 					}
 					case "2" -> {
+						System.out.println("\n>>> ADD NEW CUSTOMER <<<");
+						Customer c = new Customer();
 						System.out.println("Enter Customer Name: ");
 						String name = scanner.nextLine();
-						Customer c = new Customer();
 						c.setName(name);
+						System.out.println("Enter Customer Email: ");
+						String email = scanner.nextLine();
+						c.setEmail(email);
+						System.out.println("Enter Customer Phone Number: ");
+						String number = scanner.nextLine();
+						c.setPhoneNumber(number);
+
 						customerRepository.save(c);
-						System.out.println("SUCCESS: " + name + " saved to database.");
+						System.out.println("SUCCESS: " + c.getName() + " saved with full contact details.");
 					}
 					case "3" -> {
 						System.out.println("\n>>> CUSTOMER LIST <<<");
@@ -91,7 +100,9 @@ public class CrmuretekApplication {
 					}
 					case "5" -> {
 						System.out.println("\n>>> JOB LIST <<<");
-						jobRepository.findAll().forEach(c -> System.out.println("ID: " + c.getId() + " | Job Status: " + c.getJobStatus()));
+						jobRepository.findAll().forEach(j -> System.out.println("ID: " + j.getId() +
+								" | Client: " + j.getCustomer().getName() +
+								" | Status: " + j.getJobStatus()));
 					}
 
 					case "6" -> {
@@ -119,6 +130,35 @@ public class CrmuretekApplication {
 						}
 					}
 					case "7" -> {
+						System.out.println("\n>>> UPDATE CUSTOMER DETAILS <<<");
+						System.out.print("Enter the ID of the customer to update: ");
+						Long id = Long.parseLong(scanner.nextLine());
+
+						// 1. Find existing customer
+						customerRepository.findById(id).ifPresentOrElse(existingCustomer -> {
+							System.out.println("Current details: " + existingCustomer.getName() +
+									" | " + existingCustomer.getEmail() +
+									" | " + existingCustomer.getPhoneNumber());
+
+							// 2. Ask for new details
+							System.out.println("Enter new name (leave blank to keep existing one)");
+							String name = scanner.nextLine();
+							if (!name.isBlank()) existingCustomer.setName(name);
+
+							System.out.println("Enter new email (leave blank to keep existing one)");
+							String email = scanner.nextLine();
+							if (!email.isBlank()) existingCustomer.setEmail(email);
+
+							System.out.println("Enter new email (leave blank t keep existing one)");
+							String number = scanner.nextLine();
+							if (!number.isBlank()) existingCustomer.setPhoneNumber(number);
+
+							customerRepository.save(existingCustomer);
+							System.out.println("SUCCESS: Customer #" + id + " has been updated.");
+						}, () -> System.out.println("ERROR: Customer ID not found"));
+					}
+
+					case "8" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
