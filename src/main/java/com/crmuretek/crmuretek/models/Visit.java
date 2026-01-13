@@ -18,16 +18,14 @@ public class Visit {
     private Customer customer;
 
     private LocalDate visitDate;
-
     private boolean isVisited;
-
     private boolean hasPaidVisitFee;
-
     private Double visitFeeAmount;
-
     private String paymentMethod;
-
     private String invoiceNumber;
+
+    @Enumerated(EnumType.STRING)
+    private visitStatus status = visitStatus.PENDING;
 
     @Column(columnDefinition = "TEXT")
     private String observations;

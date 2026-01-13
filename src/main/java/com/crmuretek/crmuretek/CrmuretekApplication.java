@@ -14,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -74,6 +75,14 @@ public class CrmuretekApplication {
 						System.out.println("Enter Customer Phone Number: ");
 						String number = scanner.nextLine();
 						c.setPhoneNumber(number);
+						System.out.println("Enter Customer Address: ");
+						String address = scanner.nextLine();
+						c.setAddress(address);
+						System.out.println("Enter the Client's Issue: ");
+						String issue = scanner.nextLine();
+						c.setIssueDescription(issue);
+						c.setContactDate(LocalDate.now());
+
 
 						customerRepository.save(c);
 						System.out.println("SUCCESS: " + c.getName() + " saved with full contact details.");
@@ -159,6 +168,25 @@ public class CrmuretekApplication {
 					}
 
 					case "8" -> {
+						System.out.println("\n>>> SEARCH CUSTOMER <<<");
+						System.out.print("Enter name to search: ");
+						String name = scanner.nextLine();
+
+						// We use a custom search logic  here
+						List<Customer> results = customerRepository.findAll().stream()
+								.filter(c -> c.getName()
+										.toLowerCase()
+										.contains(name.toLowerCase()))
+								.toList();
+
+						if (results.isEmpty()){
+							System.out.println("No customers found matching: " + name);
+						} else {
+							results.forEach(c -> System.out.println("ID: " + c.getId() + " | Name: " + c.getName()));
+						}
+					}
+
+					case "9" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
