@@ -24,6 +24,6 @@ public class Customer {
     private String address;
     private String issueDescription;
     private LocalDate contactDate;
-    private boolean requestVisit;
+    private Boolean requestVisit;
 
 }

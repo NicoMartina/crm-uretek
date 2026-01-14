@@ -109,9 +109,14 @@ public class CrmuretekApplication {
 					}
 					case "5" -> {
 						System.out.println("\n>>> JOB LIST <<<");
-						jobRepository.findAll().forEach(j -> System.out.println("ID: " + j.getId() +
-								" | Client: " + j.getCustomer().getName() +
-								" | Status: " + j.getJobStatus()));
+						jobRepository.findAll().forEach(j -> {
+							System.out.println("DEBUG:  Job #" + j.getId() + " is linked to customer ID: " + j.getCustomer().getId());
+							System.out.println("DEBUG: Customer address in memory: [" + j.getCustomer().getAddress());
+							System.out.println("ID: " + j.getId() +
+									" | Client: " + j.getCustomer().getName() +
+									" | Job Site: " + j.getCustomer().getAddress() +
+									" | Status: " + j.getJobStatus());
+						});
 					}
 
 					case "6" -> {
@@ -147,7 +152,9 @@ public class CrmuretekApplication {
 						customerRepository.findById(id).ifPresentOrElse(existingCustomer -> {
 							System.out.println("Current details: " + existingCustomer.getName() +
 									" | " + existingCustomer.getEmail() +
-									" | " + existingCustomer.getPhoneNumber());
+									" | " + existingCustomer.getPhoneNumber() +
+									" | " + existingCustomer.getAddress() +
+									" | " + existingCustomer.getIssueDescription());
 
 							// 2. Ask for new details
 							System.out.println("Enter new name (leave blank to keep existing one)");
@@ -158,9 +165,17 @@ public class CrmuretekApplication {
 							String email = scanner.nextLine();
 							if (!email.isBlank()) existingCustomer.setEmail(email);
 
-							System.out.println("Enter new email (leave blank t keep existing one)");
+							System.out.println("Enter new Number (leave blank to keep existing one)");
 							String number = scanner.nextLine();
 							if (!number.isBlank()) existingCustomer.setPhoneNumber(number);
+
+							System.out.println("Enter new Address (leave blank to keep existing one)");
+							String address = scanner.nextLine();
+							if (!address.isBlank()) existingCustomer.setAddress(address);
+
+							System.out.println("Change issue description (leave blank to keep existing one)");
+							String issue = scanner.nextLine();
+							if (!issue.isBlank()) existingCustomer.setIssueDescription(issue);
 
 							customerRepository.save(existingCustomer);
 							System.out.println("SUCCESS: Customer #" + id + " has been updated.");
