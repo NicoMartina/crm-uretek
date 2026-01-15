@@ -127,29 +127,42 @@ public class CrmuretekApplication {
 					}
 
 					case "6" -> {
-						System.out.println("\n>>> RECORD MATERIAL USAGE <<<");
-						System.out.print("Enter Job ID: ");
-						Long jobId = Long.parseLong(scanner.nextLine());
+						System.out.println("\n>>> SELECT A JOB TO RECORD MATERIALS <<<");
 
+						// 1. SHOW THE JOBS FIRST (The "Menu")
+						jobRepository.findAll().forEach(j -> System.out.printf(
+								"JOB ID: %-4d | Client: %-15s | Status: %-10s%n",
+								j.getId(),
+								j.getCustomer().getName(),
+								j.getJobStatus()
+						));
+
+						// 2. NOW ASK FOR THE ID
+						System.out.println("\nEnter Job ID: ");
+						String jobIdInput = scanner.nextLine();
+
+						// 3. DO THE LOGIC
+						Long jobId = Long.parseLong(jobIdInput);
 						Optional<Job> jobOpt = jobRepository.findById(jobId);
 
 						if (jobOpt.isPresent()) {
 							MaterialUsage usage = new MaterialUsage();
 							usage.setJob(jobOpt.get());
 
-							System.out.println("Quantity of ISO: ");
+							System.out.print("Quantity of ISO (kg): ");
 							usage.setISOQuantity(Double.parseDouble(scanner.nextLine()));
 
-							System.out.println("Quantity of Resina: ");
+							System.out.print("Quantity of Resina (kg): ");
 							usage.setResinaQuantity(Double.parseDouble(scanner.nextLine()));
 
 							materialUsageRepository.save(usage);
 							System.out.println("SUCCESS: Materials recorded for Job #" + jobId);
 
 						} else {
-							System.out.println("Error: Job ID not found.");
+							System.out.println("Error: Job ID [" + jobId + "] not found.");
 						}
 					}
+
 					case "7" -> {
 						System.out.println("\n>>> UPDATE CUSTOMER DETAILS <<<");
 						System.out.print("Enter the ID of the customer to update: ");
