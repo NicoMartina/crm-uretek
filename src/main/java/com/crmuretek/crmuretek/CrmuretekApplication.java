@@ -110,6 +110,9 @@ public class CrmuretekApplication {
 							System.out.print("Total Budget Amount: ");
 							job.setTotalBudgetAmount(Double.parseDouble(scanner.nextLine()));
 
+							System.out.println("Estimated Material (kg): ");
+							job.setEstimateMaterialKg(scanner.nextDouble());
+
 							jobRepository.save(job);
 							System.out.println("SUCCESS: Job created with ID: " + job.getId());
 						}, () -> System.out.println("ERROR: Customer ID not found"));
@@ -117,12 +120,30 @@ public class CrmuretekApplication {
 					case "5" -> {
 						System.out.println("\n>>> JOB LIST <<<");
 						jobRepository.findAll().forEach(j -> {
-							System.out.println("DEBUG:  Job #" + j.getId() + " is linked to customer ID: " + j.getCustomer().getId());
-							System.out.println("DEBUG: Customer address in memory: [" + j.getCustomer().getAddress());
-							System.out.println("ID: " + j.getId() +
-									" | Client: " + j.getCustomer().getName() +
-									" | Job Site: " + j.getCustomer().getAddress() +
-									" | Status: " + j.getJobStatus());
+							try {
+								// 1. Calculate the Total used so far
+								double totalActual = j.getMaterialUsages().stream()
+										.mapToDouble(m -> (m.getISOQuantity() != null ?  m.getISOQuantity() : 0.0)
+												+ (m.getResinaQuantity() != null ? m.getResinaQuantity() : 0.0))
+										.sum();
+
+								// 2. Safely Calculating the Estimate and  "Gap" (Difference)
+								Double estimateValue = j.getEstimateMaterialKg();
+								double estimate = (estimateValue != null) ?  estimateValue : 0.0;
+								double gap = estimate - totalActual;
+
+								// 3. Safe Strings
+								String name = (j.getCustomer() != null ? j.getCustomer().getName() : "Unknown");
+								String address = (j.getCustomer() != null && j.getCustomer().getAddress() != null ? j.getCustomer().getAddress() : "No Address");
+								String status = (j.getCustomer() != null ? j.getJobStatus() : "PENDING");
+
+
+								// 4. The Final Print
+								System.out.printf("| ID: %-3d | Client: %-15s | Site: %-20s | Status: %-8s | Est: %6.1fkg | Act: %6.1fkg | Diff: %6.1fkg |%n",
+										j.getId(), name, address, status, estimate, totalActual, gap);
+							} catch (Exception e) {
+								System.out.println("Error printing  Job ID " + j.getId() + ": " + e.getMessage());
+							}
 						});
 					}
 

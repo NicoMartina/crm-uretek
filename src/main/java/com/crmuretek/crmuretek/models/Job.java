@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "jobs")
@@ -17,6 +18,10 @@ public class Job {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<MaterialUsage> materialUsages;
+
+    private Double estimateMaterialKg; // estimation of kg to use in the job
     private String acceptedBudgetNumber; // numero de presupesto aceptado
     private Double totalBudgetAmount;    // monto del presupuesto aceptado
 
