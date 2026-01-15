@@ -88,8 +88,15 @@ public class CrmuretekApplication {
 						System.out.println("SUCCESS: " + c.getName() + " saved with full contact details.");
 					}
 					case "3" -> {
+
 						System.out.println("\n>>> CUSTOMER LIST <<<");
-						customerRepository.findAll().forEach(c -> System.out.println("ID: " + c.getId() + " | Name: " + c.getName()));
+						customerRepository.findAll().forEach(customer -> System.out.printf("| ID: %-4d | Name: %-20s | Email: %-25s | Address: %-30s |%n",
+								customer.getId(),
+								customer.getName(),
+								customer.getEmail(),
+								customer.getAddress()
+						));
+
 					}
 					case "4" -> {
 						System.out.println("\n>>> ADD NEW JOB <<<");
