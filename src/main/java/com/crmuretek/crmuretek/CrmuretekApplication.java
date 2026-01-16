@@ -1,9 +1,6 @@
 package com.crmuretek.crmuretek;
 
-import com.crmuretek.crmuretek.models.Customer;
-import com.crmuretek.crmuretek.models.Job;
-import com.crmuretek.crmuretek.models.MaterialUsage;
-import com.crmuretek.crmuretek.models.Visit;
+import com.crmuretek.crmuretek.models.*;
 import com.crmuretek.crmuretek.repositories.CustomerRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.MaterialUsageRepository;
@@ -111,7 +108,14 @@ public class CrmuretekApplication {
 							job.setTotalBudgetAmount(Double.parseDouble(scanner.nextLine()));
 
 							System.out.println("Estimated Material (kg): ");
-							job.setEstimateMaterialKg(scanner.nextDouble());
+							job.setEstimateMaterialKg(Double.parseDouble(scanner.nextLine()));
+
+							System.out.println("Enter status (LEAD, QUOTED, IN_PROGRESS, PAID, ETC): ");
+							String statusInput = scanner.nextLine().toUpperCase().trim();
+
+
+							job.setJobStatus(JobStatus.valueOf(statusInput));
+
 
 							jobRepository.save(job);
 							System.out.println("SUCCESS: Job created with ID: " + job.getId());
@@ -135,12 +139,21 @@ public class CrmuretekApplication {
 								// 3. Safe Strings
 								String name = (j.getCustomer() != null ? j.getCustomer().getName() : "Unknown");
 								String address = (j.getCustomer() != null && j.getCustomer().getAddress() != null ? j.getCustomer().getAddress() : "No Address");
-								String status = (j.getCustomer() != null ? j.getJobStatus() : "PENDING");
+								String status = (j.getJobStatus() != null ? j.getJobStatus().name() : "PENDING");
 
 
 								// 4. The Final Print
-								System.out.printf("| ID: %-3d | Client: %-15s | Site: %-20s | Status: %-8s | Est: %6.1fkg | Act: %6.1fkg | Diff: %6.1fkg |%n",
-										j.getId(), name, address, status, estimate, totalActual, gap);
+								System.out.printf("| ID: %-3d | Client: %-15s | Status: %-10s | Site: %-20s | Budget: $%-9.2f | Est: %6.1fkg | Act: %6.1fkg | Diff: %6.1fkg |%n",
+										j.getId(),
+										name,
+										status,
+										address,
+										(j.getTotalBudgetAmount() != null ? j.getTotalBudgetAmount() : 0.0),
+										estimate,
+										totalActual,
+										gap
+								);
+
 							} catch (Exception e) {
 								System.out.println("Error printing  Job ID " + j.getId() + ": " + e.getMessage());
 							}

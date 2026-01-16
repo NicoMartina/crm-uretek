@@ -31,7 +31,9 @@ public class Job {
     private LocalDate downPaymentAmountDate; // fecha de pago del anticipo
 
     private LocalDate workDate;   // fecha del trabajo
-    private String jobStatus;     //status del trabajo
+
+    @Enumerated(EnumType.STRING)
+    private JobStatus jobStatus;     //status del trabajo
 
     //Final Balance (Saldo)
     private Double balanceAmount;  // monto del saldo
