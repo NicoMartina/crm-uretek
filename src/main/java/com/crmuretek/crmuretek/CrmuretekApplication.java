@@ -19,9 +19,23 @@ import java.util.Scanner;
 @SpringBootApplication
 public class CrmuretekApplication {
 
+
 	public static void main(String[] args) {
 		SpringApplication.run(CrmuretekApplication.class, args);
 	}
+
+	private static double readDoubleSafely(Scanner scanner, String prompt){
+		while (true) {
+			try {
+				System.out.println(prompt);
+				return Double.parseDouble(scanner.nextLine());
+
+			} catch (NumberFormatException e){
+				System.out.println("Error: That is not a valid number. Please try again");
+			}
+		}
+	}
+
 
 	@Bean
 	public CommandLineRunner demo(
@@ -105,10 +119,10 @@ public class CrmuretekApplication {
 							job.setCustomer(customer);
 
 							System.out.print("Total Budget Amount: ");
-							job.setTotalBudgetAmount(Double.parseDouble(scanner.nextLine()));
+							job.setTotalBudgetAmount(readDoubleSafely(scanner, "Total Budget Amount: $"));
 
 							System.out.println("Estimated Material (kg): ");
-							job.setEstimateMaterialKg(Double.parseDouble(scanner.nextLine()));
+							job.setEstimateMaterialKg(readDoubleSafely(scanner, "Estimated Material (kg): "));
 
 							System.out.println("Enter status (LEAD, QUOTED, IN_PROGRESS, PAID, ETC): ");
 							String statusInput = scanner.nextLine().toUpperCase().trim();
@@ -143,11 +157,10 @@ public class CrmuretekApplication {
 
 
 								// 4. The Final Print
-								System.out.printf("| ID: %-3d | Client: %-15s | Status: %-10s | Site: %-20s | Budget: $%-9.2f | Est: %6.1fkg | Act: %6.1fkg | Diff: %6.1fkg |%n",
+								System.out.printf("| ID: %-3d | Client: %-15s | Status: %-10s| Budget: $%-9.2f | Est: %6.1fkg | Act: %6.1fkg | Diff: %6.1fkg |%n",
 										j.getId(),
 										name,
 										status,
-										address,
 										(j.getTotalBudgetAmount() != null ? j.getTotalBudgetAmount() : 0.0),
 										estimate,
 										totalActual,
