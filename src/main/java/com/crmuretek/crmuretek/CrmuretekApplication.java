@@ -269,6 +269,42 @@ public class CrmuretekApplication {
 					}
 
 					case "9" -> {
+						System.out.println("\n>>> JOB INSPECTOR <<<");
+						System.out.println("Enter job ID to view full history: ");
+						Long jobId = Long.parseLong(scanner.nextLine());
+
+						jobRepository.findById(jobId).ifPresentOrElse(j -> {
+							System.out.println("========================================");
+							System.out.printf("DETAILS FOR JOB ID #%d%n", j.getId());
+							System.out.println("========================================");
+							System.out.println("CLIENT: 		   " + j.getCustomer().getName());
+							System.out.println("STATUS: 		   " + j.getJobStatus());
+							System.out.println("SITE ADDRESS:	   " + j.getCustomer().getAddress());
+							System.out.printf("TOTAL BUDGET: 	   $%.2f%n", j.getTotalBudgetAmount());
+							System.out.printf("ESTIMATED MATERIAL: %.1f kg%n", j.getEstimateMaterialKg());
+
+							System.out.println("\n--- MATERIAL LOG ---");
+							if (j.getMaterialUsages().isEmpty()) {
+								System.out.println("No materials recorded for this job");
+							} else {
+								// breakdown of every visit
+								j.getMaterialUsages().forEach( m -> {
+									System.out.printf(">> ISO: %5.1f kg | Resina: %5.1f kg%n",
+											m.getISOQuantity(), m.getResinaQuantity());
+								});
+
+								// the math summary
+								double totalIso = j.getMaterialUsages().stream().mapToDouble(m -> m.getISOQuantity()).sum();
+								double totalResina = j.getMaterialUsages().stream().mapToDouble(m -> m.getResinaQuantity()).sum();
+								System.out.println("--------------------");
+								System.out.printf("TOTAL USED: %.1f kg%n", (totalIso + totalResina));
+								System.out.printf("REMAINING: %.1f kg%n", (j.getEstimateMaterialKg() - (totalIso - totalResina)));
+							}
+							System.out.println("========================================\n");
+						}, () -> System.out.println("(!) Error: Job ID " + jobId + " not found."));
+					}
+
+					case "10" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
