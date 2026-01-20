@@ -44,4 +44,5 @@ public class Job {
 
     @Column(columnDefinition = "TEXT")
     private String observations;
+
 }

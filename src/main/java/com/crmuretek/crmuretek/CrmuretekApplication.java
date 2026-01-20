@@ -9,6 +9,7 @@ import com.crmuretek.crmuretek.services.VisitService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cglib.core.Local;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
@@ -58,7 +59,10 @@ public class CrmuretekApplication {
 				System.out.println("5. [DATA] View All Jobs");
 				System.out.println("6. [DATA] Material Usage");
 				System.out.println("7. [DATA] Update Customer Details");
-				System.out.println("8. [EXIT] Close System");
+				System.out.println("8. [DATA] Search for a customer");
+				System.out.println("9. [EXIT] Search for Job");
+				System.out.println("10. [DATA] Record Payment Method");
+				System.out.println("11. [EXIT] Exit");
 				System.out.print("Select an option: ");
 
 				String input = scanner.nextLine();
@@ -142,7 +146,7 @@ public class CrmuretekApplication {
 								// 1. Calculate the Total used so far
 								double totalActual = j.getMaterialUsages().stream()
 										.mapToDouble(m -> (m.getISOQuantity() != null ?  m.getISOQuantity() : 0.0)
-												+ (m.getResinaQuantity() != null ? m.getResinaQuantity() : 0.0))
+												+ (m.getResinQuantity() != null ? m.getResinQuantity() : 0.0))
 										.sum();
 
 								// 2. Safely Calculating the Estimate and  "Gap" (Difference)
@@ -174,40 +178,50 @@ public class CrmuretekApplication {
 					}
 
 					case "6" -> {
-						System.out.println("\n>>> SELECT A JOB TO RECORD MATERIALS <<<");
+						try{
+							System.out.println("\n>>> SELECT A JOB TO RECORD MATERIALS <<<");
 
-						// 1. SHOW THE JOBS FIRST (The "Menu")
-						jobRepository.findAll().forEach(j -> System.out.printf(
-								"JOB ID: %-4d | Client: %-15s | Status: %-10s%n",
-								j.getId(),
-								j.getCustomer().getName(),
-								j.getJobStatus()
-						));
+							// 1. SHOW THE JOBS FIRST (The "Menu")
+							jobRepository.findAll().forEach(j -> System.out.printf(
+									"JOB ID: %-4d | Client: %-15s | Status: %-10s%n",
+									j.getId(),
+									j.getCustomer().getName(),
+									j.getJobStatus()
+							));
 
-						// 2. NOW ASK FOR THE ID
-						System.out.println("\nEnter Job ID: ");
-						String jobIdInput = scanner.nextLine();
+							// 2. NOW ASK FOR THE ID
+							System.out.println("\nEnter Job ID: ");
+							Long jobId = Long.parseLong(scanner.nextLine());
 
-						// 3. DO THE LOGIC
-						Long jobId = Long.parseLong(jobIdInput);
-						Optional<Job> jobOpt = jobRepository.findById(jobId);
+							jobRepository.findById(jobId).ifPresentOrElse(job -> {
+								double totalKg = readDoubleSafely(scanner, "How many total Kg were used on this job? ");
 
-						if (jobOpt.isPresent()) {
-							MaterialUsage usage = new MaterialUsage();
-							usage.setJob(jobOpt.get());
+								// Calculate the ratio
+								double isoPortion = totalKg * .63;
+								double resinPortion = totalKg * .37;
 
-							System.out.print("Quantity of ISO (kg): ");
-							usage.setISOQuantity(Double.parseDouble(scanner.nextLine()));
+								// Create the record
+								MaterialUsage usage = new MaterialUsage();
+								usage.setJob(job);
+								usage.setISOQuantity(isoPortion);
+								usage.setResinQuantity(resinPortion);
+								usage.setUsageDate(LocalDate.now());
 
-							System.out.print("Quantity of Resina (kg): ");
-							usage.setResinaQuantity(Double.parseDouble(scanner.nextLine()));
+								materialUsageRepository.save(usage);
+								System.out.println("-----------------------------------------");
+								System.out.println("SUCCESS: Materials Recorded");
+								System.out.printf("TOTAL KG: %.1f kg%n", totalKg);
+								System.out.printf("ISO:      %.1f kg%n", isoPortion);
+								System.out.printf("RESINA:   %.1f kg%n", resinPortion);
+								System.out.println("-----------------------------------------");
 
-							materialUsageRepository.save(usage);
-							System.out.println("SUCCESS: Materials recorded for Job #" + jobId);
-
-						} else {
-							System.out.println("Error: Job ID [" + jobId + "] not found.");
+							}, () -> System.out.println("(!) Error: Job ID not  found."));
+						} catch (Exception e){
+							System.out.println("Error" + e.getMessage());
 						}
+
+
+
 					}
 
 					case "7" -> {
@@ -269,42 +283,76 @@ public class CrmuretekApplication {
 					}
 
 					case "9" -> {
-						System.out.println("\n>>> JOB INSPECTOR <<<");
-						System.out.println("Enter job ID to view full history: ");
-						Long jobId = Long.parseLong(scanner.nextLine());
+						try{
+							System.out.println("\n>>> JOB INSPECTOR <<<");
+							System.out.println("Enter job ID to view full history: ");
+							Long jobId = Long.parseLong(scanner.nextLine());
 
-						jobRepository.findById(jobId).ifPresentOrElse(j -> {
-							System.out.println("========================================");
-							System.out.printf("DETAILS FOR JOB ID #%d%n", j.getId());
-							System.out.println("========================================");
-							System.out.println("CLIENT: 		   " + j.getCustomer().getName());
-							System.out.println("STATUS: 		   " + j.getJobStatus());
-							System.out.println("SITE ADDRESS:	   " + j.getCustomer().getAddress());
-							System.out.printf("TOTAL BUDGET: 	   $%.2f%n", j.getTotalBudgetAmount());
-							System.out.printf("ESTIMATED MATERIAL: %.1f kg%n", j.getEstimateMaterialKg());
+							jobRepository.findById(jobId).ifPresentOrElse(j -> {
+								System.out.println("========================================");
+								System.out.printf("DETAILS FOR JOB ID #%d%n", j.getId());
+								System.out.println("========================================");
+								System.out.println("CLIENT: 		   " + j.getCustomer().getName());
+								System.out.println("STATUS: 		   " + j.getJobStatus());
+								System.out.println("SITE ADDRESS:	   " + j.getCustomer().getAddress());
+								System.out.printf("TOTAL BUDGET: 	   $%.2f%n", j.getTotalBudgetAmount());
+								System.out.printf("ESTIMATED MATERIAL: %.1f kg%n", j.getEstimateMaterialKg());
 
-							System.out.println("\n--- MATERIAL LOG ---");
-							if (j.getMaterialUsages().isEmpty()) {
-								System.out.println("No materials recorded for this job");
-							} else {
-								// breakdown of every visit
-								j.getMaterialUsages().forEach( m -> {
-									System.out.printf(">> ISO: %5.1f kg | Resina: %5.1f kg%n",
-											m.getISOQuantity(), m.getResinaQuantity());
-								});
+								System.out.println("\n--- MATERIAL LOG ---");
+								if (j.getMaterialUsages().isEmpty()) {
+									System.out.println("No materials recorded for this job");
+								} else {
+									// breakdown of every visit
+									j.getMaterialUsages().forEach( m -> {
+										System.out.printf(">> ISO: %5.1f kg | Resina: %5.1f kg%n",
+												m.getISOQuantity(), m.getResinQuantity());
+									});
 
-								// the math summary
-								double totalIso = j.getMaterialUsages().stream().mapToDouble(m -> m.getISOQuantity()).sum();
-								double totalResina = j.getMaterialUsages().stream().mapToDouble(m -> m.getResinaQuantity()).sum();
-								System.out.println("--------------------");
-								System.out.printf("TOTAL USED: %.1f kg%n", (totalIso + totalResina));
-								System.out.printf("REMAINING: %.1f kg%n", (j.getEstimateMaterialKg() - (totalIso - totalResina)));
+									// the math summary
+									double estimate = (j.getEstimateMaterialKg()!= null ? j.getEstimateMaterialKg() : 0.0);
+
+									double totalUsed = j.getMaterialUsages().stream()
+											.mapToDouble(m -> (m.getISOQuantity() != null ? m.getISOQuantity() : 0.0) + (m.getResinQuantity() != null ? m.getResinQuantity() : 0.0))
+											.sum();
+
+									double remaining = estimate - totalUsed;
+									System.out.println("--------------------");
+									System.out.printf("TOTAL USED: %.1f kg%n", totalUsed);
+									System.out.printf("REMAINING: %.1f kg%n", remaining);
+								}
+								System.out.println("========================================\n");
+							}, () -> System.out.println("(!) Error: Job ID " + jobId + " not found."));
+
+						} catch (Exception e) {
+							System.out.println("(!) Error Inspector: " + e.getMessage());
+						}
+					}
+					case "10" -> {
+						System.out.println("Enter job ID to record payment: ");
+						Long id = Long.parseLong(scanner.nextLine());
+
+						jobRepository.findById(id).ifPresentOrElse(job -> {
+							System.out.println("1. Record Down Payment");
+							System.out.println("2. Record Balance Payment");
+							String choice = scanner.nextLine();
+
+							if (choice.equals("1")) {
+								job.setDownPaymentAmount(readDoubleSafely(scanner, "Enter Down Payment: "));
+								job.setDownPaymentAmountDate(LocalDate.now());
+								System.out.println("Payment Method  (Cash, Transfer, etc.): ");
+								job.setDownPaymentMethod(scanner.nextLine());
+							} else if ( choice.equals("2")) {
+								job.setBalanceAmount(readDoubleSafely(scanner, "Enter Balance Payment: "));
+								job.setBalancePaymentDate(LocalDate.now());
+								System.out.println("Payment Method (Cash, Transfer, etc.): ");
+								job.setBalancePaymentMethod(scanner.nextLine());
 							}
-							System.out.println("========================================\n");
-						}, () -> System.out.println("(!) Error: Job ID " + jobId + " not found."));
+							jobRepository.save(job);
+							System.out.println("SUCCESS: Payment Recorded.");
+						}, () -> System.out.println("Error: Job ID was not found."));
 					}
 
-					case "10" -> {
+					case "11" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
