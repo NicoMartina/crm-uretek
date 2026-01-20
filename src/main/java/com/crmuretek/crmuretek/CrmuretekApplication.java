@@ -1,10 +1,7 @@
 package com.crmuretek.crmuretek;
 
 import com.crmuretek.crmuretek.models.*;
-import com.crmuretek.crmuretek.repositories.CustomerRepository;
-import com.crmuretek.crmuretek.repositories.JobRepository;
-import com.crmuretek.crmuretek.repositories.MaterialUsageRepository;
-import com.crmuretek.crmuretek.repositories.VisitRepository;
+import com.crmuretek.crmuretek.repositories.*;
 import com.crmuretek.crmuretek.services.VisitService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -43,7 +40,8 @@ public class CrmuretekApplication {
 			CustomerRepository customerRepository,
 			VisitService visitService,
 			JobRepository jobRepository,
-			MaterialUsageRepository materialUsageRepository) {
+			MaterialUsageRepository materialUsageRepository,
+			ExpenseRepository expenseRepository) {
 		return (args) -> {
 			Scanner scanner = new Scanner(System.in);
 			boolean running = true;
@@ -62,7 +60,8 @@ public class CrmuretekApplication {
 				System.out.println("8. [DATA] Search for a customer");
 				System.out.println("9. [EXIT] Search for Job");
 				System.out.println("10. [DATA] Record Payment Method");
-				System.out.println("11. [EXIT] Exit");
+				System.out.println("11. [DATA] Business Health Summary");
+				System.out.println("12. [EXIT] Exit");
 				System.out.print("Select an option: ");
 
 				String input = scanner.nextLine();
@@ -351,8 +350,26 @@ public class CrmuretekApplication {
 							System.out.println("SUCCESS: Payment Recorded.");
 						}, () -> System.out.println("Error: Job ID was not found."));
 					}
-
 					case "11" -> {
+						// total income + all balances
+						double totalIncome = jobRepository.findAll().stream()
+								.mapToDouble( job -> (job.getDownPaymentAmount() != null ? job.getDownPaymentAmount() : 0.0)
+								                        + (job.getBalanceAmount() != null ? job.getBalanceAmount() : 0.0))
+								.sum();
+
+						double totalExpenses = expenseRepository.findAll().stream()
+								.mapToDouble(e -> e.getAmount() != null ? e.getAmount() : 0.0)
+								.sum();
+
+						System.out.println("\n========== BUSINESS HEALTH REPORT ============");
+						System.out.printf("TOTAL REVENUE: (paid):  $%.2f%n", totalIncome);
+						System.out.printf("TOTAL EXPENSES:         $%.2f%n", totalExpenses);
+						System.out.println("--------------------------------------------------");
+						System.out.printf("NET PROFIT:             $%.2f%n", (totalIncome - totalExpenses));
+						System.out.println("==================================================\n");
+					}
+
+					case "12" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}
