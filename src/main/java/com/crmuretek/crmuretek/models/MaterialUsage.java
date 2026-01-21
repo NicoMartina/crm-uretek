@@ -1,5 +1,7 @@
 package com.crmuretek.crmuretek.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +17,7 @@ public class MaterialUsage {
 
     @ManyToOne
     @JoinColumn(name = "job_id")
+    @JsonBackReference("job-materials")
     private Job job;
 
     private Double iSOQuantity;

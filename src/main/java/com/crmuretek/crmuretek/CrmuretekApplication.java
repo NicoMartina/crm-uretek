@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cglib.core.Local;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +34,18 @@ public class CrmuretekApplication {
 				System.out.println("Error: That is not a valid number. Please try again");
 			}
 		}
+	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/api/**")
+						.allowedOrigins("http://localhost:5173")
+						.allowedMethods("GET", "POST", "PUT", "DELETE");
+			}
+		};
 	}
 
 
@@ -60,8 +74,9 @@ public class CrmuretekApplication {
 				System.out.println("8. [DATA] Search for a customer");
 				System.out.println("9. [EXIT] Search for Job");
 				System.out.println("10. [DATA] Record Payment Method");
-				System.out.println("11. [DATA] Business Health Summary");
-				System.out.println("12. [EXIT] Exit");
+				System.out.println("11. [DATA] Record New Expense");
+				System.out.println("12. [DATA] Business Health Summary");
+				System.out.println("13. [EXIT] Exit");
 				System.out.print("Select an option: ");
 
 				String input = scanner.nextLine();
@@ -121,10 +136,8 @@ public class CrmuretekApplication {
 							Job job = new Job();
 							job.setCustomer(customer);
 
-							System.out.print("Total Budget Amount: ");
-							job.setTotalBudgetAmount(readDoubleSafely(scanner, "Total Budget Amount: $"));
+							job.setTotalBudgetAmount(readDoubleSafely(scanner, "Total Budget Amount:"));
 
-							System.out.println("Estimated Material (kg): ");
 							job.setEstimateMaterialKg(readDoubleSafely(scanner, "Estimated Material (kg): "));
 
 							System.out.println("Enter status (LEAD, QUOTED, IN_PROGRESS, PAID, ETC): ");
@@ -351,6 +364,27 @@ public class CrmuretekApplication {
 						}, () -> System.out.println("Error: Job ID was not found."));
 					}
 					case "11" -> {
+						System.out.println("\n>>> RECORD NEW EXPENSE <<<");
+						Expense e = new Expense();
+
+						System.out.println("Description: ");
+						e.setDescription(scanner.nextLine());
+
+						e.setAmount(readDoubleSafely(scanner, "Amount: $"));
+						e.setExpenseDate(LocalDate.now());
+
+						System.out.println("Category: marketing, payroll, equipment, materials, fuel, overhead");
+						System.out.println("Select category: ");
+						try {
+							String catInput = scanner.nextLine().toUpperCase().trim();
+							e.setCategory(ExpenseCategory.valueOf(catInput));
+							expenseRepository.save(e);
+							System.out.println("SUCCESS:  Expense saved to database.");
+						} catch (IllegalArgumentException err) {
+							System.out.println(" Error:  Invalid Category.  Expense not saved");
+						}
+					}
+					case "12" -> {
 						// total income + all balances
 						double totalIncome = jobRepository.findAll().stream()
 								.mapToDouble( job -> (job.getDownPaymentAmount() != null ? job.getDownPaymentAmount() : 0.0)
@@ -361,7 +395,7 @@ public class CrmuretekApplication {
 								.mapToDouble(e -> e.getAmount() != null ? e.getAmount() : 0.0)
 								.sum();
 
-						System.out.println("\n========== BUSINESS HEALTH REPORT ============");
+						System.out.println("\n==========  FINANCIAL REPORT ============");
 						System.out.printf("TOTAL REVENUE: (paid):  $%.2f%n", totalIncome);
 						System.out.printf("TOTAL EXPENSES:         $%.2f%n", totalExpenses);
 						System.out.println("--------------------------------------------------");
@@ -369,7 +403,7 @@ public class CrmuretekApplication {
 						System.out.println("==================================================\n");
 					}
 
-					case "12" -> {
+					case "13" -> {
 						System.out.println("Shutting down... bye!");
 						running = false;
 					}

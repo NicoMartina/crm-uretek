@@ -1,5 +1,8 @@
 package com.crmuretek.crmuretek.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,9 +19,11 @@ public class Job {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
+    @JsonBackReference("customer-jobs")
     private Customer customer;
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference("job-materials")
     private List<MaterialUsage> materialUsages;
 
     private Double estimateMaterialKg; // estimation of kg to use in the job
