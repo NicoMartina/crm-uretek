@@ -13,7 +13,7 @@ public class JobService {
 
     private Double calculatePendingBalance(Job job){
         // Defensive coding: Check if values are null to avoid "NullPointerException"
-        Double total = (job.getTotalBudgetAmount() != null) ? job.getTotalBudgetAmount() : 0.0;
+        Double total = (job.getTotalAmount() != null) ? job.getTotalAmount() : 0.0;
         Double paid = (job.getDownPaymentAmount() != null) ? job.getDownPaymentAmount() : 0.0;
 
         return total - paid;

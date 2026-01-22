@@ -42,7 +42,7 @@ public class CrmuretekApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/api/**")
-						.allowedOrigins("http://localhost:5173")
+						.allowedOrigins("http://localhost:5174")
 						.allowedMethods("GET", "POST", "PUT", "DELETE");
 			}
 		};
@@ -136,7 +136,7 @@ public class CrmuretekApplication {
 							Job job = new Job();
 							job.setCustomer(customer);
 
-							job.setTotalBudgetAmount(readDoubleSafely(scanner, "Total Budget Amount:"));
+							job.setTotalAmount(readDoubleSafely(scanner, "Total Budget Amount:"));
 
 							job.setEstimateMaterialKg(readDoubleSafely(scanner, "Estimated Material (kg): "));
 
@@ -177,7 +177,7 @@ public class CrmuretekApplication {
 										j.getId(),
 										name,
 										status,
-										(j.getTotalBudgetAmount() != null ? j.getTotalBudgetAmount() : 0.0),
+										(j.getTotalAmount() != null ? j.getTotalAmount() : 0.0),
 										estimate,
 										totalActual,
 										gap
@@ -307,7 +307,7 @@ public class CrmuretekApplication {
 								System.out.println("CLIENT: 		   " + j.getCustomer().getName());
 								System.out.println("STATUS: 		   " + j.getJobStatus());
 								System.out.println("SITE ADDRESS:	   " + j.getCustomer().getAddress());
-								System.out.printf("TOTAL BUDGET: 	   $%.2f%n", j.getTotalBudgetAmount());
+								System.out.printf("TOTAL BUDGET: 	   $%.2f%n", j.getTotalAmount());
 								System.out.printf("ESTIMATED MATERIAL: %.1f kg%n", j.getEstimateMaterialKg());
 
 								System.out.println("\n--- MATERIAL LOG ---");
