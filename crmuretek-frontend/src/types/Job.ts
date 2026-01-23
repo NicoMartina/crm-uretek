@@ -1,11 +1,8 @@
-// src/types/Job.ts
 export interface Job {
-  customerName: String;
   id: number;
-  jobStatus: string;
+  customerName: string; // Add this line!
   totalAmount: number;
-  estimateMaterialKg: number;
-  downPaymentAmount: number;
-  downPaymentMethod: number;
   balanceAmount: number;
+  estimateMaterialKg: number;
+  jobStatus: string;
 }
