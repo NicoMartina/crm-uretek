@@ -1,29 +1,34 @@
-package com.crmuretek.crmuretek.controllers;
+    package com.crmuretek.crmuretek.controllers;
 
-import com.crmuretek.crmuretek.models.Job;
-import com.crmuretek.crmuretek.repositories.JobRepository;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+    import com.crmuretek.crmuretek.models.Job;
+    import com.crmuretek.crmuretek.repositories.JobRepository;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+    import java.util.List;
 
-@RestController
-@RequestMapping("/api/jobs")
-// This part is VITAL - it tells Java to let your React app (5173) in
-@CrossOrigin(origins = "https://localhost:5174")
-public class JobController {
+    @RestController
+    @RequestMapping("/api/jobs")
+    // This part is VITAL - it tells Java to let your React app (5173) in
+    @CrossOrigin(origins = "https://localhost:5173")
+    public class JobController {
 
-    private final JobRepository jobRepository;
+        @Autowired
+        private final JobRepository jobRepository;
 
-    public JobController(JobRepository jobRepository){
-        this.jobRepository = jobRepository;
+        public JobController(JobRepository jobRepository){
+            this.jobRepository = jobRepository;
+        }
+
+        @GetMapping
+        public List<Job> getAllJobs(){
+            return jobRepository.findAll();
+        }
+
+        @PostMapping
+        public Job createJob(@RequestBody Job job) {
+            // This will save the new job and return it back to React
+            return jobRepository.save(job);
+        }
+
     }
-
-    @GetMapping
-    public List<Job> getAllJobs(){
-        return jobRepository.findAll();
-    }
-
-}
