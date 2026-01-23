@@ -30,9 +30,6 @@ function App() {
         </button>
       </header>
 
-      {/* The Jobs Grid */}
-      <header className="max-w-5xl mx-auto mb-10 ..."> ... </header>
-
       <div className="max-w-5xl mx-auto">
         <LeadForm onRefresh={() => window.location.reload()} />
         {/* Note: Reloading the whole window is the "easiest" way to refresh for now! */}
