@@ -10,7 +10,7 @@
     @RestController
     @RequestMapping("/api/jobs")
     // This part is VITAL - it tells Java to let your React app (5173) in
-    @CrossOrigin(origins = "https://localhost:5173")
+    @CrossOrigin(origins = "*")
     public class JobController {
 
         @Autowired

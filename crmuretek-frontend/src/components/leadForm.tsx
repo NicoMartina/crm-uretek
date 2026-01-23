@@ -6,7 +6,7 @@ export default function LeadForm({ onRefresh }: { onRefresh: () => void }) {
   // We use one "state" object to hold all the form data
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
+    phoneNumber: "",
     email: "",
   });
 
@@ -17,7 +17,7 @@ export default function LeadForm({ onRefresh }: { onRefresh: () => void }) {
       await axios.post("http://localhost:8080/api/customers", formData);
 
       // Clear the form for the next lead
-      setFormData({ name: "", phone: "", email: "" });
+      setFormData({ name: "", phoneNumber: "", email: "" });
 
       // Tell the main App to refresh the list of jobs/customers
       onRefresh();
@@ -48,8 +48,10 @@ export default function LeadForm({ onRefresh }: { onRefresh: () => void }) {
         <input
           className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
           placeholder="Phone Number"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+          value={formData.phoneNumber}
+          onChange={(e) =>
+            setFormData({ ...formData, phoneNumber: e.target.value })
+          }
           required
         />
         <input

@@ -4,7 +4,7 @@ import axios from "axios";
 import type { Job } from "./types/Job";
 import { Briefcase, UserPlus, Phone, Plus } from "lucide-react";
 import LeadForm from "./components/leadForm";
-import QuoteForm from "./components/QuoteForm";
+import { QuoteForm } from "./components/QuoteForm";
 
 function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -26,17 +26,32 @@ function App() {
   };
 
   // --- NEW CREATE JOB FUNCTION ---
-  const handleCreateJob = async (jobData: any) => {
+  const handleCreateJob = async (formData: any) => {
     try {
-      await axios.post("http://localhost:8080/api/jobs", {
-        ...jobData,
+      const finalJobPackage = {
+        totalAmount: Number(formData.totalAmount),
+        estimateMaterialKg: Number(formData.estimateMaterialKg),
+        workDate: formData.workDate,
+        jobDescription: formData.jobDescription || "Structural Repair",
+        // ADD THIS: Many times the backend requires an address for a job
+        address: selectedLead.address || "Pending Address",
         customer: { id: selectedLead.id },
-      });
+        jobStatus: "QUOTED",
+      };
+
+      console.log("FINAL ATTEMPT PAYLOAD:", finalJobPackage);
+
+      await axios.post("http://localhost:8080/api/jobs", finalJobPackage);
+
       setSelectedLead(null);
       fetchData();
-      alert("Quote created! Lead moved to Projects.");
-    } catch (error) {
-      console.error("Error creating job:", error);
+      alert("¡Éxito! MadEye Moody es ahora un proyecto.");
+    } catch (error: any) {
+      if (error.response) {
+        // CLICK THE ARROW next to this in your console to see "errors" array
+        console.error("DETAILED JAVA ERROR:", error.response.data);
+      }
+      alert("Error. Revisa la consola para ver qué campo falta.");
     }
   };
 
@@ -65,9 +80,6 @@ function App() {
             Administracion de Clientes
           </p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-md transition-all active:scale-95">
-          + New Job
-        </button>
       </header>
 
       <div className="max-w-5xl mx-auto">
@@ -89,14 +101,14 @@ function App() {
                   <p className="font-bold text-slate-800">{lead.name}</p>
                   <div className="flex items-center gap-2 text-slate-500 text-sm mt-1">
                     <Phone size={14} />
-                    <span>{lead.phone || "No phone"}</span>
+                    <span>{lead.phoneNumber || "No phone"}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedLead(lead)}
-                  className="bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-600 p-2 rounded-lg transition-colors"
+                  className="bg-blue-50 text-blue-600 p-2 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"
                 >
-                  <Plus size={20} />
+                  Agregar Trabajo
                 </button>
               </div>
             ))}
