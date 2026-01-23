@@ -23,4 +23,10 @@ public class CustomerController {
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteCustomer(@PathVariable Long id){
+        customerRepository.deleteById(id);
+    }
+
 }

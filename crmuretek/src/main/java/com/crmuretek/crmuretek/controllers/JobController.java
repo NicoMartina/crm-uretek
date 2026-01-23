@@ -31,4 +31,9 @@
             return jobRepository.save(job);
         }
 
+        @DeleteMapping("/{id}")
+        public void deleteJob(@PathVariable Long id){
+            jobRepository.deleteById(id);
+        }
+
     }

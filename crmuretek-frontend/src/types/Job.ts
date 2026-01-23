@@ -1,4 +1,5 @@
 export interface Job {
+  workDate: string;
   id: number;
   customerName: string; // Add this line!
   totalAmount: number;
