@@ -32,5 +32,6 @@ public class Customer {
     private String issueDescription;
     private LocalDate contactDate;
     private Boolean requestVisit;
+    private LocalDate visitDate;
 
 }

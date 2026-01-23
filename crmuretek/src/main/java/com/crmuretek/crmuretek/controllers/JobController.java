@@ -1,5 +1,6 @@
     package com.crmuretek.crmuretek.controllers;
 
+    import com.crmuretek.crmuretek.models.Customer;
     import com.crmuretek.crmuretek.models.Job;
     import com.crmuretek.crmuretek.repositories.JobRepository;
     import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,6 @@
         public void deleteJob(@PathVariable Long id){
             jobRepository.deleteById(id);
         }
+
 
     }

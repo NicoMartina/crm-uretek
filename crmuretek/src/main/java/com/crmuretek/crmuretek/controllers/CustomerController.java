@@ -29,4 +29,20 @@ public class CustomerController {
         customerRepository.deleteById(id);
     }
 
+    @PutMapping("/{id}")
+    public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
+        // 1. Find the existing customer
+        return customerRepository.findById(id)
+                .map(customer -> {
+                    customer.setName(customerDetails.getName());
+                    customer.setPhoneNumber(customerDetails.getPhoneNumber());
+                    customer.setAddress(customerDetails.getAddress());
+                    customer.setVisitDate(customerDetails.getVisitDate());
+
+                    return customerRepository.save(customer);
+                })
+                .orElseThrow(() -> new RuntimeException("Customer Not found with id " + id));
+    }
+
+
 }
