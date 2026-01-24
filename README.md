@@ -7,7 +7,7 @@ A custom enterprise solution designed to modernize the workflow management for U
 
 ## 2. Tech Stack
 * **Language:** Java 17
-* **Framework:** Spring Boot 3.x (Web, Data JPA, Security)
+* **Framework:** Spring Boot 3.x (Web, Data JPA, Lombok, Security)
 * **Database:** PostgreSQL
 * **Tools:** Maven, Docker, Trello (Agile Management)
 
