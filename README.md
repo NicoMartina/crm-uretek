@@ -1,9 +1,9 @@
-# [Project Name] - Internal Management System
+# Internal Management System
 **Company:** Uretek Argentina  
 **Developer:** Nicolas Martina
 
 ## 1. Overview
-A custom enterprise solution designed to modernize [insert process, e.g., logistics/inventory] for Uretek Argentina. This application replaces legacy [Excel/Paper] systems with a robust, scalable Java backend.
+A custom enterprise solution designed to modernize the workflow management for Uretek Argentina. This application replaces endless Google and Excel Sheets and systems with a robust, scalable Java backend reducing the work time by 30%
 
 ## 2. Tech Stack
 * **Language:** Java 17
@@ -14,7 +14,7 @@ A custom enterprise solution designed to modernize [insert process, e.g., logist
 ## 3. Key Features
 * **Feature A:** (e.g., Automated reporting for daily operations)
 * **Feature B:** (e.g., Secure RESTful API for future mobile integration)
-* **Feature C:** (e.g., Relational database schema optimized for [X])
+* **Feature C:** (e.g., Relational database schema optimized for Leads Visitation and Jobs)
 
 ## 4. How to Run
 ```bash
