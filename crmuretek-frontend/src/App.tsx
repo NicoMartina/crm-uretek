@@ -209,10 +209,13 @@ function App() {
                     <p className="font-bold text-lg text-slate-800">
                       {lead.name}
                     </p>
-                    <p className="text-slate-500 text-sm flex items-center gap-2">
+                    <a
+                      href={`tel:${lead.phoneNumber}`}
+                      className="text-slate-500 text-sm flex items-center gap-2 hover:text-orange-600 transition-colors"
+                    >
                       <Phone size={14} className="text-slate-400" />
                       {lead.phoneNumber || "Sin teléfono"}
-                    </p>
+                    </a>
                     {lead.visitDate && (
                       <p className="mt-2 text-xs font-bold text-orange-600 bg-orange-50 p-1 rounded inline-block">
                         📅 Visita: {lead.visitDate}
