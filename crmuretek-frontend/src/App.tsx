@@ -15,9 +15,10 @@ import {
 import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
 
+// 1. Updated Map to handle your specific Enums
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
-  PENDIENTE: { label: "Pendiente", color: "bg-amber-100 text-amber-700" },
+  IN_PROGRESS: { label: "En Obra", color: "bg-amber-100 text-amber-700" },
   COMPLETED: { label: "Finalizado", color: "bg-green-100 text-green-700" },
 };
 
@@ -38,27 +39,45 @@ function App() {
       );
       setLeads(newLeads);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error:", error);
+    }
+  };
+
+  const handleUpdateStatus = async (jobId: number, newStatus: string) => {
+    try {
+      await axios.patch(
+        `http://localhost:8080/api/jobs/${jobId}/status`,
+        newStatus,
+        {
+          headers: { "Content-Type": "text/plain" },
+        }
+      );
+      fetchData();
+    } catch (error) {
+      console.error("Error updating status:", error);
     }
   };
 
   const handleScheduleVisit = async (lead: any, date: string | null) => {
-    if (date === "" && date !== null)
-      return alert("Selecciona una fecha primero");
+    if (date === "" && date !== null) return alert("Selecciona una fecha");
     try {
       await axios.put(`http://localhost:8080/api/customers/${lead.id}`, {
         ...lead,
         visitDate: date,
       });
       fetchData();
-      if (date) alert(`Visita programada con ${lead.name} para el ${date}`);
     } catch (error) {
-      console.error("Error scheduling visit:", error);
+      console.error(error);
     }
   };
 
+  const handleConvertVisit = (lead: any) => {
+    setSelectedLead(lead);
+    handleScheduleVisit(lead, null);
+  };
+
   const handleDeleteJob = async (id: number) => {
-    if (window.confirm("¿Eliminar solo este trabajo?")) {
+    if (window.confirm("¿Eliminar este trabajo?")) {
       await axios.delete(`http://localhost:8080/api/jobs/${id}`);
       fetchData();
     }
@@ -69,7 +88,7 @@ function App() {
       await axios.post("http://localhost:8080/api/jobs", {
         ...formData,
         customer: { id: selectedLead.id },
-        jobStatus: "QUOTED",
+        jobStatus: "QUOTED", // Default status when creating from a lead
       });
       setSelectedLead(null);
       fetchData();
@@ -78,30 +97,22 @@ function App() {
     }
   };
 
-  const handleConvertVisit = (lead: any) => {
-    setSelectedLead(lead);
-    handleScheduleVisit(lead, null); // Clear the visit date
-  };
-
   useEffect(() => {
     fetchData();
   }, []);
 
-  // --- STATS CALCULATIONS ---
+  // --- LOGIC ---
   const totalQuoted = jobs
     .filter((j) => j.jobStatus === "QUOTED")
     .reduce((sum, j) => sum + (j.totalAmount || 0), 0);
-
   const totalActive = jobs
-    .filter((j) => j.jobStatus === "PENDIENTE")
+    .filter((j) => j.jobStatus === "IN_PROGRESS")
     .reduce((sum, j) => sum + (j.totalAmount || 0), 0);
-
   const upcomingVisits = leads.filter((l) => l.visitDate != null);
 
   const filteredLeads = leads.filter((l) =>
     l.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const filteredJobs = jobs.filter((j) => {
     const matchesSearch = j.customerName
       .toLowerCase()
@@ -121,37 +132,35 @@ function App() {
       )}
 
       <header className="max-w-5xl mx-auto mb-10">
-        <h1 className="text-4xl font-black tracking-tight text-slate-800">
+        <h1 className="text-4xl font-black text-slate-800">
           Uretek <span className="text-orange-600">Argentina</span>
         </h1>
-        <p className="text-slate-500 font-medium tracking-wide">
-          Administración de Obras
-        </p>
+        <p className="text-slate-500 font-medium">Administración de Obras</p>
       </header>
 
-      {/* --- STATS CARDS --- */}
+      {/* --- STATS --- */}
       <section className="max-w-5xl mx-auto mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
           <span className="text-slate-400 text-xs font-bold uppercase">
             Presupuestado
           </span>
-          <h3 className="text-3xl font-black text-slate-800 mt-1">
+          <h3 className="text-3xl font-black">
             ${totalQuoted.toLocaleString()}
           </h3>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
           <span className="text-slate-400 text-xs font-bold uppercase">
-            Proyectado
+            En Obra
           </span>
-          <h3 className="text-3xl font-black text-slate-800 mt-1">
+          <h3 className="text-3xl font-black">
             ${totalActive.toLocaleString()}
           </h3>
         </div>
         <div className="bg-orange-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
           <span className="text-orange-100 text-xs font-bold uppercase">
-            Visitas Pendientes
+            Visitas
           </span>
-          <h3 className="text-2xl font-black mt-1">
+          <h3 className="text-2xl font-black">
             {upcomingVisits.length} para esta semana
           </h3>
         </div>
@@ -166,8 +175,8 @@ function App() {
           />
           <input
             type="text"
-            placeholder="Buscar por nombre..."
-            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 shadow-sm outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+            placeholder="Buscar..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -180,7 +189,7 @@ function App() {
               : "bg-white text-slate-600 border border-slate-200"
           }`}
         >
-          <Archive size={20} />
+          <Archive size={20} />{" "}
           {showArchived ? "Viendo Historial" : "Ver Archivados"}
         </button>
       </div>
@@ -192,28 +201,23 @@ function App() {
         {!showArchived && (
           <section className="mb-12 mt-10">
             <h2 className="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
-              <UserPlus className="text-orange-500" size={20} />
-              Prospectos ({filteredLeads.length})
+              <UserPlus className="text-orange-500" size={20} /> Prospectos (
+              {filteredLeads.length})
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {filteredLeads.map((lead) => (
                 <div
                   key={lead.id}
-                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all"
+                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm"
                 >
-                  {/* ROW 1: HEADER INFO */}
                   <div className="mb-4">
-                    <p className="font-bold text-lg text-slate-800">
-                      {lead.name}
-                    </p>
+                    <p className="font-bold text-lg">{lead.name}</p>
                     <a
                       href={`tel:${lead.phoneNumber}`}
                       className="text-slate-500 text-sm flex items-center gap-2 hover:text-orange-600 transition-colors"
                     >
-                      <Phone size={14} className="text-slate-400" />
-                      {lead.phoneNumber || "Sin teléfono"}
+                      <Phone size={14} /> {lead.phoneNumber || "Sin teléfono"}
                     </a>
-
                     {lead.visitDate && (
                       <div className="mt-2">
                         <p className="text-xs font-bold text-orange-600 bg-orange-50 p-1 rounded inline-block">
@@ -221,18 +225,16 @@ function App() {
                         </p>
                         <button
                           onClick={() => handleConvertVisit(lead)}
-                          className="w-full mt-3 bg-emerald-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1"
+                          className="w-full mt-3 bg-emerald-600 text-white py-2 rounded-lg font-bold text-sm"
                         >
-                          🏁 Finalizar Visita y Presupuestar
+                          🏁 Finalizar Visita
                         </button>
                       </div>
                     )}
                   </div>
 
-                  {/* ROW 2: NEW CONTACT & SCHEDULE ACTION ROW */}
                   <div className="flex flex-col gap-2 border-t pt-4">
                     <div className="flex gap-2">
-                      {/* WhatsApp Button */}
                       <a
                         href={`https://wa.me/${lead.phoneNumber?.replace(
                           /\D/g,
@@ -240,38 +242,36 @@ function App() {
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2"
                       >
-                        <Phone size={14} /> WhatsApp
+                        WhatsApp
                       </a>
-
-                      {/* Date Input and Calendar Icon */}
                       <div className="flex gap-1 flex-1">
                         <input
                           type="date"
                           id={`date-${lead.id}`}
-                          className="text-xs border p-2 rounded-lg flex-1 min-w-0 outline-none focus:ring-1 focus:ring-orange-500"
+                          className="text-xs border p-2 rounded-lg flex-1 min-w-0"
                         />
                         <button
-                          onClick={() => {
-                            const val = (
-                              document.getElementById(
-                                `date-${lead.id}`
-                              ) as HTMLInputElement
-                            ).value;
-                            handleScheduleVisit(lead, val);
-                          }}
-                          className="bg-slate-800 text-white p-2 rounded-lg hover:bg-black transition-colors"
+                          onClick={() =>
+                            handleScheduleVisit(
+                              lead,
+                              (
+                                document.getElementById(
+                                  `date-${lead.id}`
+                                ) as HTMLInputElement
+                              ).value
+                            )
+                          }
+                          className="bg-slate-800 text-white p-2 rounded-lg"
                         >
                           <Calendar size={16} />
                         </button>
                       </div>
                     </div>
-
-                    {/* ROW 3: PRIMARY CREATE JOB BUTTON */}
                     <button
                       onClick={() => setSelectedLead(lead)}
-                      className="w-full bg-orange-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-orange-700 transition-colors flex items-center justify-center gap-1"
+                      className="w-full bg-orange-600 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-1"
                     >
                       <Plus size={16} /> Crear Trabajo
                     </button>
@@ -284,11 +284,9 @@ function App() {
 
         {/* --- PROJECTS --- */}
         <h2 className="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
-          <Briefcase className="text-orange-500" size={20} />
-          {showArchived ? "Obras Finalizadas" : "Proyectos Activos"} (
-          {filteredJobs.length})
+          <Briefcase className="text-orange-500" size={20} />{" "}
+          {showArchived ? "Finalizadas" : "Activos"}
         </h2>
-
         <main className="grid gap-6">
           {filteredJobs.map((job) => (
             <div
@@ -301,22 +299,25 @@ function App() {
                     <Briefcase size={28} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-xl text-slate-800">
-                      Obra #{job.id}
-                    </h3>
+                    <h3 className="font-bold text-xl">Obra #{job.id}</h3>
                     <p className="text-sm font-semibold text-orange-600 uppercase">
                       {job.customerName}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span
-                    className={`px-4 py-1 rounded-full text-xs font-black uppercase ${
+                  {/* DROPDOWN STATUS UPDATE */}
+                  <select
+                    value={job.jobStatus}
+                    onChange={(e) => handleUpdateStatus(job.id, e.target.value)}
+                    className={`px-3 py-1 rounded-full text-xs font-black uppercase outline-none cursor-pointer border-none shadow-sm ${
                       STATUS_MAP[job.jobStatus]?.color || "bg-slate-100"
                     }`}
                   >
-                    {STATUS_MAP[job.jobStatus]?.label || job.jobStatus}
-                  </span>
+                    <option value="QUOTED">Presupuestado</option>
+                    <option value="IN_PROGRESS">En Obra</option>
+                    <option value="COMPLETED">Finalizado</option>
+                  </select>
                   <button
                     onClick={() => handleDeleteJob(job.id)}
                     className="text-slate-300 hover:text-red-500 p-1"
@@ -328,7 +329,7 @@ function App() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-slate-50 pt-6">
                 <div className="flex flex-col">
                   <span className="text-slate-400 text-xs font-bold uppercase mb-1">
-                    Precio Total
+                    Precio
                   </span>
                   <span className="text-2xl font-black text-slate-800">
                     ${job.totalAmount?.toLocaleString()}
@@ -344,7 +345,7 @@ function App() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-slate-400 text-xs font-bold uppercase mb-1">
-                    Fecha de Obra
+                    Fecha
                   </span>
                   <span className="text-xl font-bold text-slate-800">
                     {job.workDate || "Pendiente"}
