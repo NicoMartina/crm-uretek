@@ -201,11 +201,11 @@ function App() {
                   key={lead.id}
                   className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all"
                 >
+                  {/* ROW 1: HEADER INFO */}
                   <div className="mb-4">
                     <p className="font-bold text-lg text-slate-800">
                       {lead.name}
                     </p>
-                    {/* CLICK-TO-CALL LINK */}
                     <a
                       href={`tel:${lead.phoneNumber}`}
                       className="text-slate-500 text-sm flex items-center gap-2 hover:text-orange-600 transition-colors"
@@ -213,6 +213,7 @@ function App() {
                       <Phone size={14} className="text-slate-400" />
                       {lead.phoneNumber || "Sin teléfono"}
                     </a>
+
                     {lead.visitDate && (
                       <div className="mt-2">
                         <p className="text-xs font-bold text-orange-600 bg-orange-50 p-1 rounded inline-block">
@@ -228,27 +229,46 @@ function App() {
                     )}
                   </div>
 
+                  {/* ROW 2: NEW CONTACT & SCHEDULE ACTION ROW */}
                   <div className="flex flex-col gap-2 border-t pt-4">
-                    <div className="flex gap-1">
-                      <input
-                        type="date"
-                        id={`date-${lead.id}`}
-                        className="text-xs border p-2 rounded-lg flex-1 outline-none focus:ring-1 focus:ring-orange-500"
-                      />
-                      <button
-                        onClick={() => {
-                          const val = (
-                            document.getElementById(
-                              `date-${lead.id}`
-                            ) as HTMLInputElement
-                          ).value;
-                          handleScheduleVisit(lead, val);
-                        }}
-                        className="bg-slate-800 text-white p-2 rounded-lg hover:bg-black transition-colors"
+                    <div className="flex gap-2">
+                      {/* WhatsApp Button */}
+                      <a
+                        href={`https://wa.me/${lead.phoneNumber?.replace(
+                          /\D/g,
+                          ""
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-emerald-500 text-white py-2 rounded-lg font-bold text-sm hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2"
                       >
-                        <Calendar size={16} />
-                      </button>
+                        <Phone size={14} /> WhatsApp
+                      </a>
+
+                      {/* Date Input and Calendar Icon */}
+                      <div className="flex gap-1 flex-1">
+                        <input
+                          type="date"
+                          id={`date-${lead.id}`}
+                          className="text-xs border p-2 rounded-lg flex-1 min-w-0 outline-none focus:ring-1 focus:ring-orange-500"
+                        />
+                        <button
+                          onClick={() => {
+                            const val = (
+                              document.getElementById(
+                                `date-${lead.id}`
+                              ) as HTMLInputElement
+                            ).value;
+                            handleScheduleVisit(lead, val);
+                          }}
+                          className="bg-slate-800 text-white p-2 rounded-lg hover:bg-black transition-colors"
+                        >
+                          <Calendar size={16} />
+                        </button>
+                      </div>
                     </div>
+
+                    {/* ROW 3: PRIMARY CREATE JOB BUTTON */}
                     <button
                       onClick={() => setSelectedLead(lead)}
                       className="w-full bg-orange-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-orange-700 transition-colors flex items-center justify-center gap-1"
