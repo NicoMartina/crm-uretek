@@ -79,6 +79,14 @@ function App() {
     }
   };
 
+  const handleConvertVisit = (lead: any) => {
+    // 1. We select the lead to open the form
+    setSelectedLead(lead);
+
+    // 2. We "clean" the visit date since it's done
+    handleScheduleVisit(lead, null as any);
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -210,6 +218,12 @@ function App() {
                         📅 Visita: {lead.visitDate}
                       </p>
                     )}
+                    <button
+                      onClick={() => handleConvertVisit(lead)}
+                      className="w-full mt-2 bg-emerald-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1"
+                    >
+                      🏁 Finalizar Visita y Presupuestar
+                    </button>
                   </div>
 
                   {/* Visit Scheduler Row */}
