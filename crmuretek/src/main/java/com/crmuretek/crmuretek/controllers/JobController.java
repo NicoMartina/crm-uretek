@@ -4,6 +4,7 @@
     import com.crmuretek.crmuretek.models.Job;
     import com.crmuretek.crmuretek.repositories.JobRepository;
     import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
 
     import java.util.List;
@@ -35,6 +36,12 @@
         @DeleteMapping("/{id}")
         public void deleteJob(@PathVariable Long id){
             jobRepository.deleteById(id);
+        }
+
+        @GetMapping("/stats/material-total")
+        public ResponseEntity<Double> getTotalMaterial(){
+            Double total = jobRepository.sumTotalMaterialForPendingJobs();
+            return ResponseEntity.ok(total != null ? total : 0.0);
         }
 
 
