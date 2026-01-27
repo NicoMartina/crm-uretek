@@ -2,7 +2,6 @@
 
     import com.crmuretek.crmuretek.models.Customer;
     import com.crmuretek.crmuretek.models.Job;
-    import com.crmuretek.crmuretek.models.JobStatus;
     import com.crmuretek.crmuretek.repositories.JobRepository;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
@@ -39,14 +38,13 @@
             jobRepository.deleteById(id);
         }
 
-        @PatchMapping("/{id}/status")
-        public ResponseEntity<Job> updateStatus(@PathVariable Long id, @RequestBody String status){
-            return jobRepository.findById(id)
-                    .map(job -> {
-                        String cleanStatus = status.replace("\"", "");
-                        job.setJobStatus(JobStatus.valueOf(cleanStatus));
-                        return ResponseEntity.ok(jobRepository.save(job));
-                    })
-                    .orElse(ResponseEntity.notFound().build());
+        @GetMapping("/stats/material-total")
+        public ResponseEntity<Double> getTotalMaterial(){
+            Double total = jobRepository.sumTotalMaterialForPendingJobs();
+            return ResponseEntity.ok(total != null ? total : 0.0);
         }
+
+
+
+
     }
