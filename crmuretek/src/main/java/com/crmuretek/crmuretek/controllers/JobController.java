@@ -2,6 +2,7 @@
 
     import com.crmuretek.crmuretek.models.Customer;
     import com.crmuretek.crmuretek.models.Job;
+    import com.crmuretek.crmuretek.models.JobStatus;
     import com.crmuretek.crmuretek.repositories.JobRepository;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
@@ -28,9 +29,15 @@
         }
 
         @PostMapping
-        public Job createJob(@RequestBody Job job) {
-            // This will save the new job and return it back to React
-            return jobRepository.save(job);
+        public ResponseEntity<Job> createJob(@RequestBody Job job) {
+            // Basic validation: Ensure we have a customer linked
+            if (job.getCustomer() == null || job.getCustomer().getId() <= 0){
+                return ResponseEntity.badRequest().build();
+            }
+            job.setJobStatus(JobStatus.QUOTED);
+
+            Job savedJob =jobRepository.save(job);
+            return ResponseEntity.ok(savedJob);
         }
 
         @DeleteMapping("/{id}")
@@ -43,6 +50,9 @@
             Double total = jobRepository.sumTotalMaterialForPendingJobs();
             return ResponseEntity.ok(total != null ? total : 0.0);
         }
+
+
+
 
 
 
