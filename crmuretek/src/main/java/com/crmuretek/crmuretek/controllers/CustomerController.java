@@ -3,6 +3,7 @@ package com.crmuretek.crmuretek.controllers;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -24,10 +25,16 @@ public class CustomerController {
         return customerRepository.findAll();
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable Long id){
+    @DeleteMapping("/api/customers/{id}")
+    public ResponseEntity<Customer> deleteCustomer(@PathVariable Long id){
+        // Check if customer exists first (The Senior Way)
+        if (!customerRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
         customerRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
+
 
     @PutMapping("/{id}")
     public Customer updateCustomer(@PathVariable Long id, @RequestBody Customer customerDetails) {
