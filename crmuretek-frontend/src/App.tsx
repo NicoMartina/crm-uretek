@@ -16,9 +16,10 @@ import {
 import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
 
+// Change this at the top of App.tsx
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
-  IN_PROGRESS: { label: "En Obra", color: "bg-amber-100 text-amber-700" },
+  IN_PROGRESS: { label: "En Obra", color: "bg-amber-100 text-amber-700" }, // Changed from PENDIENTE
   COMPLETED: { label: "Finalizado", color: "bg-green-100 text-green-700" },
 };
 
@@ -303,12 +304,11 @@ function App() {
                       onChange={(e) =>
                         handleUpdateStatus(job.id, e.target.value)
                       }
-                      className={`px-3 py-1 rounded-full text-xs font-black border-none ${
-                        STATUS_MAP[job.jobStatus]?.color
-                      }`}
+                      className={`... ${STATUS_MAP[job.jobStatus]?.color}`}
                     >
                       <option value="QUOTED">Presupuestado</option>
-                      <option value="IN_PROGRESS">En Obra</option>
+                      <option value="IN_PROGRESS">En Obra</option>{" "}
+                      {/* Changed from PENDIENTE */}
                       <option value="COMPLETED">Finalizado</option>
                     </select>
                   </div>
