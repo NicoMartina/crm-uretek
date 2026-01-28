@@ -110,6 +110,24 @@ function App() {
     }
   };
 
+  const handleDeleteLead = async (id: number) => {
+    // 1. Safety first - always ask before deleting!
+    if (
+      window.confirm("¿Estás seguro de que quieres eliminar este prospecto?")
+    ) {
+      try {
+        // 2. Call your new Java endpoint
+        await axios.delete(`http://localhost:8080/api/customers/${id}`);
+
+        // 3. Refresh the list so the lead vanishes from the screen
+        fetchData();
+      } catch (error) {
+        console.error("Error deleting lead:", error);
+        alert("No se pudo eliminar el prospecto.");
+      }
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -216,8 +234,15 @@ function App() {
               {filteredLeads.map((lead) => (
                 <div
                   key={lead.id}
-                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm"
+                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm relative"
                 >
+                  <button
+                    onClick={() => handleDeleteLead(lead.id)}
+                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1"
+                    title="Eliminar Prospecto"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                   <p className="font-bold text-lg">{lead.name}</p>
                   <a
                     href={`tel:${lead.phoneNumber}`}
@@ -238,6 +263,7 @@ function App() {
                     >
                       WhatsApp
                     </a>
+
                     <button
                       onClick={() => setSelectedLead(lead)}
                       className="bg-orange-600 text-white py-2 rounded-lg font-bold text-sm"
