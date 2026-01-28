@@ -12,8 +12,6 @@
 
     @RestController
     @RequestMapping("/api/jobs")
-    // This part is VITAL - it tells Java to let your React app (5173) in
-    @CrossOrigin(origins = "*")
     public class JobController {
 
         @Autowired
@@ -49,6 +47,25 @@
         public ResponseEntity<Double> getTotalMaterial(){
             Double total = jobRepository.sumTotalMaterialForPendingJobs();
             return ResponseEntity.ok(total != null ? total : 0.0);
+        }
+
+        @PatchMapping("{id}/status")
+        public ResponseEntity<Job> updateJobStatus(@PathVariable Long id, @RequestBody String status){
+            // 1.Find job in database
+            return jobRepository.findById(id).map(job -> {
+                try {
+                    // 2. Convert the String from React (e.g., "IN_PROGRESS") to Java Enum
+                    // We strip quotes just in case the body comes in as "IN_PROGRESS"
+                    String cleanStatus =  status.replace("\"", "");
+                    job.setJobStatus(JobStatus.valueOf(cleanStatus));
+
+                    // 3. Save the updated job
+                    jobRepository.save(job);
+                    return ResponseEntity.ok(job);
+                } catch(IllegalArgumentException e){
+                    return ResponseEntity.badRequest().<Job>build();
+                }
+            }).orElse(ResponseEntity.notFound().build());
         }
 
 
