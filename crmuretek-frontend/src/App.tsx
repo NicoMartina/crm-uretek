@@ -195,17 +195,6 @@ function App() {
         </button>
 
         <button
-          onClick={() => setActiveTab("jobs")}
-          className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
-            activeTab === "jobs"
-              ? "bg-orange-400 text-white shadow-lg"
-              : "text-slate-500 hover:bg-slate-100"
-          }`}
-        >
-          <Briefcase size={20} /> <span className="hidden md:block">Obras</span>
-        </button>
-
-        <button
           onClick={() => setActiveTab("visits")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "visits"
@@ -215,6 +204,18 @@ function App() {
         >
           <Calendar size={20} />{" "}
           <span className="hidden md:block">Visitas</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("jobs")}
+          className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
+            activeTab === "jobs"
+              ? "bg-orange-400 text-white shadow-lg"
+              : "text-slate-500 hover:bg-slate-100"
+          }`}
+        >
+          <Briefcase size={20} />{" "}
+          <span className="hidden md:block">Trabajos</span>
         </button>
       </nav>
 
@@ -364,7 +365,7 @@ function App() {
         {activeTab === "jobs" && (
           <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
             <header>
-              <h2 className="text-3xl font-black">Obras Activas</h2>
+              <h2 className="text-3xl font-black">Trabajos Activos</h2>
               <p className="text-slate-500">Control de producción y estados</p>
             </header>
 
@@ -403,7 +404,7 @@ function App() {
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="font-bold text-xl">Obra #{job.id}</h3>
+                      <h3 className="font-bold text-xl">Trabajo #{job.id}</h3>
                       <p className="text-orange-600 font-bold uppercase text-xs">
                         {job.customerName}
                       </p>
