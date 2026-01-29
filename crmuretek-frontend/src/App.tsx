@@ -110,24 +110,6 @@ function App() {
     }
   };
 
-  const handleDeleteLead = async (id: number) => {
-    // 1. Safety first - always ask before deleting!
-    if (
-      window.confirm("¿Estás seguro de que quieres eliminar este prospecto?")
-    ) {
-      try {
-        // 2. Call your new Java endpoint
-        await axios.delete(`http://localhost:8080/api/customers/${id}`);
-
-        // 3. Refresh the list so the lead vanishes from the screen
-        fetchData();
-      } catch (error) {
-        console.error("Error deleting lead:", error);
-        alert("No se pudo eliminar el prospecto.");
-      }
-    }
-  };
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -195,6 +177,20 @@ function App() {
           />
         )}
 
+        <div className="relative max-w-md mx-auto mb-8">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={20}
+          />
+          <input
+            type="text"
+            placeholder="Buscar..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500 bg-white shadow-sm"
+          />
+        </div>
+
         {/* --- LEADS VIEW --- */}
         {activeTab === "leads" && (
           <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
@@ -216,33 +212,12 @@ function App() {
 
             <LeadForm onRefresh={fetchData} />
 
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Buscar..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500"
-              />
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {filteredLeads.map((lead) => (
                 <div
                   key={lead.id}
-                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm relative"
+                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm"
                 >
-                  <button
-                    onClick={() => handleDeleteLead(lead.id)}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-1"
-                    title="Eliminar Prospecto"
-                  >
-                    <Trash2 size={18} />
-                  </button>
                   <p className="font-bold text-lg">{lead.name}</p>
                   <a
                     href={`tel:${lead.phoneNumber}`}
@@ -263,7 +238,6 @@ function App() {
                     >
                       WhatsApp
                     </a>
-
                     <button
                       onClick={() => setSelectedLead(lead)}
                       className="bg-orange-600 text-white py-2 rounded-lg font-bold text-sm"
