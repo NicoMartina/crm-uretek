@@ -46,6 +46,16 @@ public class VisitController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/{id}")
+    public  ResponseEntity<Void> deleteVisit(@PathVariable Long id){
+        if (visitRepository.existsById(id)) {
+            visitRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
 
 
 }

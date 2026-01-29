@@ -30,9 +30,9 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showArchived, setShowArchived] = useState(false);
-  const [activeTab, setActiveTab] = useState<"leads" | "jobs" | "visits">(
-    "leads"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "leads" | "jobs" | "visits"
+  >("leads");
   const [materialTotal, setMaterialTotal] = useState<number>(0);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [schedulingVisitLead, setSchedulingVisitLead] = useState<any | null>(
@@ -40,6 +40,7 @@ function App() {
   );
   const [visitDate, setVisitDate] = useState("");
   const [visitNotes, setVisitNotes] = useState("");
+  const [stockInStorage, setStockInStorage] = useState(1500);
 
   const fetchData = async () => {
     try {
@@ -68,13 +69,9 @@ function App() {
 
   const handleUpdateStatus = async (jobId: number, newStatus: string) => {
     try {
-      await axios.patch(
-        `http://localhost:8080/api/jobs/${jobId}/status`,
-        newStatus,
-        {
-          headers: { "Content-Type": "text/plain" },
-        }
-      );
+      await axios.patch(`http://localhost:8080/api/jobs/${jobId}/status`, {
+        status: newStatus,
+      });
       fetchData();
     } catch (error) {
       console.error("Error updating status:", error);
@@ -127,6 +124,13 @@ function App() {
     }
   };
 
+  const handleDeleteVisit = async (id: number) => {
+    if (window.confirm("¿Eliminar esta visita?")) {
+      await axios.delete(`http://localhost:8080/api/visits/${id}`);
+      fetchData();
+    }
+  };
+
   const handleCreateJob = async (formData: any) => {
     try {
       await axios.post("http://localhost:8080/api/jobs", {
@@ -168,8 +172,10 @@ function App() {
     return matchesSearch && (showArchived ? isCompleted : !isCompleted);
   });
 
-  const filteredVisits = visits.filter((v) =>
-    v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVisits = visits.filter(
+    (v) =>
+      v.status === "PENDING" &&
+      v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -181,7 +187,17 @@ function App() {
             Uretek <span className="text-orange-400">CRM</span>
           </h1>
         </div>
-
+        <button
+          onClick={() => setActiveTab("dashboard")}
+          className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
+            activeTab === "dashboard"
+              ? "bg-orange-600 text-white shadow-lg"
+              : "text-slate-500 hover:bg-slate-100"
+          }`}
+        >
+          <LayoutDashboard size={20} />{" "}
+          <span className="hidden md:block">Inicio</span>
+        </button>
         <button
           onClick={() => setActiveTab("leads")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
@@ -409,6 +425,7 @@ function App() {
                         {job.customerName}
                       </p>
                     </div>
+
                     <select
                       value={job.jobStatus}
                       onChange={(e) =>
@@ -422,6 +439,12 @@ function App() {
                       <option value="COMPLETED">Finalizado</option>
                     </select>
                   </div>
+                  <button
+                    onClick={() => handleDeleteVisit(job.id)}
+                    className="text-slate-400 hover:text-red-500"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               ))}
             </main>
@@ -467,24 +490,94 @@ function App() {
               {filteredVisits.map((visit) => (
                 <div
                   key={visit.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
+                  className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-bold text-xl">Visita #{visit.id}</h3>
-                      <p className="text-orange-600 font-bold uppercase text-xs">
-                        {visit.customer.name}
-                      </p>
-                      <p className="text-slate-500 text-sm  mt-1">
-                        📅 Fecha:{" "}
-                        {new Date(visit.visitDate).toLocaleDateString()}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    {/* LEFT SIDE: Info */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-black px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">
+                          #{visit.id}
+                        </span>
+                        <h3 className="text-orange-600 font-black uppercase text-sm tracking-wider">
+                          {visit.customer.name}
+                        </h3>
+                      </div>
+                      <p className="flex items-center gap-2 text-slate-500 font-medium">
+                        <Calendar size={16} className="text-slate-400" />
+                        Fecha: {new Date(visit.visitDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="{`px-3 py-1 rounded-full text-sm font-bold ${visit.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : visit.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}"></div>
+
+                    {/* RIGHT SIDE: Actions */}
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                      <button
+                        onClick={() => setSelectedLead(visit.customer)}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-100"
+                      >
+                        <Briefcase size={16} />
+                        Convertir a Obra
+                      </button>
+
+                      <button
+                        onClick={() => handleDeleteVisit(visit.id)}
+                        className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        title="Eliminar Visita"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
             </main>
+          </div>
+        )}
+        {/* --- DASHBOARD VIEW --- */}
+        {activeTab === "dashboard" && (
+          <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+            <header>
+              <h2 className="text-3xl font-black">Panel de Control</h2>
+              <p className="text-slate-500">Resumen general de Uretek</p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* 1. Prospectos Card */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Prospectos
+                </span>
+                <h3 className="text-2xl font-black">{leads.length}</h3>
+              </div>
+
+              {/* 2. Visitas Card */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-blue-500">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Visitas Pendientes
+                </span>
+                <h3 className="text-2xl font-black">{visits.length}</h3>
+              </div>
+
+              {/* 3. Obras Card (Money) */}
+              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Monto en Obra
+                </span>
+                <h3 className="text-2xl font-black">
+                  ${totalActive.toLocaleString()}
+                </h3>
+              </div>
+
+              {/* 4. Global Stock Card */}
+              <div className="bg-slate-800 p-6 rounded-2xl shadow-sm border-b-4 border-slate-500 text-white">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Stock Total Requerido
+                </span>
+                <h3 className="text-2xl font-black text-orange-500">
+                  {materialTotal.toLocaleString()} kg
+                </h3>
+              </div>
+            </div>
           </div>
         )}
       </main>
