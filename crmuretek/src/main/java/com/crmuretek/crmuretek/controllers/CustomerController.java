@@ -3,6 +3,7 @@ package com.crmuretek.crmuretek.controllers;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -25,11 +26,17 @@ public class CustomerController {
         return customerRepository.findAll();
     }
 
-    @DeleteMapping("/api/customers/{id}")
-    public ResponseEntity<Customer> deleteCustomer(@PathVariable Long id){
-        // Check if customer exists first (The Senior Way)
-        if (!customerRepository.existsById(id)) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id){
+        // first check if the customer has jobs already arranged
+        Customer customer = customerRepository.findById(id).orElse(null);
+
+        if (customer == null){
             return ResponseEntity.notFound().build();
+        }
+
+        if (!customer.getJobs().isEmpty()){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         customerRepository.deleteById(id);
         return ResponseEntity.noContent().build();
