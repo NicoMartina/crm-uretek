@@ -321,15 +321,6 @@ function App() {
               </p>
             </header>
 
-            <div className="bg-orange-400 p-6 rounded-2xl shadow-md text-white inline-block">
-              <span className="text-orange-100 text-xs font-bold uppercase">
-                Visitas
-              </span>
-              <h3 className="text-2xl font-black">
-                {upcomingVisits.length} pendientes
-              </h3>
-            </div>
-
             <LeadForm onRefresh={fetchData} />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -537,45 +528,58 @@ function App() {
         {activeTab === "dashboard" && (
           <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
             <header>
-              <h2 className="text-3xl font-black">Panel de Control</h2>
-              <p className="text-slate-500">Resumen general de Uretek</p>
+              <h2 className="text-3xl font-black text-slate-800">
+                Panel de Control
+              </h2>
+              <p className="text-slate-500 font-medium">
+                Estado general de la operación
+              </p>
             </header>
 
+            {/* Summary Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* 1. Prospectos Card */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Prospectos
+              {/* 1. Inventory Status (The new logic you wanted) */}
+              <div className="bg-slate-900 p-6 rounded-3xl shadow-xl text-white border-b-4 border-orange-500">
+                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+                  Depósito (Est.)
                 </span>
-                <h3 className="text-2xl font-black">{leads.length}</h3>
+                <h3 className="text-2xl font-black mt-1">1,500 kg</h3>
+                <p className="text-orange-400 text-xs mt-2 font-bold">
+                  -{materialTotal} kg Comprometidos
+                </p>
               </div>
 
-              {/* 2. Visitas Card */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-blue-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
+              {/* 2. Pending Visits */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
                   Visitas Pendientes
                 </span>
-                <h3 className="text-2xl font-black">{visits.length}</h3>
+                <h3 className="text-2xl font-black text-blue-600 mt-1">
+                  {visits.filter((v) => v.status === "PENDING").length}
+                </h3>
+                <p className="text-slate-400 text-xs mt-2">Próximos días</p>
               </div>
 
-              {/* 3. Obras Card (Money) */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
+              {/* 3. Active Jobs Money */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
                   Monto en Obra
                 </span>
-                <h3 className="text-2xl font-black">
+                <h3 className="text-2xl font-black text-emerald-600 mt-1">
                   ${totalActive.toLocaleString()}
                 </h3>
+                <p className="text-slate-400 text-xs mt-2">Trabajos en curso</p>
               </div>
 
-              {/* 4. Global Stock Card */}
-              <div className="bg-slate-800 p-6 rounded-2xl shadow-sm border-b-4 border-slate-500 text-white">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Stock Total Requerido
+              {/* 4. Active Leads */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
+                  Prospectos
                 </span>
-                <h3 className="text-2xl font-black text-orange-500">
-                  {materialTotal.toLocaleString()} kg
+                <h3 className="text-2xl font-black text-slate-800 mt-1">
+                  {leads.length}
                 </h3>
+                <p className="text-slate-400 text-xs mt-2">Sin visitar</p>
               </div>
             </div>
           </div>
