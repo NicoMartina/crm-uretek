@@ -35,6 +35,11 @@ function App() {
   );
   const [materialTotal, setMaterialTotal] = useState<number>(0);
   const [visits, setVisits] = useState<Visit[]>([]);
+  const [schedulingVisitLead, setSchedulingVisitLead] = useState<any | null>(
+    null
+  );
+  const [visitDate, setVisitDate] = useState("");
+  const [visitNotes, setVisitNotes] = useState("");
 
   const fetchData = async () => {
     try {
@@ -86,6 +91,27 @@ function App() {
       fetchData();
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleConfirmVisit = async () => {
+    if (!visitDate) return alert("Por favor selecciona una fecha");
+
+    try {
+      await axios.post("http://localhost:8080/api/visits", {
+        customer: { id: schedulingVisitLead.id }, // Link to the customer
+        visitDate: visitDate,
+        observations: visitNotes,
+        status: "PENDING",
+      });
+
+      setSchedulingVisitLead(null); // Close modal
+      setVisitDate("");
+      setVisitNotes("");
+      fetchData(); // Refresh the counts
+      setActiveTab("visits"); // Take dad to the visits tab to see it!
+    } catch (error) {
+      console.error("Error scheduling visit:", error);
     }
   };
 
@@ -152,7 +178,7 @@ function App() {
       <nav className="fixed bottom-0 left-0 w-full bg-white border-t md:relative md:w-64 md:h-screen md:border-r md:border-t-0 p-4 z-50 flex md:flex-col gap-2">
         <div className="hidden md:block mb-8 px-4">
           <h1 className="text-2xl font-black text-slate-800">
-            Uretek <span className="text-orange-600">CRM</span>
+            Uretek <span className="text-orange-400">CRM</span>
           </h1>
         </div>
 
@@ -160,7 +186,7 @@ function App() {
           onClick={() => setActiveTab("leads")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "leads"
-              ? "bg-orange-600 text-white shadow-lg"
+              ? "bg-orange-400 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -172,7 +198,7 @@ function App() {
           onClick={() => setActiveTab("jobs")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "jobs"
-              ? "bg-orange-600 text-white shadow-lg"
+              ? "bg-orange-400 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -183,7 +209,7 @@ function App() {
           onClick={() => setActiveTab("visits")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "visits"
-              ? "bg-orange-600 text-white shadow-lg"
+              ? "bg-orange-400 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -200,6 +226,58 @@ function App() {
             onCancel={() => setSelectedLead(null)}
             onCreate={handleCreateJob}
           />
+        )}
+
+        {schedulingVisitLead && (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-100 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+              <h3 className="text-2xl font-black mb-2">Agendar Visita</h3>
+              <p className="text-slate-500 mb-6">
+                Cliente: {schedulingVisitLead.name}
+              </p>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
+                    Fecha de Visita
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
+                    value={visitDate}
+                    onChange={(e) => setVisitDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
+                    Observaciones
+                  </label>
+                  <textarea
+                    className="w-full p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500"
+                    rows={3}
+                    value={visitNotes}
+                    onChange={(e) => setVisitNotes(e.target.value)}
+                    placeholder="Ej: Revisar grietas en el garaje..."
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setSchedulingVisitLead(null)}
+                    className="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleConfirmVisit}
+                    className="flex-1 py-3 bg-orange-400 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-500 transition-all"
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         <div className="relative max-w-md mx-auto mb-8">
@@ -226,7 +304,7 @@ function App() {
               </p>
             </header>
 
-            <div className="bg-orange-600 p-6 rounded-2xl shadow-md text-white inline-block">
+            <div className="bg-orange-400 p-6 rounded-2xl shadow-md text-white inline-block">
               <span className="text-orange-100 text-xs font-bold uppercase">
                 Visitas
               </span>
@@ -241,7 +319,7 @@ function App() {
               {filteredLeads.map((lead) => (
                 <div
                   key={lead.id}
-                  className="bg-white border-t-4 border-orange-500 p-5 rounded-2xl shadow-sm"
+                  className="bg-white border-t-4 border-orange-400 p-5 rounded-2xl shadow-sm"
                 >
                   <p className="font-bold text-lg">{lead.name}</p>
                   <a
@@ -264,10 +342,16 @@ function App() {
                       WhatsApp
                     </a>
                     <button
-                      onClick={() => setSelectedLead(lead)}
-                      className="bg-orange-600 text-white py-2 rounded-lg font-bold text-sm"
+                      onClick={() => setSchedulingVisitLead(lead)} // Open the scheduling modal
+                      className="bg-blue-600 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2"
                     >
-                      Crear Trabajo
+                      <Calendar size={16} /> Agendar Visita
+                    </button>
+                    <button
+                      onClick={() => setSelectedLead(lead)}
+                      className="bg-orange-400 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2"
+                    >
+                      Crear Trabajo Directo
                     </button>
                   </div>
                 </div>
