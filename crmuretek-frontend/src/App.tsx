@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
+import type { Visit } from "./types/Visit";
 
 // Change this at the top of App.tsx
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -29,20 +30,28 @@ function App() {
   const [selectedLead, setSelectedLead] = useState<any | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showArchived, setShowArchived] = useState(false);
-  const [activeTab, setActiveTab] = useState<"leads" | "jobs">("leads");
+  const [activeTab, setActiveTab] = useState<"leads" | "jobs" | "visits">(
+    "leads"
+  );
   const [materialTotal, setMaterialTotal] = useState<number>(0);
+  const [visits, setVisits] = useState<Visit[]>([]);
 
   const fetchData = async () => {
     try {
       const jobsRes = await getJobs();
       setJobs(jobsRes);
+
       const custRes = await axios.get("http://localhost:8080/api/customers");
       const newLeads = custRes.data.filter(
         (c: any) => !c.jobs || c.jobs.length === 0
       );
       setLeads(newLeads);
 
-      // Fetch the new Java Query data
+      // --- ADD THIS PART ---
+      const visitsRes = await axios.get("http://localhost:8080/api/visits");
+      setVisits(visitsRes.data);
+      // ---------------------
+
       const materialRes = await axios.get(
         "http://localhost:8080/api/jobs/stats/material-total"
       );
@@ -133,6 +142,10 @@ function App() {
     return matchesSearch && (showArchived ? isCompleted : !isCompleted);
   });
 
+  const filteredVisits = visits.filter((v) =>
+    v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 md:flex text-slate-900">
       {/* --- SIDEBAR --- */}
@@ -164,6 +177,18 @@ function App() {
           }`}
         >
           <Briefcase size={20} /> <span className="hidden md:block">Obras</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("visits")}
+          className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
+            activeTab === "visits"
+              ? "bg-orange-600 text-white shadow-lg"
+              : "text-slate-500 hover:bg-slate-100"
+          }`}
+        >
+          <Calendar size={20} />{" "}
+          <span className="hidden md:block">Visitas</span>
         </button>
       </nav>
 
@@ -311,6 +336,66 @@ function App() {
                       {/* Changed from PENDIENTE */}
                       <option value="COMPLETED">Finalizado</option>
                     </select>
+                  </div>
+                </div>
+              ))}
+            </main>
+          </div>
+        )}
+
+        {/* --- VISITS VIEW --- */}
+        {activeTab === "visits" && (
+          <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+            <header>
+              <h2 className="text-3xl font-black">Visitas Activas</h2>
+              <p className="text-slate-500">Control de Visitas y Estados</p>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Programadas
+                </span>
+                <h3 className="text-2xl font-black">
+                  ${totalQuoted.toLocaleString()}
+                </h3>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Visitas para Hoy
+                </span>
+                <h3 className="text-2xl font-black">
+                  ${totalActive.toLocaleString()}
+                </h3>
+              </div>
+              <div className="bg-slate-800 p-6 rounded-2xl shadow-sm border-b-4 border-slate-500 text-white">
+                <span className="text-slate-400 text-xs font-bold uppercase">
+                  Stock Necesario
+                </span>
+                <h3 className="text-2xl font-black">
+                  {materialTotal.toLocaleString()} kg
+                </h3>
+              </div>
+            </div>
+
+            <main className="grid gap-6">
+              {filteredVisits.map((visit) => (
+                <div
+                  key={visit.id}
+                  className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="font-bold text-xl">Visita #{visit.id}</h3>
+                      <p className="text-orange-600 font-bold uppercase text-xs">
+                        {visit.customer.name}
+                      </p>
+                      <p className="text-slate-500 text-sm  mt-1">
+                        📅 Fecha:{" "}
+                        {new Date(visit.visitDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="{`px-3 py-1 rounded-full text-sm font-bold ${visit.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' : visit.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}"></div>
                   </div>
                 </div>
               ))}
