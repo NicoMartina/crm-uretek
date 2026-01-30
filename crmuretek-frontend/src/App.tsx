@@ -188,7 +188,7 @@ function App() {
 
   const filteredVisits = visits.filter(
     (v) =>
-      v.status === "SCHEDULED" &&
+      (v.status === "SCHEDULED" || v.status === "VISITED") &&
       v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -416,7 +416,20 @@ function App() {
                 </h3>
               </div>
             </div>
-
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => setShowArchived(!showArchived)}
+                className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                  showArchived
+                    ? "bg-orange-100 text-orange-600 border border-orange-200"
+                    : "bg-slate-100 text-slate-600 border border-slate-200"
+                }`}
+              >
+                {showArchived
+                  ? "Ver Trabajos Activos"
+                  : "Ver Historial (Finalizados)"}
+              </button>
+            </div>
             <main className="grid gap-6">
               {filteredJobs.map((job) => (
                 <div
