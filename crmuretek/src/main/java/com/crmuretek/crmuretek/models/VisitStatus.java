@@ -1,8 +1,8 @@
 package com.crmuretek.crmuretek.models;
 
-public enum visitStatus {
+public enum VisitStatus {
     SCHEDULED,
-    PENDING,
     VISITED,
+    COMPLETED,
     CANCELLED
 }

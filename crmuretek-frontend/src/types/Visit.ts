@@ -13,6 +13,6 @@ export interface Visit {
   visitFeeAmount: number;
   paymentMethod?: string;
   invoiceNumber?: string;
-  status: "PENDING" | "COMPLETED" | "CANCELLED";
+  status: "SCHEDULED" | "VISITED" | "COMPLETED" | "CANCELLED";
   observations?: string;
 }

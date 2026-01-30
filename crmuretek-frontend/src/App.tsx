@@ -78,6 +78,20 @@ function App() {
     }
   };
 
+  const handleUpdateVisitStatus = async (
+    visitId: number,
+    newStatus: string
+  ) => {
+    try {
+      await axios.patch(`http://localhost:8080/api/visits/${visitId}/status`, {
+        status: newStatus,
+      });
+      fetchData();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
+  };
+
   const handleScheduleVisit = async (lead: any, date: string | null) => {
     if (date === "" && date !== null) return alert("Selecciona una fecha");
     try {
@@ -99,7 +113,7 @@ function App() {
         customer: { id: schedulingVisitLead.id }, // Link to the customer
         visitDate: visitDate,
         observations: visitNotes,
-        status: "PENDING",
+        status: "SCHEDULED",
       });
 
       setSchedulingVisitLead(null); // Close modal
@@ -174,7 +188,7 @@ function App() {
 
   const filteredVisits = visits.filter(
     (v) =>
-      v.status === "PENDING" &&
+      v.status === "SCHEDULED" &&
       v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -497,6 +511,24 @@ function App() {
                           <h3 className="font-black text-slate-800 text-lg">
                             {visit.customer.name}
                           </h3>
+                          <span
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
+                              visit.status === "SCHEDULED" && (
+                                <button
+                                  onClick={() =>
+                                    handleUpdateVisitStatus(visit.id, "VISITED")
+                                  }
+                                  className="flex-1 md:flex-none px-4 py-3 bg-blue-50 text-blue-600 rounded-2xl font-bold text-sm hover:bg-blue-100 transition-all border border-blue-100"
+                                >
+                                  Marcar como Visitado
+                                </button>
+                              )
+                                ? "bg-green-100 text-green-700"
+                                : "bg-blue-100 text-blue-700"
+                            }`}
+                          >
+                            {visit.status}
+                          </span>
                         </div>
                         <p className="text-slate-500 text-sm font-medium">
                           Programada para el{" "}
@@ -509,6 +541,14 @@ function App() {
 
                     {/* 2. ACTION GROUP (This keeps them together on the right) */}
                     <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
+                      <button
+                        onClick={() =>
+                          handleUpdateVisitStatus(visit.id, "VISITED")
+                        }
+                        className="flex-1 md:flex-none px-4 py-3 bg-blue-50 text-blue-600 rounded-2xl font-bold text-sm hover:bg-blue-100 transition-all"
+                      >
+                        Marcar Visitado
+                      </button>
                       <button
                         onClick={() => setSelectedLead(visit.customer)}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg shadow-emerald-100 active:scale-95"
@@ -562,7 +602,7 @@ function App() {
                   Visitas Pendientes
                 </span>
                 <h3 className="text-2xl font-black text-blue-600 mt-1">
-                  {visits.filter((v) => v.status === "PENDING").length}
+                  {visits.filter((v) => v.status === "SCHEDULED").length}
                 </h3>
                 <p className="text-slate-400 text-xs mt-2">Próximos días</p>
               </div>

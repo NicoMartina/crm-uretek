@@ -25,7 +25,7 @@ public class Visit {
     private String invoiceNumber;
 
     @Enumerated(EnumType.STRING)
-    private visitStatus status = visitStatus.PENDING;
+    private VisitStatus status = VisitStatus.SCHEDULED;
 
     @Column(columnDefinition = "TEXT")
     private String observations;

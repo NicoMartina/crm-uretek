@@ -2,7 +2,7 @@ package com.crmuretek.crmuretek.controllers;
 
 import com.crmuretek.crmuretek.models.Job;
 import com.crmuretek.crmuretek.models.Visit;
-import com.crmuretek.crmuretek.models.visitStatus;
+import com.crmuretek.crmuretek.models.VisitStatus;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +22,9 @@ public class VisitController {
     }
 
     @PostMapping
-    public Visit createVisit(@RequestBody Visit visit){
-        return visitRepository.save(visit);
+    public ResponseEntity<Visit> createVisit(@RequestBody Visit visit){
+        visit.setStatus(VisitStatus.SCHEDULED);
+        return ResponseEntity.ok(visitRepository.save(visit));
     }
 
     @GetMapping
@@ -36,7 +37,7 @@ public class VisitController {
         return visitRepository.findById(id).map(visit -> {
             try {
                 String cleanStatus = body.get("status");
-                visit.setStatus(visitStatus.valueOf(cleanStatus.toUpperCase()));
+                visit.setStatus(VisitStatus.valueOf(cleanStatus.toUpperCase()));
 
                 visitRepository.save(visit);
                 return ResponseEntity.ok(visit);
