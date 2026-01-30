@@ -4,6 +4,7 @@
     import com.crmuretek.crmuretek.models.Job;
     import com.crmuretek.crmuretek.models.JobStatus;
     import com.crmuretek.crmuretek.repositories.JobRepository;
+    import com.crmuretek.crmuretek.services.InventoryService;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,11 @@
 
         @Autowired
         private final JobRepository jobRepository;
+        private final InventoryService inventoryService;
 
-        public JobController(JobRepository jobRepository){
+        public JobController(JobRepository jobRepository, InventoryService inventoryService){
             this.jobRepository = jobRepository;
+            this.inventoryService = inventoryService;
         }
 
         @GetMapping
@@ -56,9 +59,12 @@
                 try {
                     // 2. Convert the String from React (e.g., "IN_PROGRESS") to Java Enum
                     // We strip quotes just in case the body comes in as "IN_PROGRESS"
-                    String cleanStatus =  body.get("status");
-                    job.setJobStatus(JobStatus.valueOf(cleanStatus.toUpperCase()));
+                    String cleanStatus =  body.get("status").toUpperCase();
+                    job.setJobStatus(JobStatus.valueOf(cleanStatus));
 
+                    if ("COMPLETED".equals(cleanStatus) && job.getJobStatus() != JobStatus.COMPLETED) {
+                        inventoryService.consumeMaterial(job.getEstimateMaterialKg());
+                    }
                     // 3. Save the updated job
                     jobRepository.save(job);
                     return ResponseEntity.ok(job);
