@@ -27,9 +27,11 @@ public class Customer {
     @Column(nullable = false)
     private String name;
     private String email;
-    private String phoneNumber;
     private String address;
-    private String issueDescription;
+    private String source; //how they found us
+    private String phoneNumber;
+    private String problemDescription;
+    private String contactChannel;
     private LocalDate contactDate;
     private Boolean requestVisit;
     private LocalDate visitDate;

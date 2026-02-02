@@ -44,6 +44,7 @@ function App() {
   const [visitNotes, setVisitNotes] = useState("");
   const [stockInStorage, setStockInStorage] = useState(1500);
   const [inventory, setInventory] = useState<Inventory | null>(null);
+  const [isAddingLead, setIsAddingLead] = useState(false);
 
   const fetchInventory = async () => {
     try {
@@ -196,6 +197,10 @@ function App() {
     fetchData();
     fetchInventory();
   }, []);
+
+  useEffect(() => {
+    setSearchTerm("");
+  }, [activeTab]);
 
   const totalQuoted = jobs
     .filter((j) => j.jobStatus === "QUOTED")
@@ -365,144 +370,278 @@ function App() {
         {activeTab === "leads" && (
           <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
             <header>
-              <h2 className="text-3xl font-black">Prospectos</h2>
-              <p className="text-slate-500">
-                Gestión de nuevas visitas y clientes
-              </p>
+              <div>
+                <h2 className="text-3xl font-black">Prospectos</h2>
+                <p className="text-slate-500">
+                  Gestión de nuevas visitas y clientes
+                </p>
+              </div>
+              <button
+                onClick={() => setIsAddingLead(true)}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-orange-200 transition-all active:scale-95"
+              >
+                <Plus size={20} />
+                Nuevo Prospecto
+              </button>
             </header>
 
-            <LeadForm onRefresh={fetchData} />
+            {/* MODAL POPUP */}
+            {isAddingLead && (
+              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                  <div className="p-8">
+                    <div className="flex justify-between items-center mb-6">
+                      <h2 className="text-2xl font-black text-slate-800">
+                        Registrar Nuevo Cliente
+                      </h2>
+                      <button
+                        onClick={() => setIsAddingLead(false)}
+                        className="text-slate-400 hover:text-slate-600"
+                      >
+                        <Trash2 size={24} /> {/* Or an X icon */}
+                      </button>
+                    </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {filteredLeads.map((lead) => (
-                <div
-                  key={lead.id}
-                  className="bg-white border-t-4 border-orange-400 p-5 rounded-2xl shadow-sm"
-                >
-                  <p className="font-bold text-lg">{lead.name}</p>
-                  <a
-                    href={`tel:${lead.phoneNumber}`}
-                    className="text-slate-500 text-sm flex items-center gap-2 mb-4"
-                  >
-                    <Phone size={14} />
-                    {lead.phoneNumber}
-                  </a>
-
-                  <div className="flex flex-col gap-2 border-t pt-4">
-                    <a
-                      href={`https://wa.me/${lead.phoneNumber?.replace(
-                        /\D/g,
-                        ""
-                      )}`}
-                      target="_blank"
-                      className="bg-emerald-500 text-white py-2 rounded-lg font-bold text-center text-sm"
-                    >
-                      WhatsApp
-                    </a>
-                    <button
-                      onClick={() => setSchedulingVisitLead(lead)} // Open the scheduling modal
-                      className="bg-blue-600 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2"
-                    >
-                      <Calendar size={16} /> Agendar Visita
-                    </button>
-                    <button
-                      onClick={() => setSelectedLead(lead)}
-                      className="bg-orange-400 text-white py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2"
-                    >
-                      Crear Trabajo Directo
-                    </button>
+                    {/* Pass the close function so the form can close itself after saving */}
+                    <LeadForm
+                      onRefresh={() => {
+                        fetchData();
+                        setIsAddingLead(false);
+                      }}
+                    />
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
+
+            <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[700px]">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Fecha
+                      </th>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Nombre
+                      </th>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Teléfono
+                      </th>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
+                        Acciones Rápidas
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredLeads.map((lead) => (
+                      <tr
+                        key={lead.id}
+                        className="hover:bg-slate-50/50 transition-colors group"
+                      >
+                        <td className="p-4 text-xs font-medium text-slate-400">
+                          {/* If your backend doesn't have contactDate yet, we can use a placeholder */}
+                          {lead.contactDate || "---"}
+                        </td>
+                        <td className="p-4 font-black text-slate-800">
+                          {lead.name}
+                        </td>
+                        <td className="p-4 text-slate-500 font-medium">
+                          {lead.phoneNumber}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex justify-end gap-2">
+                            <a
+                              href={`https://wa.me/${lead.phoneNumber?.replace(
+                                /\D/g,
+                                ""
+                              )}`}
+                              target="_blank"
+                              className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-200 transition-all"
+                            >
+                              WhatsApp
+                            </a>
+                            <button
+                              onClick={() => setSchedulingVisitLead(lead)}
+                              className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-bold text-[10px] uppercase hover:bg-blue-200 transition-all flex items-center gap-1"
+                            >
+                              <Calendar size={12} /> Visita
+                            </button>
+                            <button
+                              onClick={() => setSelectedLead(lead)}
+                              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg font-bold text-[10px] uppercase hover:bg-orange-200 transition-all"
+                            >
+                              + Obra
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
         {/* --- JOBS VIEW --- */}
         {activeTab === "jobs" && (
-          <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
-            <header>
-              <h2 className="text-3xl font-black">Trabajos Activos</h2>
-              <p className="text-slate-500">Control de producción y estados</p>
-            </header>
+          <>
+            <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+              <header>
+                <h2 className="text-3xl font-black">Trabajos Activos</h2>
+                <p className="text-slate-500">
+                  Control de producción y estados
+                </p>
+              </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Presupuestado
-                </span>
-                <h3 className="text-2xl font-black">
-                  ${totalQuoted.toLocaleString()}
-                </h3>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  En Obra
-                </span>
-                <h3 className="text-2xl font-black">
-                  ${totalActive.toLocaleString()}
-                </h3>
-              </div>
-              <div className="bg-slate-800 p-6 rounded-2xl shadow-sm border-b-4 border-slate-500 text-white">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Stock Necesario
-                </span>
-                <h3 className="text-2xl font-black">
-                  {materialTotal.toLocaleString()} kg
-                </h3>
-              </div>
-            </div>
-            <div className="flex justify-end mb-4">
-              <button
-                onClick={() => setShowArchived(!showArchived)}
-                className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${
-                  showArchived
-                    ? "bg-orange-100 text-orange-600 border border-orange-200"
-                    : "bg-slate-100 text-slate-600 border border-slate-200"
-                }`}
-              >
-                {showArchived
-                  ? "Ver Trabajos Activos"
-                  : "Ver Historial (Finalizados)"}
-              </button>
-            </div>
-            <main className="grid gap-6">
-              {filteredJobs.map((job) => (
-                <div
-                  key={job.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="font-bold text-xl">Trabajo #{job.id}</h3>
-                      <p className="text-orange-600 font-bold uppercase text-xs">
-                        {job.customerName}
-                      </p>
-                    </div>
-
-                    <select
-                      value={job.jobStatus}
-                      onChange={(e) =>
-                        handleUpdateStatus(job.id, e.target.value)
-                      }
-                      className={`... ${STATUS_MAP[job.jobStatus]?.color}`}
-                    >
-                      <option value="QUOTED">Presupuestado</option>
-                      <option value="IN_PROGRESS">En Obra</option>{" "}
-                      {/* Changed from PENDIENTE */}
-                      <option value="COMPLETED">Finalizado</option>
-                    </select>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteJob(job.id)}
-                    className="text-slate-400 hover:text-red-500"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+              {/* STATS ROW */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
+                  <span className="text-slate-400 text-xs font-bold uppercase">
+                    Presupuestado
+                  </span>
+                  <h3 className="text-2xl font-black">
+                    ${totalQuoted.toLocaleString()}
+                  </h3>
                 </div>
-              ))}
-            </main>
-          </div>
+                <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
+                  <span className="text-slate-400 text-xs font-bold uppercase">
+                    En Obra
+                  </span>
+                  <h3 className="text-2xl font-black">
+                    ${totalActive.toLocaleString()}
+                  </h3>
+                </div>
+                <div className="bg-slate-800 p-6 rounded-2xl shadow-sm border-b-4 border-slate-500 text-white">
+                  <span className="text-slate-400 text-xs font-bold uppercase">
+                    Stock Necesario
+                  </span>
+                  <h3 className="text-2xl font-black">
+                    {materialTotal.toLocaleString()} kg
+                  </h3>
+                </div>
+              </div>
+
+              {/* SEARCH & ARCHIVE BAR */}
+              <div className="flex justify-between items-center mb-6 gap-4">
+                <div className="relative flex-1">
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Buscar por cliente..."
+                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 outline-none transition-all"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <button
+                  onClick={() => setShowArchived(!showArchived)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition-all whitespace-nowrap"
+                >
+                  {showArchived ? "Ver Activos" : "Ver Historial"}
+                </button>
+              </div>
+
+              {/* NEW TABLE VIEW */}
+              <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead className="bg-slate-50 border-b border-slate-200">
+                      <tr>
+                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          ID
+                        </th>
+                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Cliente
+                        </th>
+                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                          Estado
+                        </th>
+                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
+                          Acciones
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredJobs.map((job) => (
+                        <tr
+                          key={job.id}
+                          className="hover:bg-slate-50/50 transition-colors group"
+                        >
+                          <td className="p-4 text-xs font-bold text-slate-400">
+                            #{job.id}
+                          </td>
+                          <td className="p-4">
+                            <div className="font-bold text-slate-800">
+                              {job.customer?.name || "Sin nombre"}
+                            </div>
+                            <div className="text-[10px] text-slate-500">
+                              {job.customer?.phoneNumber}
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <select
+                              value={job.jobStatus}
+                              onChange={(e) =>
+                                handleUpdateStatus(job.id, e.target.value)
+                              }
+                              className={`text-[10px] font-black uppercase px-2 py-1 rounded-md outline-none cursor-pointer border-none ${
+                                STATUS_MAP[job.jobStatus]?.color
+                              }`}
+                            >
+                              <option value="QUOTED">Presupuestado</option>
+                              <option value="IN_PROGRESS">En Obra</option>
+                              <option value="COMPLETED">Finalizado</option>
+                            </select>
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleDeleteJob(job.id)}
+                                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* TEMP SECTION: OLD CARDS (TO BE DELETED) */}
+              <div className="mt-20 pt-10 border-t-2 border-dashed border-slate-200 opacity-40">
+                <p className="text-center font-bold text-slate-400 mb-6 uppercase tracking-widest">
+                  Vista de Cards Antigua
+                </p>
+                <div className="grid gap-6">
+                  {filteredJobs.map((job) => (
+                    <div
+                      key={job.id}
+                      className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-xl">
+                            Trabajo #{job.id}
+                          </h3>
+                          <p className="text-orange-600 font-bold uppercase text-xs">
+                            {job.customerName}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* --- VISITS VIEW --- */}
@@ -513,111 +652,85 @@ function App() {
               <p className="text-slate-500">Control de Visitas y Estados</p>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-orange-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Programadas
-                </span>
-                <h3 className="text-2xl font-black">
-                  ${totalQuoted.toLocaleString()}
-                </h3>
-              </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-emerald-500">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Visitas para Hoy
-                </span>
-                <h3 className="text-2xl font-black">
-                  ${totalActive.toLocaleString()}
-                </h3>
-              </div>
-              <div className="bg-slate-800 p-6 rounded-2xl shadow-sm border-b-4 border-slate-500 text-white">
-                <span className="text-slate-400 text-xs font-bold uppercase">
-                  Stock Necesario
-                </span>
-                <h3 className="text-2xl font-black">
-                  {materialTotal.toLocaleString()} kg
-                </h3>
-              </div>
-            </div>
-
-            <main className="grid gap-4">
-              {filteredVisits.map((visit) => (
-                <div
-                  key={visit.id}
-                  className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all animate-in slide-in-from-bottom-2"
-                >
-                  <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                    {/* 1. INFO GROUP */}
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                      <div className="bg-slate-50 p-4 rounded-2xl text-slate-400">
-                        <Calendar size={24} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] font-black px-2 py-0.5 bg-orange-100 text-orange-600 rounded-full uppercase">
+            <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[800px]">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Fecha
+                      </th>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Cliente
+                      </th>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                        Estado
+                      </th>
+                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
+                        Gestión
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredVisits.map((visit) => (
+                      <tr
+                        key={visit.id}
+                        className="hover:bg-slate-50/50 transition-colors group"
+                      >
+                        <td className="p-4">
+                          <div className="font-bold text-slate-800">
+                            {new Date(visit.visitDate).toLocaleDateString()}
+                          </div>
+                          <div className="text-[10px] text-slate-400 font-bold uppercase">
                             Visita #{visit.id}
-                          </span>
-                          <h3 className="font-black text-slate-800 text-lg">
-                            {visit.customer.name}
-                          </h3>
+                          </div>
+                        </td>
+                        <td className="p-4 font-black text-slate-700">
+                          {visit.customer.name}
+                        </td>
+                        <td className="p-4">
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${
-                              visit.status === "SCHEDULED" && (
-                                <button
-                                  onClick={() =>
-                                    handleUpdateVisitStatus(visit.id, "VISITED")
-                                  }
-                                  className="flex-1 md:flex-none px-4 py-3 bg-blue-50 text-blue-600 rounded-2xl font-bold text-sm hover:bg-blue-100 transition-all border border-blue-100"
-                                >
-                                  Marcar como Visitado
-                                </button>
-                              )
-                                ? "bg-green-100 text-green-700"
-                                : "bg-blue-100 text-blue-700"
+                            className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${
+                              visit.status === "VISITED"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-orange-100 text-orange-700"
                             }`}
                           >
                             {visit.status}
                           </span>
-                        </div>
-                        <p className="text-slate-500 text-sm font-medium">
-                          Programada para el{" "}
-                          <span className="text-slate-900 font-bold">
-                            {new Date(visit.visitDate).toLocaleDateString()}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* 2. ACTION GROUP (This keeps them together on the right) */}
-                    <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
-                      <button
-                        onClick={() =>
-                          handleUpdateVisitStatus(visit.id, "VISITED")
-                        }
-                        className="flex-1 md:flex-none px-4 py-3 bg-blue-50 text-blue-600 rounded-2xl font-bold text-sm hover:bg-blue-100 transition-all"
-                      >
-                        Marcar Visitado
-                      </button>
-                      <button
-                        onClick={() => setSelectedLead(visit.customer)}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-bold text-sm transition-all shadow-lg shadow-emerald-100 active:scale-95"
-                      >
-                        <Briefcase size={18} />
-                        Convertir a Obra
-                      </button>
-
-                      <button
-                        onClick={() => handleDeleteVisit(visit.id)}
-                        className="p-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-2xl transition-all border border-slate-100"
-                        title="Eliminar Visita"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </main>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex justify-end gap-2">
+                            {visit.status === "SCHEDULED" && (
+                              <button
+                                onClick={() =>
+                                  handleUpdateVisitStatus(visit.id, "VISITED")
+                                }
+                                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-blue-700 transition-all"
+                              >
+                                Marcar Visitado
+                              </button>
+                            )}
+                            <button
+                              onClick={() => setSelectedLead(visit.customer)}
+                              className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"
+                            >
+                              <Briefcase size={12} /> Convertir
+                            </button>
+                            <button
+                              onClick={() => handleDeleteVisit(visit.id)}
+                              className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
         {/* --- DASHBOARD VIEW --- */}

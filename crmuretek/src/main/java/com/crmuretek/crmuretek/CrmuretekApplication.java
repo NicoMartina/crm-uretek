@@ -112,7 +112,7 @@ public class CrmuretekApplication {
 						c.setAddress(address);
 						System.out.println("Enter the Client's Issue: ");
 						String issue = scanner.nextLine();
-						c.setIssueDescription(issue);
+						c.setProblemDescription(issue);
 						c.setContactDate(LocalDate.now());
 
 
@@ -250,7 +250,7 @@ public class CrmuretekApplication {
 									" | " + existingCustomer.getEmail() +
 									" | " + existingCustomer.getPhoneNumber() +
 									" | " + existingCustomer.getAddress() +
-									" | " + existingCustomer.getIssueDescription());
+									" | " + existingCustomer.getProblemDescription());
 
 							// 2. Ask for new details
 							System.out.println("Enter new name (leave blank to keep existing one)");
@@ -271,7 +271,7 @@ public class CrmuretekApplication {
 
 							System.out.println("Change issue description (leave blank to keep existing one)");
 							String issue = scanner.nextLine();
-							if (!issue.isBlank()) existingCustomer.setIssueDescription(issue);
+							if (!issue.isBlank()) existingCustomer.setProblemDescription(issue);
 
 							customerRepository.save(existingCustomer);
 							System.out.println("SUCCESS: Customer #" + id + " has been updated.");
