@@ -38,17 +38,31 @@ public class InventoryService {
 
     public void addIso(Double amount){
         Inventory inventory = inventoryRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Inventory not initialized."));
+                .orElseGet(() -> {
+                    Inventory newInv = new Inventory();
+                    newInv.setId(1L);
+                    newInv.setIso_stock(0.0);
+                    newInv.setResina_stock(0.0);
+                    return inventoryRepository.save(newInv);
+                });
+        Double currentStock = (inventory.getIso_stock() != null ) ? inventory.getIso_stock() : 0.0;
 
-        inventory.setIso_stock(inventory.getIso_stock() + amount);
+        inventory.setIso_stock(currentStock + amount);
         inventoryRepository.save(inventory);
     }
 
     public void addResina(Double amount){
         Inventory inventory = inventoryRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Inventory not initialized."));
+                .orElseGet(() -> {
+                    Inventory newInv = new Inventory();
+                    newInv.setId(1L);
+                    newInv.setIso_stock(0.0);
+                    newInv.setResina_stock(0.0);
+                    return inventoryRepository.save(newInv);
+                });
 
-        inventory.setResina_stock(inventory.getResina_stock() + amount);
+        Double currentStock = (inventory.getResina_stock() != null) ? inventory.getResina_stock() : 0.0;
+        inventory.setResina_stock(currentStock + amount);
         inventoryRepository.save(inventory);
     }
 

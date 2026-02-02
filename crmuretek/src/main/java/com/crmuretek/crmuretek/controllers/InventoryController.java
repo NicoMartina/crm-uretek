@@ -27,13 +27,14 @@ public class InventoryController {
     }
 
     @PostMapping("/add-iso")
-    public ResponseEntity<Void> addIso(@RequestBody java.util.Map<String, Double> body){
-        inventoryService.addIso(body.get("amount"));
+    public ResponseEntity<?> addIso(@RequestBody java.util.Map<String, Double> request){
+        Double amount = request.get("amount");
+        inventoryService.addIso(amount);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/add-resina")
-    public ResponseEntity<Void> addResina(@RequestBody java.util.Map<String, Double> body){
+    public ResponseEntity<?> addResina(@RequestBody java.util.Map<String, Double> body){
         inventoryService.addResina(body.get("amount"));
         return ResponseEntity.ok().build();
     }

@@ -12,10 +12,12 @@ import {
   Archive,
   Calendar,
   LayoutDashboard,
+  Package,
 } from "lucide-react";
 import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
 import type { Visit } from "./types/Visit";
+import type { Inventory } from "./types/Inventory";
 
 // Change this at the top of App.tsx
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -41,7 +43,16 @@ function App() {
   const [visitDate, setVisitDate] = useState("");
   const [visitNotes, setVisitNotes] = useState("");
   const [stockInStorage, setStockInStorage] = useState(1500);
+  const [inventory, setInventory] = useState<Inventory | null>(null);
 
+  const fetchInventory = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/api/inventory");
+      setInventory(response.data);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    }
+  };
   const fetchData = async () => {
     try {
       const jobsRes = await getJobs();
@@ -163,8 +174,27 @@ function App() {
     }
   };
 
+  const handleAddStock = async (type: "iso" | "resina") => {
+    const amount = window.prompt(
+      `¿Cuántos kg de ${type.toUpperCase()} compraste?`
+    );
+
+    if (amount && !isNaN(Number(amount))) {
+      try {
+        // Remember your Java endpoint is /api/inventory/add-iso or /add-resina
+        await axios.post(`http://localhost:8080/api/inventory/add-${type}`, {
+          amount: Number(amount),
+        });
+        fetchInventory(); // Refresh the numbers on the screen!
+      } catch (error) {
+        alert("Error al cargar stock");
+      }
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchInventory();
   }, []);
 
   const totalQuoted = jobs
@@ -191,6 +221,12 @@ function App() {
       (v.status === "SCHEDULED" || v.status === "VISITED") &&
       v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const maxMixFromIso = inventory?.iso_stock ? inventory.iso_stock / 0.63 : 0;
+  const maxMixFromResina = inventory?.resina_stock
+    ? inventory.resina_stock / 0.37
+    : 0;
+  const totalPossibleMix = Math.min(maxMixFromIso, maxMixFromResina);
 
   return (
     <div className="min-h-screen bg-slate-50 md:flex text-slate-900">
@@ -586,61 +622,53 @@ function App() {
         )}
         {/* --- DASHBOARD VIEW --- */}
         {activeTab === "dashboard" && (
-          <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
-            <header>
-              <h2 className="text-3xl font-black text-slate-800">
-                Panel de Control
-              </h2>
-              <p className="text-slate-500 font-medium">
-                Estado general de la operación
-              </p>
-            </header>
-
-            {/* Summary Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* 1. Inventory Status (The new logic you wanted) */}
-              <div className="bg-slate-900 p-6 rounded-3xl shadow-xl text-white border-b-4 border-orange-500">
-                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  Depósito (Est.)
+          <div className="bg-slate-900 p-8 rounded-[2rem] shadow-xl text-white col-span-1 md:col-span-2 border-b-8 border-orange-500">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <span className="text-slate-400 text-xs font-black uppercase tracking-[0.2em]">
+                  Capacidad de Obra Total
                 </span>
-                <h3 className="text-2xl font-black mt-1">1,500 kg</h3>
-                <p className="text-orange-400 text-xs mt-2 font-bold">
-                  -{materialTotal} kg Comprometidos
+                <h3 className="text-5xl font-black mt-2 leading-none">
+                  {Math.floor(totalPossibleMix).toLocaleString()}{" "}
+                  <span className="text-xl text-slate-500 uppercase">kg</span>
+                </h3>
+              </div>
+              <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-sm">
+                <Package size={32} className="text-orange-500" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
+              <div>
+                <p className="text-slate-500 text-xs font-bold uppercase mb-1">
+                  Stock ISO (63%)
+                </p>
+                <p className="text-xl font-black text-blue-400">
+                  {inventory?.iso_stock.toLocaleString()} kg
                 </p>
               </div>
-
-              {/* 2. Pending Visits */}
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  Visitas Pendientes
-                </span>
-                <h3 className="text-2xl font-black text-blue-600 mt-1">
-                  {visits.filter((v) => v.status === "SCHEDULED").length}
-                </h3>
-                <p className="text-slate-400 text-xs mt-2">Próximos días</p>
+              <div>
+                <p className="text-slate-500 text-xs font-bold uppercase mb-1">
+                  Stock Resina (37%)
+                </p>
+                <p className="text-xl font-black text-emerald-400">
+                  {inventory?.resina_stock.toLocaleString()} kg
+                </p>
               </div>
-
-              {/* 3. Active Jobs Money */}
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  Monto en Obra
-                </span>
-                <h3 className="text-2xl font-black text-emerald-600 mt-1">
-                  ${totalActive.toLocaleString()}
-                </h3>
-                <p className="text-slate-400 text-xs mt-2">Trabajos en curso</p>
-              </div>
-
-              {/* 4. Active Leads */}
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  Prospectos
-                </span>
-                <h3 className="text-2xl font-black text-slate-800 mt-1">
-                  {leads.length}
-                </h3>
-                <p className="text-slate-400 text-xs mt-2">Sin visitar</p>
-              </div>
+            </div>
+            <div className="mt-8 flex gap-4 border-t border-white/10 pt-6">
+              <button
+                onClick={() => handleAddStock("iso")}
+                className="flex-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 py-3 rounded-2xl font-bold text-sm transition-all border border-blue-500/30"
+              >
+                + Cargar ISO
+              </button>
+              <button
+                onClick={() => handleAddStock("resina")}
+                className="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 py-3 rounded-2xl font-bold text-sm transition-all border border-emerald-500/30"
+              >
+                + Cargar RESINA
+              </button>
             </div>
           </div>
         )}
