@@ -36,4 +36,11 @@ public class Customer {
     private Boolean requestVisit;
     private LocalDate visitDate;
 
+    @PrePersist
+    protected void onCreate(){
+        if(this.contactDate == null){
+            this.contactDate = LocalDate.now();
+        }
+    }
+
 }

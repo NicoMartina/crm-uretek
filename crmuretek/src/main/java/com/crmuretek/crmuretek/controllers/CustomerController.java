@@ -28,18 +28,15 @@ public class CustomerController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id){
-        // first check if the customer has jobs already arranged
-        Customer customer = customerRepository.findById(id).orElse(null);
-
-        if (customer == null){
-            return ResponseEntity.notFound().build();
-        }
-
-        if (!customer.getJobs().isEmpty()){
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        customerRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return customerRepository.findById(id)
+                .map( customer -> {
+                    if (!customer.getJobs().isEmpty()){
+                        return ResponseEntity.status(HttpStatus.CONFLICT).<Void>build();
+                    }
+                    customerRepository.deleteById(id);
+                    return ResponseEntity.noContent().<Void>build();
+        })
+                .orElse(ResponseEntity.notFound().build());
     }
 
 

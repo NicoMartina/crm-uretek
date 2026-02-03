@@ -42,7 +42,7 @@ export default function LeadForm({ onRefresh }: { onRefresh: () => void }) {
         problemDescription: "",
         source: "",
         contactChannel: "",
-        contactDate: "",
+        contactDate: new Date().toISOString().split("T")[0],
       });
 
       // Tell the main App to refresh the list of jobs/customers

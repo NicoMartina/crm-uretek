@@ -45,6 +45,7 @@ function App() {
   const [stockInStorage, setStockInStorage] = useState(1500);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [isAddingLead, setIsAddingLead] = useState(false);
+  const [viewingLead, setViewingLead] = useState<any | null>(null);
 
   const fetchInventory = async () => {
     try {
@@ -189,6 +190,23 @@ function App() {
         fetchInventory(); // Refresh the numbers on the screen!
       } catch (error) {
         alert("Error al cargar stock");
+      }
+    }
+  };
+
+  const handleDeleteLead = async (id: number) => {
+    if (window.confirm("¿Seguro que quieres borrar este prospecto?")) {
+      try {
+        await axios.delete(`http://localhost:8080/api/customers/${id}`);
+        fetchData(); // Refresh the list
+      } catch (error: any) {
+        if (error.response?.status == 409) {
+          alert(
+            "No se puede eliminar el prospecto porque tiene visitas o trabajos asociados."
+          );
+        } else {
+          alert("Hubo un error al intentar borrar el prospecto.");
+        }
       }
     }
   };
@@ -414,6 +432,97 @@ function App() {
               </div>
             )}
 
+            {/* VIEW LEAD DETAILS MODAL */}
+            {viewingLead && (
+              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+                <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+                  <div className="p-8">
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <span className="text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-1 rounded-md uppercase">
+                          Ficha del Cliente
+                        </span>
+                        <h2 className="text-3xl font-black text-slate-800 mt-2">
+                          {viewingLead.name}
+                        </h2>
+                      </div>
+                      <button
+                        onClick={() => setViewingLead(null)}
+                        className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                      >
+                        <Plus size={24} className="rotate-45 text-slate-400" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-slate-50 p-4 rounded-2xl">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">
+                            Teléfono
+                          </p>
+                          <p className="font-bold">
+                            {viewingLead.phoneNumber || "---"}
+                          </p>
+                        </div>
+                        <div className="bg-slate-50 p-4 rounded-2xl">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">
+                            Email
+                          </p>
+                          <p className="font-bold text-sm truncate">
+                            {viewingLead.email || "---"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-50 p-4 rounded-2xl">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">
+                          Dirección de Obra
+                        </p>
+                        <p className="font-bold">
+                          {viewingLead.address || "---"}
+                        </p>
+                      </div>
+
+                      <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100">
+                        <p className="text-[10px] font-bold text-orange-400 uppercase">
+                          Problema Reportado
+                        </p>
+                        <p className="text-sm font-medium text-slate-700 mt-1">
+                          {viewingLead.problemDescription || "No especificado"}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">
+                            Origen
+                          </p>
+                          <p className="text-sm font-bold">
+                            {viewingLead.source || "---"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">
+                            Medio de Contacto
+                          </p>
+                          <p className="text-sm font-bold">
+                            {viewingLead.contactChannel || "---"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setViewingLead(null)}
+                      className="w-full mt-8 py-4 bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-900 transition-all"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[700px]">
@@ -444,7 +553,13 @@ function App() {
                           {lead.contactDate || "---"}
                         </td>
                         <td className="p-4 font-black text-slate-800">
-                          {lead.name}
+                          {/* CLICKABLE NAME */}
+                          <button
+                            onClick={() => setViewingLead(lead)}
+                            className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
+                          >
+                            {lead.name}
+                          </button>
                         </td>
                         <td className="p-4 text-slate-500 font-medium">
                           {lead.phoneNumber}
@@ -457,7 +572,7 @@ function App() {
                                 ""
                               )}`}
                               target="_blank"
-                              className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-200 transition-all"
+                              className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-200 transition-all flex items-center gap-1"
                             >
                               WhatsApp
                             </a>
@@ -472,6 +587,13 @@ function App() {
                               className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg font-bold text-[10px] uppercase hover:bg-orange-200 transition-all"
                             >
                               + Obra
+                            </button>
+                            <button
+                              onClick={() => handleDeleteLead(lead.id)}
+                              className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                              title="Eliminar Prospecto"
+                            >
+                              <Trash2 size={18} />
                             </button>
                           </div>
                         </td>
@@ -612,32 +734,6 @@ function App() {
                       ))}
                     </tbody>
                   </table>
-                </div>
-              </div>
-
-              {/* TEMP SECTION: OLD CARDS (TO BE DELETED) */}
-              <div className="mt-20 pt-10 border-t-2 border-dashed border-slate-200 opacity-40">
-                <p className="text-center font-bold text-slate-400 mb-6 uppercase tracking-widest">
-                  Vista de Cards Antigua
-                </p>
-                <div className="grid gap-6">
-                  {filteredJobs.map((job) => (
-                    <div
-                      key={job.id}
-                      className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-xl">
-                            Trabajo #{job.id}
-                          </h3>
-                          <p className="text-orange-600 font-bold uppercase text-xs">
-                            {job.customerName}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
