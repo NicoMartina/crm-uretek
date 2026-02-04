@@ -1,123 +1,179 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// We define what "onRefresh" is so App.tsx can tell us to update the list
-export default function LeadForm({ onRefresh }: { onRefresh: () => void }) {
-  // We use one "state" object to hold all the form data
-  const [formData, setFormData] = useState<{
-    name: string;
-    phoneNumber: string;
-    email: string;
-    problemDescription: string;
-    source: string;
-    contactChannel: string;
-    contactDate?: string;
-  }>({
+interface LeadFormProps {
+  onRefresh: () => void;
+  initialData?: any; // If this exists, we are in "Edit Mode"
+}
+
+export default function LeadForm({ onRefresh, initialData }: LeadFormProps) {
+  const [formData, setFormData] = useState({
     name: "",
     phoneNumber: "",
     email: "",
+    address: "",
     problemDescription: "",
     source: "",
     contactChannel: "",
-    contactDate: "",
+    contactDate: new Date().toISOString().split("T")[0],
   });
 
+  // When the component opens, if we have initialData, fill the form
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Stops the page from reloading
+    e.preventDefault();
 
-    // Create a copy of the data
-    const dataToSend = { ...formData };
+    // Basic frontend validation before even hitting the server
+    if (!formData.name.trim()) return alert("El nombre no puede estar vacío");
 
-    // If date is empty, don't send it or set it to null
-    if (!dataToSend.contactDate) delete dataToSend.contactDate;
     try {
-      // This sends the data to your @PostMapping in Java
-      await axios.post("http://localhost:8080/api/customers", formData);
-
-      // Clear the form for the next lead
-      setFormData({
-        name: "",
-        phoneNumber: "",
-        email: "",
-        problemDescription: "",
-        source: "",
-        contactChannel: "",
-        contactDate: new Date().toISOString().split("T")[0],
-      });
-
-      // Tell the main App to refresh the list of jobs/customers
+      if (initialData?.id) {
+        await axios.put(
+          `http://localhost:8080/api/customers/${initialData.id}`,
+          formData
+        );
+        alert("✅ ¡Cambios guardados con éxito!");
+      } else {
+        await axios.post("http://localhost:8080/api/customers", formData);
+        alert("✅ ¡Nuevo prospecto registrado!");
+      }
       onRefresh();
-
-      alert("Lead saved successfully!");
-    } catch (error) {
-      console.error("Error saving lead:", error);
-      alert("Failed to save lead. Is the Java backend running?");
+    } catch (error: any) {
+      // If Java returns a 400 Bad Request (Validation failed)
+      if (error.response?.status === 400) {
+        alert("❌ Error: Datos inválidos. Revisa que el nombre esté completo.");
+      } else {
+        alert("❌ Ups! Algo salió mal en el servidor.");
+      }
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
-      <h2 className="text-xl font-bold text-slate-800 mb-4">
-        Add New Customer Lead
-      </h2>
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-4 gap-4"
-      >
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+    >
+      {/* Input Group 1 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Nombre
+        </label>
         <input
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
-          placeholder="Nombre del Cliente"
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
         />
+      </div>
+
+      {/* Input Group 2 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Teléfono
+        </label>
         <input
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
-          placeholder="Numero de Telefono"
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.phoneNumber}
           onChange={(e) =>
             setFormData({ ...formData, phoneNumber: e.target.value })
           }
           required
         />
+      </div>
+      {/* Input Group 3 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Email
+        </label>
         <input
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
-          placeholder="Email"
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
         />
+      </div>
+      {/* Input Group 4 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Direccion
+        </label>
         <input
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
-          placeholder="Problema del Cliente"
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+          value={formData.address}
+          onChange={(e) =>
+            setFormData({ ...formData, address: e.target.value })
+          }
+          required
+        />
+      </div>
+      {/* Input Group 5 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Problema del Cliente
+        </label>
+        <input
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.problemDescription}
           onChange={(e) =>
             setFormData({ ...formData, problemDescription: e.target.value })
           }
           required
         />
+      </div>
+      {/* Input Group 6 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Como nos conocio
+        </label>
         <input
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
-          placeholder="Como nos conocio"
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.source}
           onChange={(e) => setFormData({ ...formData, source: e.target.value })}
           required
         />
+      </div>
+      {/* Input Group 7 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Como se contacto
+        </label>
         <input
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
-          placeholder="Como se contacto"
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.contactChannel}
           onChange={(e) =>
             setFormData({ ...formData, contactChannel: e.target.value })
           }
           required
         />
+      </div>
+      {/* Input Group 8 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
+          Fecha de Contacto
+        </label>
+        <input
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+          value={formData.contactDate}
+          onChange={(e) =>
+            setFormData({ ...formData, contactDate: e.target.value })
+          }
+          required
+        />
+      </div>
+
+      <div className="md:col-span-2 pt-4">
         <button
           type="submit"
-          className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition"
         >
-          Create Lead
+          {initialData?.id ? "Guardar Cambios" : "Crear Prospecto"}
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

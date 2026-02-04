@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.cglib.core.Local;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,10 +26,14 @@ public class Customer {
 
 
     @Column(nullable = false)
+    @NotBlank(message = "El nombre es obligatorio")
     private String name;
+    @NotBlank(message = "El email es obligatorio")
     private String email;
+    @NotBlank(message = "La direccion es obligatorio")
     private String address;
     private String source; //how they found us
+    @NotBlank(message = "El numero de telefono es obligatorio")
     private String phoneNumber;
     private String problemDescription;
     private String contactChannel;

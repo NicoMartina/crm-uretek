@@ -13,6 +13,7 @@ import {
   Calendar,
   LayoutDashboard,
   Package,
+  Edit,
 } from "lucide-react";
 import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
@@ -257,14 +258,14 @@ function App() {
       <nav className="fixed bottom-0 left-0 w-full bg-white border-t md:relative md:w-64 md:h-screen md:border-r md:border-t-0 p-4 z-50 flex md:flex-col gap-2">
         <div className="hidden md:block mb-8 px-4">
           <h1 className="text-2xl font-black text-slate-800">
-            Uretek <span className="text-orange-400">CRM</span>
+            Uretek <span className="">CRM</span>
           </h1>
         </div>
         <button
           onClick={() => setActiveTab("dashboard")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "dashboard"
-              ? "bg-orange-600 text-white shadow-lg"
+              ? "bg-orange-400 hover:bg-orange-500 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -275,7 +276,7 @@ function App() {
           onClick={() => setActiveTab("leads")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "leads"
-              ? "bg-orange-400 text-white shadow-lg"
+              ? "bg-orange-400 hover:bg-orange-500 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -287,7 +288,7 @@ function App() {
           onClick={() => setActiveTab("visits")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "visits"
-              ? "bg-orange-400 text-white shadow-lg"
+              ? "bg-orange-400 hover:bg-orange-500 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -299,7 +300,7 @@ function App() {
           onClick={() => setActiveTab("jobs")}
           className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
             activeTab === "jobs"
-              ? "bg-orange-400 text-white shadow-lg"
+              ? "bg-orange-400 hover:bg-orange-500 text-white shadow-lg"
               : "text-slate-500 hover:bg-slate-100"
           }`}
         >
@@ -396,7 +397,7 @@ function App() {
               </div>
               <button
                 onClick={() => setIsAddingLead(true)}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-orange-200 transition-all active:scale-95"
+                className="bg-orange-400 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-orange-200 transition-all active:scale-95"
               >
                 <Plus size={20} />
                 Nuevo Prospecto
@@ -410,21 +411,27 @@ function App() {
                   <div className="p-8">
                     <div className="flex justify-between items-center mb-6">
                       <h2 className="text-2xl font-black text-slate-800">
-                        Registrar Nuevo Cliente
+                        {selectedLead
+                          ? "Editar Cliente"
+                          : "Registrar Nuevo Cliente"}
                       </h2>
                       <button
-                        onClick={() => setIsAddingLead(false)}
+                        onClick={() => {
+                          setIsAddingLead(false);
+                          setSelectedLead(null); // IMPORTANT: Clear selection when closing
+                        }}
                         className="text-slate-400 hover:text-slate-600"
                       >
-                        <Trash2 size={24} /> {/* Or an X icon */}
+                        <Trash2 size={24} />
                       </button>
                     </div>
 
-                    {/* Pass the close function so the form can close itself after saving */}
                     <LeadForm
+                      initialData={selectedLead} // Pass the lead data if we are editing
                       onRefresh={() => {
                         fetchData();
                         setIsAddingLead(false);
+                        setSelectedLead(null); // Clear selection after saving
                       }}
                     />
                   </div>
@@ -514,7 +521,7 @@ function App() {
 
                     <button
                       onClick={() => setViewingLead(null)}
-                      className="w-full mt-8 py-4 bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-900 transition-all"
+                      className="w-full mt-8 py-4 bg-orange-400 text-white font-bold rounded-2xl hover:bg-orange-500 transition-all"
                     >
                       Cerrar
                     </button>
@@ -555,7 +562,9 @@ function App() {
                         <td className="p-4 font-black text-slate-800">
                           {/* CLICKABLE NAME */}
                           <button
-                            onClick={() => setViewingLead(lead)}
+                            onClick={() => {
+                              setViewingLead(lead);
+                            }}
                             className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
                           >
                             {lead.name}
@@ -588,9 +597,21 @@ function App() {
                             >
                               + Obra
                             </button>
+                            {/* NEW EDIT BUTTON */}
+                            <button
+                              onClick={() => {
+                                setSelectedLead(lead); // Set the lead to be edited
+                                setIsAddingLead(true); // Open the modal
+                              }}
+                              className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
+                              title="Editar Datos"
+                            >
+                              <Edit size={18} />{" "}
+                              {/* Or use an Edit icon if you prefer */}
+                            </button>
                             <button
                               onClick={() => handleDeleteLead(lead.id)}
-                              className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                               title="Eliminar Prospecto"
                             >
                               <Trash2 size={18} />
