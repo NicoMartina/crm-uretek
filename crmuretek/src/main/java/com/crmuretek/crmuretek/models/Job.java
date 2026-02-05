@@ -27,6 +27,7 @@
         private List<MaterialUsage> materialUsages;
 
         private Double estimateMaterialKg; // estimation of kg to use in the job
+        private Double pricePerKilo;
         private String quoteNumber; // numero de presupesto aceptado
         private Double totalAmount;    // monto del presupuesto aceptado
 
@@ -54,4 +55,16 @@
         public String getCustomerName() {
             return this.customer != null ? this.customer.getName() : "No Customer";
         }
+
+        public void calculateTotals(){
+            if (this.estimateMaterialKg != null &&  this.pricePerKilo != null) {
+                this.totalAmount = this.estimateMaterialKg * this.pricePerKilo;
+            } else {
+                this.totalAmount = 0.0;
+            }
+
+            double downPayment = (this.downPaymentAmount != null) ? this.downPaymentAmount : 0.0;
+            double balanceAmount = this.totalAmount - downPayment;
+        }
+
     }

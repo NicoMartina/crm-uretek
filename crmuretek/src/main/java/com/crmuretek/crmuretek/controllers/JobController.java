@@ -74,6 +74,25 @@
             }).orElse(ResponseEntity.notFound().build());
         }
 
+        @PutMapping("/{id}")
+        public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody Job details) {
+            return jobRepository.findById(id).map(job -> {
+                // 1. Update only the fields we are editing
+                job.setObservations(details.getObservations());
+                job.setEstimateMaterialKg(details.getEstimateMaterialKg());
+                job.setPricePerKilo(details.getPricePerKilo());
+
+                // 2. Recalculate the totals (Saldo/Total) before saving
+                job.calculateTotals();
+
+                // 3. Save to database
+                jobRepository.save(job);
+
+                // 4. Return success (no body to avoid circular reference errors)
+                return ResponseEntity.ok().build();
+            }).orElse(ResponseEntity.notFound().build());
+        }
+
 
 
 

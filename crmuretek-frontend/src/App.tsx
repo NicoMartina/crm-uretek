@@ -47,6 +47,7 @@ function App() {
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [viewingLead, setViewingLead] = useState<any | null>(null);
+  const [editingJob, setEditingJob] = useState<any>(null);
 
   const fetchInventory = async () => {
     try {
@@ -744,6 +745,12 @@ function App() {
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-2">
                               <button
+                                onClick={() => setEditingJob(job)}
+                                className="p-2 text-slate-400 hover:text-blue-500 transition-colors"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
                                 onClick={() => handleDeleteJob(job.id)}
                                 className="p-2 text-slate-400 hover:text-red-500 transition-colors"
                               >
@@ -899,6 +906,99 @@ function App() {
               >
                 + Cargar RESINA
               </button>
+            </div>
+          </div>
+        )}
+        {editingJob && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
+            <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4 text-slate-800">
+                Editar Trabajo
+              </h2>
+
+              <div className="space-y-4">
+                {/* Observations Field */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
+                    Observaciones
+                  </label>
+                  <textarea
+                    className="w-full border rounded-lg p-2 h-24 focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={editingJob.observations || ""}
+                    onChange={(e) =>
+                      setEditingJob({
+                        ...editingJob,
+                        observations: e.target.value,
+                      })
+                    }
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase">
+                        Kg Estimados
+                      </label>
+                      <input
+                        type="number"
+                        className="w-full border rounded-lg p-2"
+                        value={editingJob.estimateMaterialKg || ""}
+                        onChange={(e) =>
+                          setEditingJob({
+                            ...editingJob,
+                            estimateMaterialKg: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-500 uppercase">
+                        Precio por Kg
+                      </label>
+                      <input
+                        type="number"
+                        className="w-full border rounded-lg p-2"
+                        value={editingJob.pricePerKilo || ""}
+                        onChange={(e) =>
+                          setEditingJob({
+                            ...editingJob,
+                            pricePerKilo: Number(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setEditingJob(null)}
+                    className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg font-semibold"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        // We use editingJob.id directly here
+                        await axios.put(
+                          `http://localhost:8080/api/jobs/${editingJob.id}`,
+                          editingJob
+                        );
+                        setEditingJob(null);
+                        fetchData();
+                        alert("✅ Guardado con éxito");
+                      } catch (err) {
+                        console.error(err);
+                        alert(
+                          "❌ Error: No se pudo guardar. Revisa la consola."
+                        );
+                      }
+                    }}
+                    className="flex-1 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg font-semibold"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
