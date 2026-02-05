@@ -4,6 +4,7 @@ import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +14,7 @@ public class InventoryService {
 
 
     private final InventoryRepository inventoryRepository;
+    private static final Long DEFAULT_INVENTORY_ID = 1L;
 
     public InventoryService(InventoryRepository inventoryRepository) {
         this.inventoryRepository = inventoryRepository;
@@ -36,33 +38,32 @@ public class InventoryService {
 
     }
 
-    public void addIso(Double amount){
-        Inventory inventory = inventoryRepository.findById(1L)
+    // This helper method removes the duplicate code!
+    private Inventory getOrCreateInventory(){
+        return inventoryRepository.findById(DEFAULT_INVENTORY_ID)
                 .orElseGet(() -> {
                     Inventory newInv = new Inventory();
-                    newInv.setId(1L);
+                    newInv.setId(DEFAULT_INVENTORY_ID);
                     newInv.setIso_stock(0.0);
                     newInv.setResina_stock(0.0);
                     return inventoryRepository.save(newInv);
                 });
-        Double currentStock = (inventory.getIso_stock() != null ) ? inventory.getIso_stock() : 0.0;
+    }
 
+    @Transactional
+    public void addIso(Double amount){
+        Inventory inventory = getOrCreateInventory();
+        Double currentStock = (inventory.getIso_stock() != null ) ? inventory.getIso_stock() : 0.0;
         inventory.setIso_stock(currentStock + amount);
+        inventory.setLastUpdated(LocalDateTime.now());
         inventoryRepository.save(inventory);
     }
 
     public void addResina(Double amount){
-        Inventory inventory = inventoryRepository.findById(1L)
-                .orElseGet(() -> {
-                    Inventory newInv = new Inventory();
-                    newInv.setId(1L);
-                    newInv.setIso_stock(0.0);
-                    newInv.setResina_stock(0.0);
-                    return inventoryRepository.save(newInv);
-                });
-
+        Inventory inventory = getOrCreateInventory();
         Double currentStock = (inventory.getResina_stock() != null) ? inventory.getResina_stock() : 0.0;
         inventory.setResina_stock(currentStock + amount);
+        inventory.setLastUpdated(LocalDateTime.now());
         inventoryRepository.save(inventory);
     }
 
