@@ -1,9 +1,7 @@
 package com.crmuretek.crmuretek.controllers;
-
 import com.crmuretek.crmuretek.models.Customer;
-import com.crmuretek.crmuretek.repositories.CustomerRepository;
+import com.crmuretek.crmuretek.services.CustomerService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,53 +12,33 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class CustomerController {
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
-    @PostMapping
-    public Customer createaCustomer(@Valid @RequestBody Customer customer){
-        return customerRepository.save(customer);
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public List<Customer> getAll(){
+        return customerService.findAll();
+    }
+
+    @PostMapping
+    public Customer create(@Valid @RequestBody Customer customer){
+        return customerService.create(customer);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Customer> update(@PathVariable Long id, @Valid @RequestBody  Customer details){
+        return ResponseEntity.ok(customerService.update(id, details));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id){
-        return customerRepository.findById(id)
-                .map( customer -> {
-                    if (!customer.getJobs().isEmpty()){
-                        return ResponseEntity.status(HttpStatus.CONFLICT).<Void>build();
-                    }
-                    customerRepository.deleteById(id);
-                    return ResponseEntity.noContent().<Void>build();
-        })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+        boolean  deleted = customerService.delete(id);
+        if (deleted){
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
-
-
-    @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customerDetails) {
-        // 1. Find the existing customer
-        return customerRepository.findById(id)
-                .map(customer -> {
-                    customer.setName(customerDetails.getName());
-                    customer.setPhoneNumber(customerDetails.getPhoneNumber());
-                    customer.setEmail(customerDetails.getEmail());
-                    customer.setAddress(customerDetails.getAddress());
-                    customer.setProblemDescription(customerDetails.getProblemDescription());
-                    customer.setSource(customerDetails.getSource());
-                    customer.setContactChannel(customerDetails.getContactChannel());
-                    customer.setContactDate(customerDetails.getContactDate());
-                    customer.setRequestVisit(customerDetails.getRequestVisit());
-                    customer.setVisitDate(customerDetails.getVisitDate());
-
-                    return customerRepository.save(customer);
-                })
-                .orElseThrow(() -> new RuntimeException("Customer Not found with id " + id));
-    }
-
-
 }
