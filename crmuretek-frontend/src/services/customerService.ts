@@ -1,0 +1,20 @@
+import api from "./api";
+
+export const customerService = {
+  // Get all customers
+  getAll: async () => {
+    const response = await api.get("/customers");
+    return response.data;
+  },
+
+  // Delete a customer
+  delete: async (id: number) => {
+    return await api.delete(`/customers/${id}`);
+  },
+
+  // Update a customer (for scheduling visits, etc.)
+  update: async (id: number, data: any) => {
+    const response = await api.put(`/customers/${id}`, data);
+    return response.data;
+  },
+};

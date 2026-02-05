@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getJobs } from "./services/api";
+import { jobService } from "./services/jobService";
+import { customerService } from "./services/customerService";
 import axios from "axios";
 import type { Job } from "./types/Job";
 import {
@@ -19,6 +20,9 @@ import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
 import type { Visit } from "./types/Visit";
 import type { Inventory } from "./types/Inventory";
+import { VisitModal } from "./components/VisitModal";
+import { calculatePossibleMix } from "./utils/InventoryMath";
+import { visitService } from "./services/visitService";
 
 // Change this at the top of App.tsx
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -47,7 +51,6 @@ function App() {
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [viewingLead, setViewingLead] = useState<any | null>(null);
-  const [editingJob, setEditingJob] = useState<any>(null);
 
   const fetchInventory = async () => {
     try {
@@ -59,11 +62,12 @@ function App() {
   };
   const fetchData = async () => {
     try {
-      const jobsRes = await getJobs();
+      const jobsRes = await jobService.getAll();
       setJobs(jobsRes);
 
-      const custRes = await axios.get("http://localhost:8080/api/customers");
-      const newLeads = custRes.data.filter(
+      // CLEAN VERSION:
+      const customers = await customerService.getAll();
+      const newLeads = customers.filter(
         (c: any) => !c.jobs || c.jobs.length === 0
       );
       setLeads(newLeads);
@@ -98,10 +102,8 @@ function App() {
     newStatus: string
   ) => {
     try {
-      await axios.patch(`http://localhost:8080/api/visits/${visitId}/status`, {
-        status: newStatus,
-      });
-      fetchData();
+      await visitService.updateStatus(visitId, newStatus);
+      fetchData(); // Always refresh after a change!
     } catch (error) {
       console.error("Error updating status:", error);
     }
@@ -124,8 +126,8 @@ function App() {
     if (!visitDate) return alert("Por favor selecciona una fecha");
 
     try {
-      await axios.post("http://localhost:8080/api/visits", {
-        customer: { id: schedulingVisitLead.id }, // Link to the customer
+      await visitService.create({
+        customer: { id: schedulingVisitLead.id },
         visitDate: visitDate,
         observations: visitNotes,
         status: "SCHEDULED",
@@ -199,7 +201,7 @@ function App() {
   const handleDeleteLead = async (id: number) => {
     if (window.confirm("¿Seguro que quieres borrar este prospecto?")) {
       try {
-        await axios.delete(`http://localhost:8080/api/customers/${id}`);
+        await customerService.delete(id); // Using the service!
         fetchData(); // Refresh the list
       } catch (error: any) {
         if (error.response?.status == 409) {
@@ -247,11 +249,7 @@ function App() {
       v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const maxMixFromIso = inventory?.iso_stock ? inventory.iso_stock / 0.63 : 0;
-  const maxMixFromResina = inventory?.resina_stock
-    ? inventory.resina_stock / 0.37
-    : 0;
-  const totalPossibleMix = Math.min(maxMixFromIso, maxMixFromResina);
+  const totalPossibleMix = calculatePossibleMix(inventory);
 
   return (
     <div className="min-h-screen bg-slate-50 md:flex text-slate-900">
@@ -320,57 +318,15 @@ function App() {
           />
         )}
 
-        {schedulingVisitLead && (
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-100 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-              <h3 className="text-2xl font-black mb-2">Agendar Visita</h3>
-              <p className="text-slate-500 mb-6">
-                Cliente: {schedulingVisitLead.name}
-              </p>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
-                    Fecha de Visita
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500"
-                    value={visitDate}
-                    onChange={(e) => setVisitDate(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
-                    Observaciones
-                  </label>
-                  <textarea
-                    className="w-full p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500"
-                    rows={3}
-                    value={visitNotes}
-                    onChange={(e) => setVisitNotes(e.target.value)}
-                    placeholder="Ej: Revisar grietas en el garaje..."
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setSchedulingVisitLead(null)}
-                    className="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleConfirmVisit}
-                    className="flex-1 py-3 bg-orange-400 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-500 transition-all"
-                  >
-                    Confirmar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <VisitModal
+          lead={schedulingVisitLead}
+          visitDate={visitDate}
+          setVisitDate={setVisitDate}
+          visitNotes={visitNotes}
+          setVisitNotes={setVisitNotes}
+          onClose={() => setSchedulingVisitLead(null)}
+          onConfirm={handleConfirmVisit}
+        />
 
         <div className="relative max-w-md mx-auto mb-8">
           <Search
@@ -745,12 +701,6 @@ function App() {
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-2">
                               <button
-                                onClick={() => setEditingJob(job)}
-                                className="p-2 text-slate-400 hover:text-blue-500 transition-colors"
-                              >
-                                <Edit size={16} />
-                              </button>
-                              <button
                                 onClick={() => handleDeleteJob(job.id)}
                                 className="p-2 text-slate-400 hover:text-red-500 transition-colors"
                               >
@@ -906,99 +856,6 @@ function App() {
               >
                 + Cargar RESINA
               </button>
-            </div>
-          </div>
-        )}
-        {editingJob && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
-            <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4 text-slate-800">
-                Editar Trabajo
-              </h2>
-
-              <div className="space-y-4">
-                {/* Observations Field */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">
-                    Observaciones
-                  </label>
-                  <textarea
-                    className="w-full border rounded-lg p-2 h-24 focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={editingJob.observations || ""}
-                    onChange={(e) =>
-                      setEditingJob({
-                        ...editingJob,
-                        observations: e.target.value,
-                      })
-                    }
-                  />
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase">
-                        Kg Estimados
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full border rounded-lg p-2"
-                        value={editingJob.estimateMaterialKg || ""}
-                        onChange={(e) =>
-                          setEditingJob({
-                            ...editingJob,
-                            estimateMaterialKg: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-500 uppercase">
-                        Precio por Kg
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full border rounded-lg p-2"
-                        value={editingJob.pricePerKilo || ""}
-                        onChange={(e) =>
-                          setEditingJob({
-                            ...editingJob,
-                            pricePerKilo: Number(e.target.value),
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={() => setEditingJob(null)}
-                    className="flex-1 py-2 bg-slate-100 text-slate-600 rounded-lg font-semibold"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={async () => {
-                      try {
-                        // We use editingJob.id directly here
-                        await axios.put(
-                          `http://localhost:8080/api/jobs/${editingJob.id}`,
-                          editingJob
-                        );
-                        setEditingJob(null);
-                        fetchData();
-                        alert("✅ Guardado con éxito");
-                      } catch (err) {
-                        console.error(err);
-                        alert(
-                          "❌ Error: No se pudo guardar. Revisa la consola."
-                        );
-                      }
-                    }}
-                    className="flex-1 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded-lg font-semibold"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         )}

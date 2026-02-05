@@ -1,10 +1,10 @@
 import axios from "axios";
 
+// One place to change the URL for the whole app
+const API_URL = "http://localhost:8080/api";
+
 const api = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: API_URL,
 });
 
-export const getJobs = async () => {
-  const response = await api.get("/jobs");
-  return response.data;
-};
+export default api;
