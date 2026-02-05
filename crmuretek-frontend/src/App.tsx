@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { jobService } from "./services/jobService";
 import { customerService } from "./services/customerService";
-import axios from "axios";
+
 import type { Job } from "./types/Job";
 import {
   Briefcase,
@@ -23,6 +23,11 @@ import type { Inventory } from "./types/Inventory";
 import { VisitModal } from "./components/VisitModal";
 import { calculatePossibleMix } from "./utils/InventoryMath";
 import { visitService } from "./services/visitService";
+import { LeadsTable } from "./components/LeadsTable";
+import { JobsTable } from "./components/JobsTable";
+import { VisitsTable } from "./components/VisitsTable";
+import { inventoryService } from "./services/inventoryService";
+import { DashboardView } from "./components/DashboardView";
 
 // Change this at the top of App.tsx
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
@@ -54,33 +59,21 @@ function App() {
 
   const fetchInventory = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/inventory");
-      setInventory(response.data);
+      const data = await inventoryService.getInventory();
+      setInventory(data);
     } catch (error) {
       console.error("Error fetching inventory:", error);
     }
   };
   const fetchData = async () => {
     try {
-      const jobsRes = await jobService.getAll();
-      setJobs(jobsRes);
+      setJobs(await jobService.getAll());
 
-      // CLEAN VERSION:
       const customers = await customerService.getAll();
-      const newLeads = customers.filter(
-        (c: any) => !c.jobs || c.jobs.length === 0
-      );
-      setLeads(newLeads);
+      setLeads(customers.filter((c: any) => !c.jobs || c.jobs.length === 0));
 
-      // --- ADD THIS PART ---
-      const visitsRes = await axios.get("http://localhost:8080/api/visits");
-      setVisits(visitsRes.data);
-      // ---------------------
-
-      const materialRes = await axios.get(
-        "http://localhost:8080/api/jobs/stats/material-total"
-      );
-      setMaterialTotal(materialRes.data);
+      setVisits(await visitService.getAll());
+      setMaterialTotal(await jobService.getMaterialTotal());
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -88,9 +81,7 @@ function App() {
 
   const handleUpdateStatus = async (jobId: number, newStatus: string) => {
     try {
-      await axios.patch(`http://localhost:8080/api/jobs/${jobId}/status`, {
-        status: newStatus,
-      });
+      await jobService.updateStatus(jobId, newStatus);
       fetchData();
     } catch (error) {
       console.error("Error updating status:", error);
@@ -112,10 +103,8 @@ function App() {
   const handleScheduleVisit = async (lead: any, date: string | null) => {
     if (date === "" && date !== null) return alert("Selecciona una fecha");
     try {
-      await axios.put(`http://localhost:8080/api/customers/${lead.id}`, {
-        ...lead,
-        visitDate: date,
-      });
+      // Uses customerService.update instead of axios.put
+      await customerService.update(lead.id, { ...lead, visitDate: date });
       fetchData();
     } catch (error) {
       console.error(error);
@@ -150,30 +139,27 @@ function App() {
 
   const handleDeleteJob = async (id: number) => {
     if (window.confirm("¿Eliminar este trabajo?")) {
-      await axios.delete(`http://localhost:8080/api/jobs/${id}`);
+      await jobService.delete(id); // Uses jobService
       fetchData();
     }
   };
 
   const handleDeleteVisit = async (id: number) => {
     if (window.confirm("¿Eliminar esta visita?")) {
-      await axios.delete(`http://localhost:8080/api/visits/${id}`);
+      await visitService.delete(id); // Uses visitService
       fetchData();
     }
   };
 
   const handleCreateJob = async (formData: any) => {
     try {
-      await axios.post("http://localhost:8080/api/jobs", {
+      await jobService.create({
         ...formData,
         customer: { id: selectedLead.id },
         jobStatus: "QUOTED",
       });
-
-      setSelectedLead(null); // Close the modal
-      fetchData(); // Refresh the lists (this removes the lead from the list!)
-
-      // THE PRO MOVE: Switch the tab so dad sees the new job instantly
+      setSelectedLead(null);
+      fetchData();
       setActiveTab("jobs");
     } catch (error) {
       console.error("Error creating job:", error);
@@ -187,11 +173,8 @@ function App() {
 
     if (amount && !isNaN(Number(amount))) {
       try {
-        // Remember your Java endpoint is /api/inventory/add-iso or /add-resina
-        await axios.post(`http://localhost:8080/api/inventory/add-${type}`, {
-          amount: Number(amount),
-        });
-        fetchInventory(); // Refresh the numbers on the screen!
+        await inventoryService.addStock(type, Number(amount));
+        fetchInventory();
       } catch (error) {
         alert("Error al cargar stock");
       }
@@ -489,96 +472,17 @@ function App() {
 
             <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[700px]">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Fecha
-                      </th>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Nombre
-                      </th>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Teléfono
-                      </th>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
-                        Acciones Rápidas
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filteredLeads.map((lead) => (
-                      <tr
-                        key={lead.id}
-                        className="hover:bg-slate-50/50 transition-colors group"
-                      >
-                        <td className="p-4 text-xs font-medium text-slate-400">
-                          {/* If your backend doesn't have contactDate yet, we can use a placeholder */}
-                          {lead.contactDate || "---"}
-                        </td>
-                        <td className="p-4 font-black text-slate-800">
-                          {/* CLICKABLE NAME */}
-                          <button
-                            onClick={() => {
-                              setViewingLead(lead);
-                            }}
-                            className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
-                          >
-                            {lead.name}
-                          </button>
-                        </td>
-                        <td className="p-4 text-slate-500 font-medium">
-                          {lead.phoneNumber}
-                        </td>
-                        <td className="p-4">
-                          <div className="flex justify-end gap-2">
-                            <a
-                              href={`https://wa.me/${lead.phoneNumber?.replace(
-                                /\D/g,
-                                ""
-                              )}`}
-                              target="_blank"
-                              className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-200 transition-all flex items-center gap-1"
-                            >
-                              WhatsApp
-                            </a>
-                            <button
-                              onClick={() => setSchedulingVisitLead(lead)}
-                              className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-bold text-[10px] uppercase hover:bg-blue-200 transition-all flex items-center gap-1"
-                            >
-                              <Calendar size={12} /> Visita
-                            </button>
-                            <button
-                              onClick={() => setSelectedLead(lead)}
-                              className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg font-bold text-[10px] uppercase hover:bg-orange-200 transition-all"
-                            >
-                              + Obra
-                            </button>
-                            {/* NEW EDIT BUTTON */}
-                            <button
-                              onClick={() => {
-                                setSelectedLead(lead); // Set the lead to be edited
-                                setIsAddingLead(true); // Open the modal
-                              }}
-                              className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
-                              title="Editar Datos"
-                            >
-                              <Edit size={18} />{" "}
-                              {/* Or use an Edit icon if you prefer */}
-                            </button>
-                            <button
-                              onClick={() => handleDeleteLead(lead.id)}
-                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                              title="Eliminar Prospecto"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <LeadsTable
+                  leads={filteredLeads}
+                  onView={(lead) => setViewingLead(lead)}
+                  onEdit={(lead) => {
+                    setSelectedLead(lead);
+                    setIsAddingLead(true);
+                  }}
+                  onDelete={handleDeleteLead}
+                  onScheduleVisit={(lead) => setSchedulingVisitLead(lead)}
+                  onQuote={(lead) => setSelectedLead(lead)}
+                />
               </div>
             </div>
           </div>
@@ -647,73 +551,12 @@ function App() {
               </div>
 
               {/* NEW TABLE VIEW */}
-              <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse min-w-[600px]">
-                    <thead className="bg-slate-50 border-b border-slate-200">
-                      <tr>
-                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                          ID
-                        </th>
-                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                          Cliente
-                        </th>
-                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                          Estado
-                        </th>
-                        <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
-                          Acciones
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredJobs.map((job) => (
-                        <tr
-                          key={job.id}
-                          className="hover:bg-slate-50/50 transition-colors group"
-                        >
-                          <td className="p-4 text-xs font-bold text-slate-400">
-                            #{job.id}
-                          </td>
-                          <td className="p-4">
-                            <div className="font-bold text-slate-800">
-                              {job.customer?.name || "Sin nombre"}
-                            </div>
-                            <div className="text-[10px] text-slate-500">
-                              {job.customer?.phoneNumber}
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <select
-                              value={job.jobStatus}
-                              onChange={(e) =>
-                                handleUpdateStatus(job.id, e.target.value)
-                              }
-                              className={`text-[10px] font-black uppercase px-2 py-1 rounded-md outline-none cursor-pointer border-none ${
-                                STATUS_MAP[job.jobStatus]?.color
-                              }`}
-                            >
-                              <option value="QUOTED">Presupuestado</option>
-                              <option value="IN_PROGRESS">En Obra</option>
-                              <option value="COMPLETED">Finalizado</option>
-                            </select>
-                          </td>
-                          <td className="p-4 text-right">
-                            <div className="flex justify-end gap-2">
-                              <button
-                                onClick={() => handleDeleteJob(job.id)}
-                                className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <JobsTable
+                jobs={filteredJobs}
+                statusMap={STATUS_MAP}
+                onUpdateStatus={handleUpdateStatus}
+                onDelete={handleDeleteJob}
+              />
             </div>
           </>
         )}
@@ -728,136 +571,26 @@ function App() {
 
             <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[800px]">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Fecha
-                      </th>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Cliente
-                      </th>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                        Estado
-                      </th>
-                      <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
-                        Gestión
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {filteredVisits.map((visit) => (
-                      <tr
-                        key={visit.id}
-                        className="hover:bg-slate-50/50 transition-colors group"
-                      >
-                        <td className="p-4">
-                          <div className="font-bold text-slate-800">
-                            {new Date(visit.visitDate).toLocaleDateString()}
-                          </div>
-                          <div className="text-[10px] text-slate-400 font-bold uppercase">
-                            Visita #{visit.id}
-                          </div>
-                        </td>
-                        <td className="p-4 font-black text-slate-700">
-                          {visit.customer.name}
-                        </td>
-                        <td className="p-4">
-                          <span
-                            className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${
-                              visit.status === "VISITED"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-orange-100 text-orange-700"
-                            }`}
-                          >
-                            {visit.status}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex justify-end gap-2">
-                            {visit.status === "SCHEDULED" && (
-                              <button
-                                onClick={() =>
-                                  handleUpdateVisitStatus(visit.id, "VISITED")
-                                }
-                                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-blue-700 transition-all"
-                              >
-                                Marcar Visitado
-                              </button>
-                            )}
-                            <button
-                              onClick={() => setSelectedLead(visit.customer)}
-                              className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"
-                            >
-                              <Briefcase size={12} /> Convertir
-                            </button>
-                            <button
-                              onClick={() => handleDeleteVisit(visit.id)}
-                              className="p-2 text-slate-300 hover:text-red-500 transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <VisitsTable
+                  visits={filteredVisits}
+                  onUpdateStatus={handleUpdateVisitStatus}
+                  onConvert={(customer) => setSelectedLead(customer)}
+                  onDelete={handleDeleteVisit}
+                />
               </div>
             </div>
           </div>
         )}
         {/* --- DASHBOARD VIEW --- */}
         {activeTab === "dashboard" && (
-          <div className="bg-slate-900 p-8 rounded-[2rem] shadow-xl text-white col-span-1 md:col-span-2 border-b-8 border-orange-500">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <span className="text-slate-400 text-xs font-black uppercase tracking-[0.2em]">
-                  Capacidad de Obra Total
-                </span>
-                <h3 className="text-5xl font-black mt-2 leading-none">
-                  {Math.floor(totalPossibleMix).toLocaleString()}{" "}
-                  <span className="text-xl text-slate-500 uppercase">kg</span>
-                </h3>
-              </div>
-              <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-sm">
-                <Package size={32} className="text-orange-500" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
-              <div>
-                <p className="text-slate-500 text-xs font-bold uppercase mb-1">
-                  Stock ISO (63%)
-                </p>
-                <p className="text-xl font-black text-blue-400">
-                  {inventory?.iso_stock.toLocaleString()} kg
-                </p>
-              </div>
-              <div>
-                <p className="text-slate-500 text-xs font-bold uppercase mb-1">
-                  Stock Resina (37%)
-                </p>
-                <p className="text-xl font-black text-emerald-400">
-                  {inventory?.resina_stock.toLocaleString()} kg
-                </p>
-              </div>
-            </div>
-            <div className="mt-8 flex gap-4 border-t border-white/10 pt-6">
-              <button
-                onClick={() => handleAddStock("iso")}
-                className="flex-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 py-3 rounded-2xl font-bold text-sm transition-all border border-blue-500/30"
-              >
-                + Cargar ISO
-              </button>
-              <button
-                onClick={() => handleAddStock("resina")}
-                className="flex-1 bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 py-3 rounded-2xl font-bold text-sm transition-all border border-emerald-500/30"
-              >
-                + Cargar RESINA
-              </button>
-            </div>
-          </div>
+          <DashboardView
+            inventory={inventory}
+            totalPossibleMix={totalPossibleMix}
+            onAddStock={handleAddStock}
+            totalQuoted={totalQuoted}
+            totalActive={totalActive}
+            materialTotal={materialTotal}
+          />
         )}
       </main>
     </div>
