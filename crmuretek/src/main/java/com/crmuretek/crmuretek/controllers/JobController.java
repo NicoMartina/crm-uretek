@@ -48,7 +48,7 @@
 
         @GetMapping("/stats/material-total")
         public ResponseEntity<Double> getTotalMaterial(){
-            Double total = jobRepository.sumTotalMaterialForPendingJobs();
+            Double total = jobRepository.sumRequiredMaterial();
             return ResponseEntity.ok(total != null ? total : 0.0);
         }
 
