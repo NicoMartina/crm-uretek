@@ -1,6 +1,8 @@
 package com.crmuretek.crmuretek.services;
 
+import com.crmuretek.crmuretek.exceptions.InsuffcientMaterialException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
+import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.models.Job;
 import com.crmuretek.crmuretek.models.JobStatus;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
@@ -8,8 +10,11 @@ import com.crmuretek.crmuretek.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.client.ResourceAccessException;
+
+import java.awt.*;
 
 @Service
 public class JobService {
@@ -39,12 +44,25 @@ public class JobService {
         return jobRepository.save(job);
     }
 
-    public Job updateJobStatus(Long id, JobStatus newStatus){
+    @Transactional
+    public Job updateJobStatus(Long id, String statusName){
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
-        if (newStatus ==  JobStatus.IN_PROGRESS){
-            // Logic: Check inventory here before allowing the status change
-            // This is pure backend specialization!
+        JobStatus newStatus = JobStatus.valueOf(statusName.toUpperCase());
+
+        if (newStatus ==  JobStatus.IN_PROGRESS && job.getJobStatus() != JobStatus.IN_PROGRESS) {
+            Inventory stock = inventoryRepository.findAll().stream().findFirst()
+                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+            double requiredIso = job.getEstimateMaterialKg() * 0.63;
+            double requiredResina = job.getEstimateMaterialKg() * 0.37;
+
+            if (stock.getIso_stock() < requiredIso || stock.getResina_stock() < requiredResina){
+                throw new InsuffcientMaterialException("Insufficient stock to start the job.");
+            }
+
+            stock.setIso_stock(stock.getIso_stock() - requiredIso);
+            stock.setResina_stock(stock.getResina_stock() - requiredResina);
+            stock.setLastUpdated(java.time.LocalDateTime.now());
         }
         job.setJobStatus(newStatus);
         return jobRepository.save(job);
