@@ -6,11 +6,9 @@ import type { Job } from "./types/Job";
 import {
   Briefcase,
   UserPlus,
-  Phone,
   Plus,
   Trash2,
   Search,
-  Archive,
   Calendar,
   LayoutDashboard,
   Package,
@@ -21,7 +19,7 @@ import { QuoteForm } from "./components/QuoteForm";
 import type { Visit } from "./types/Visit";
 import type { Inventory } from "./types/Inventory";
 import { VisitModal } from "./components/VisitModal";
-import { calculatePossibleMix } from "./utils/InventoryMath";
+
 import { visitService } from "./services/visitService";
 import { LeadsTable } from "./components/LeadsTable";
 import { JobsTable } from "./components/JobsTable";
@@ -56,28 +54,39 @@ function App() {
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [viewingLead, setViewingLead] = useState<any | null>(null);
+  const [totalQuoted, setTotalQuoted] = useState<number>(0);
+  const [totalActive, setTotalActive] = useState<number>(0);
+  const [totalPossibleMix, setTotalPossibleMix] = useState<number>(0);
 
-  const fetchInventory = async () => {
-    try {
-      const data = await inventoryService.getInventory();
-      setInventory(data);
-    } catch (error) {
-      console.error("Error fetching inventory:", error);
-    }
-  };
   const fetchData = async () => {
     try {
+      // 1. Get the lists for the tables
       setJobs(await jobService.getAll());
+      setVisits(await visitService.getAll());
 
       const customers = await customerService.getAll();
       setLeads(customers.filter((c: any) => !c.jobs || c.jobs.length === 0));
 
-      setVisits(await visitService.getAll());
-      setMaterialTotal(await jobService.getMaterialTotal());
+      // 2. GET THE DASHBOARD SUMMARY (The Java Brain)
+      const summary = await jobService.getDashboardSummary();
+
+      // Update the UI with the pre-calculated numbers from Java
+      setInventory({
+        iso_stock: summary.isoStock,
+        resina_stock: summary.resinaStock,
+      });
+
+      setMaterialTotal(summary.materialNeededTotal);
+      setTotalQuoted(summary.totalQuoted);
+      setTotalActive(summary.totalActive);
+      setTotalPossibleMix(summary.possibleMix);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error syncing with Backend:", error);
     }
   };
+
+  // You can now delete the old fetchInventory function entirely!
+  // Everything comes through fetchData now.
 
   const handleUpdateStatus = async (jobId: number, newStatus: string) => {
     try {
@@ -174,7 +183,7 @@ function App() {
     if (amount && !isNaN(Number(amount))) {
       try {
         await inventoryService.addStock(type, Number(amount));
-        fetchInventory();
+        fetchData();
       } catch (error) {
         alert("Error al cargar stock");
       }
@@ -200,19 +209,12 @@ function App() {
 
   useEffect(() => {
     fetchData();
-    fetchInventory();
   }, []);
 
   useEffect(() => {
     setSearchTerm("");
   }, [activeTab]);
 
-  const totalQuoted = jobs
-    .filter((j) => j.jobStatus === "QUOTED")
-    .reduce((sum, j) => sum + (j.totalAmount || 0), 0);
-  const totalActive = jobs
-    .filter((j) => j.jobStatus === "IN_PROGRESS")
-    .reduce((sum, j) => sum + (j.totalAmount || 0), 0);
   const upcomingVisits = leads.filter((l) => l.visitDate != null);
 
   const filteredLeads = leads.filter((l) =>
@@ -231,8 +233,6 @@ function App() {
       (v.status === "SCHEDULED" || v.status === "VISITED") &&
       v.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const totalPossibleMix = calculatePossibleMix(inventory);
 
   return (
     <div className="min-h-screen bg-slate-50 md:flex text-slate-900">
@@ -585,11 +585,11 @@ function App() {
         {activeTab === "dashboard" && (
           <DashboardView
             inventory={inventory}
-            totalPossibleMix={totalPossibleMix}
+            totalPossibleMix={totalPossibleMix} // This now comes from Java!
             onAddStock={handleAddStock}
-            totalQuoted={totalQuoted}
-            totalActive={totalActive}
-            materialTotal={materialTotal}
+            totalQuoted={totalQuoted} // This now comes from Java!
+            totalActive={totalActive} // This now comes from Java!
+            materialTotal={materialTotal} // This now comes from Java!
           />
         )}
       </main>

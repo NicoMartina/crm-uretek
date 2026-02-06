@@ -26,4 +26,9 @@ export const jobService = {
     const response = await api.get("/jobs/stats/material-total");
     return response.data;
   },
+
+  getDashboardSummary: async () => {
+    const response = await api.get("/dashboard/summary");
+    return response.data;
+  },
 };
