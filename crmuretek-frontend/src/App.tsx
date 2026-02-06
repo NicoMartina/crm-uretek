@@ -19,7 +19,6 @@ import { QuoteForm } from "./components/QuoteForm";
 import type { Visit } from "./types/Visit";
 import type { Inventory } from "./types/Inventory";
 import { VisitModal } from "./components/VisitModal";
-
 import { visitService } from "./services/visitService";
 import { LeadsTable } from "./components/LeadsTable";
 import { JobsTable } from "./components/JobsTable";
@@ -50,13 +49,14 @@ function App() {
   );
   const [visitDate, setVisitDate] = useState("");
   const [visitNotes, setVisitNotes] = useState("");
-  const [stockInStorage, setStockInStorage] = useState(1500);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [viewingLead, setViewingLead] = useState<any | null>(null);
   const [totalQuoted, setTotalQuoted] = useState<number>(0);
   const [totalActive, setTotalActive] = useState<number>(0);
   const [totalPossibleMix, setTotalPossibleMix] = useState<number>(0);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [isAddingJob, setIsAddingJob] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -556,6 +556,14 @@ function App() {
                 statusMap={STATUS_MAP}
                 onUpdateStatus={handleUpdateStatus}
                 onDelete={handleDeleteJob}
+                onEdit={(id) => {
+                  // 1. Find the actual job object from your list using the ID
+                  const jobToEdit = jobs.find((j) => j.id === id);
+                  // 2. Set it as the "selected" item so the form knows what to show
+                  setSelectedJob(jobToEdit);
+                  // 3. Open the modal/form
+                  setIsAddingJob(true);
+                }}
               />
             </div>
           </>

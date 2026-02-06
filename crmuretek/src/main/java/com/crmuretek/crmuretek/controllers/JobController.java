@@ -5,6 +5,8 @@
     import com.crmuretek.crmuretek.models.JobStatus;
     import com.crmuretek.crmuretek.repositories.JobRepository;
     import com.crmuretek.crmuretek.services.InventoryService;
+    import com.crmuretek.crmuretek.services.JobService;
+    import jakarta.validation.Valid;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
@@ -18,10 +20,23 @@
         @Autowired
         private final JobRepository jobRepository;
         private final InventoryService inventoryService;
+        private final JobService jobService;
 
-        public JobController(JobRepository jobRepository, InventoryService inventoryService){
+        public JobController(JobRepository jobRepository, InventoryService inventoryService, JobService jobService){
             this.jobRepository = jobRepository;
             this.inventoryService = inventoryService;
+            this.jobService = jobService;
+        }
+
+        @PostMapping
+        public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
+            // Basic validation: Ensure we have a customer linked
+            if (job.getCustomer() == null || job.getCustomer().getId() <= 0){
+                return ResponseEntity.badRequest().build();
+            }
+            job.setJobStatus(JobStatus.QUOTED);
+
+            return ResponseEntity.ok(jobService.saveJob(job));
         }
 
         @GetMapping
@@ -29,16 +44,24 @@
             return jobRepository.findAll();
         }
 
-        @PostMapping
-        public ResponseEntity<Job> createJob(@RequestBody Job job) {
-            // Basic validation: Ensure we have a customer linked
-            if (job.getCustomer() == null || job.getCustomer().getId() <= 0){
-                return ResponseEntity.badRequest().build();
-            }
-            job.setJobStatus(JobStatus.QUOTED);
+        @GetMapping("/stats/material-total")
+        public ResponseEntity<Double> getTotalMaterial(){
+            Double total = jobRepository.sumRequiredMaterial();
+            return ResponseEntity.ok(total != null ? total : 0.0);
+        }
 
-            Job savedJob =jobRepository.save(job);
-            return ResponseEntity.ok(savedJob);
+        @PutMapping("/{id}")
+        public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody Job details) {
+            return jobRepository.findById(id).map(job -> {
+                // 1. Update only the fields we are editing
+                job.setObservations(details.getObservations());
+                job.setEstimateMaterialKg(details.getEstimateMaterialKg());
+                job.setPricePerKilo(details.getPricePerKilo());
+                job.setDownPaymentAmount(details.getDownPaymentAmount());
+
+                // 2. We call the service which handles everything
+                return ResponseEntity.ok(jobService.saveJob(job));
+            }).orElse(ResponseEntity.notFound().build());
         }
 
         @DeleteMapping("/{id}")
@@ -46,11 +69,7 @@
             jobRepository.deleteById(id);
         }
 
-        @GetMapping("/stats/material-total")
-        public ResponseEntity<Double> getTotalMaterial(){
-            Double total = jobRepository.sumRequiredMaterial();
-            return ResponseEntity.ok(total != null ? total : 0.0);
-        }
+
 
         @PatchMapping("{id}/status")
         public ResponseEntity<Job> updateJobStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
@@ -74,24 +93,7 @@
             }).orElse(ResponseEntity.notFound().build());
         }
 
-        @PutMapping("/{id}")
-        public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody Job details) {
-            return jobRepository.findById(id).map(job -> {
-                // 1. Update only the fields we are editing
-                job.setObservations(details.getObservations());
-                job.setEstimateMaterialKg(details.getEstimateMaterialKg());
-                job.setPricePerKilo(details.getPricePerKilo());
 
-                // 2. Recalculate the totals (Saldo/Total) before saving
-                job.calculateTotals();
-
-                // 3. Save to database
-                jobRepository.save(job);
-
-                // 4. Return success (no body to avoid circular reference errors)
-                return ResponseEntity.ok().build();
-            }).orElse(ResponseEntity.notFound().build());
-        }
 
 
 

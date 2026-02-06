@@ -10,9 +10,9 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     @Query("SELECT SUM(j.totalAmount) FROM Job j WHERE j.jobStatus = 'QUOTED'")
     Double sumQuotedAmount();
 
-    @Query("SELECT  SUM(j.totalAmount) FROM Job j WHERE j.jobStatus = = 'IN_PROGRESS'")
+    @Query("SELECT  SUM(j.totalAmount) FROM Job j WHERE j.jobStatus = 'IN_PROGRESS'")
     Double sumActiveAmount();
 
-    @Query("SELECT SUM(j.materialNeeded) FROM Job WHERE j.jobStatus != 'COMPLETED'")
+    @Query("SELECT SUM(j.estimateMaterialKg) FROM Job j WHERE j.jobStatus != 'COMPLETED'")
     Double sumRequiredMaterial();
 }

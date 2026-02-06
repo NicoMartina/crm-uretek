@@ -1,0 +1,13 @@
+### Create a New Job
+POST http://localhost:8080/api/jobs
+Content-Type: application/json
+
+{
+  "customer": { "id": 1 },
+  "estimateMaterialKg": 100.0,
+  "pricePerKilo": 50.0,
+  "observations": "Test from Backend"
+}
+
+### Get All Jobs
+GET http://localhost:8080/api/jobs

@@ -1,11 +1,12 @@
 import React from "react";
-import { Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 interface JobsTableProps {
   jobs: any[];
   statusMap: Record<string, { label: string; color: string }>;
   onUpdateStatus: (id: number, status: string) => void;
   onDelete: (id: number) => void;
+  onEdit: (id: number) => void;
 }
 
 export const JobsTable = ({
@@ -13,6 +14,7 @@ export const JobsTable = ({
   statusMap,
   onUpdateStatus,
   onDelete,
+  onEdit,
 }: JobsTableProps) => {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -66,6 +68,12 @@ export const JobsTable = ({
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => onEdit(job.id)}
+                      className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <Edit size={16} />
+                    </button>
                     <button
                       onClick={() => onDelete(job.id)}
                       className="p-2 text-slate-400 hover:text-red-500 transition-colors"

@@ -4,6 +4,8 @@
     import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
     import com.fasterxml.jackson.annotation.JsonManagedReference;
     import jakarta.persistence.*;
+    import jakarta.validation.constraints.Min;
+    import jakarta.validation.constraints.Positive;
     import lombok.Data;
 
     import java.time.LocalDate;
@@ -26,10 +28,15 @@
         @JsonManagedReference("job-materials")
         private List<MaterialUsage> materialUsages;
 
+        @Min(value = 0, message = "Material cannot be negative")
         private Double estimateMaterialKg; // estimation of kg to use in the job
+
+        @Positive(message = "Price must be greater than 0")
         private Double pricePerKilo;
+
         private String quoteNumber; // numero de presupesto aceptado
         private Double totalAmount;    // monto del presupuesto aceptado
+
 
         // Down payment (anticipo)
         private Double downPaymentAmount;    // monto del anticipo (generalmente 50%)
