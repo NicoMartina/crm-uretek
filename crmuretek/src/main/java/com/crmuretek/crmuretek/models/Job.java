@@ -24,6 +24,10 @@
         @JsonBackReference("customer-jobs")
         private Customer customer;
 
+        @OneToOne
+        @JoinColumn(name = "visit_id")
+        private Visit visit;
+
         @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
         @JsonManagedReference("job-materials")
         private List<MaterialUsage> materialUsages;
@@ -33,6 +37,12 @@
 
         @Positive(message = "Price must be greater than 0")
         private Double pricePerKilo;
+
+
+        // --- EXPENSE TRACKING ---
+        private Double travelExpenses;   // Cost of gas/hotels for the crew
+        private Double extraCosts;       // Any other expenses (rentals, etc.)
+
 
         private String quoteNumber; // numero de presupesto aceptado
         private Double totalAmount;    // monto del presupuesto aceptado

@@ -5,8 +5,10 @@ import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.models.Job;
 import com.crmuretek.crmuretek.models.JobStatus;
+import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
+import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ public class JobService {
     @Autowired
     private InventoryRepository inventoryRepository;
 
+    @Autowired
+    private VisitRepository visitRepository;
+
     public void syncFinancials(Job job){
         // 1. Calculate Total: Kg * Price
         double kg = (job.getEstimateMaterialKg() != null) ? job.getEstimateMaterialKg() : 0.0;
@@ -39,9 +44,16 @@ public class JobService {
     }
 
     // We use this in the Controller  with POST  and PUT
-    public Job saveJob(Job job){
-        syncFinancials(job);
-        return jobRepository.save(job);
+    @Transactional
+    public Job createJobFromVisit(Long visitId, Job  jobDetails){
+        Visit visit = visitRepository.findById(visitId)
+                .orElseThrow(() -> new RuntimeException("Visit Not Found"));
+
+        jobDetails.setVisit(visit);
+        jobDetails.setCustomer(visit.getCustomer());
+        jobDetails.setJobStatus(JobStatus.QUOTED);
+
+        return jobRepository.save(jobDetails);
     }
 
     @Transactional

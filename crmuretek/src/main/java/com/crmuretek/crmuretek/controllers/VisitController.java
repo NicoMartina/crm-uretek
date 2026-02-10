@@ -22,7 +22,11 @@ public class VisitController {
 
     @PostMapping
     public ResponseEntity<Visit> createVisit(@RequestBody Visit visit){
-        visit.setStatus(VisitStatus.SCHEDULED);
+        // 1. If a lead is provided in the request, let's link it
+        if (visit.getLead() != null && visit.getLead().getId() != null){
+            // We set the status based on our workflow
+            visit.setStatus(VisitStatus.SCHEDULED);
+        }
         return ResponseEntity.ok(visitRepository.save(visit));
     }
 
