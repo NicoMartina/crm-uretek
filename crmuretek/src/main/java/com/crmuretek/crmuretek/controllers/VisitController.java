@@ -14,7 +14,6 @@ import java.util.List;
 @RequestMapping("/api/visits")
 public class VisitController {
 
-    @Autowired
     private final VisitRepository visitRepository;
 
     public VisitController(VisitRepository visitRepository) {
