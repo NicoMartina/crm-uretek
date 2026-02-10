@@ -33,10 +33,6 @@ public class CustomerService {
                     existing.setPhoneNumber(details.getPhoneNumber());
                     existing.setEmail(details.getEmail());
                     existing.setAddress(details.getAddress());
-                    existing.setProblemDescription(details.getProblemDescription());
-                    existing.setSource(details.getSource());
-                    existing.setContactChannel(details.getContactChannel());
-                    existing.setContactDate(details.getContactDate());
 
                     return customerRepository.save(existing);
                 })

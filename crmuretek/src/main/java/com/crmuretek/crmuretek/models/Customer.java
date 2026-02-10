@@ -24,6 +24,9 @@ public class Customer {
     @JsonManagedReference("customer-jobs")
     private List<Job> jobs;
 
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Lead> lead;
+
 
     @Column(nullable = false)
     @NotBlank(message = "El nombre es obligatorio")
@@ -32,20 +35,9 @@ public class Customer {
     private String email;
     @NotBlank(message = "La direccion es obligatorio")
     private String address;
-    private String source; //how they found us
+
     @NotBlank(message = "El numero de telefono es obligatorio")
     private String phoneNumber;
-    private String problemDescription;
-    private String contactChannel;
-    private LocalDate contactDate;
-    private Boolean requestVisit;
-    private LocalDate visitDate;
 
-    @PrePersist
-    protected void onCreate(){
-        if(this.contactDate == null){
-            this.contactDate = LocalDate.now();
-        }
-    }
 
 }

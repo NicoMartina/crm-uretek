@@ -17,6 +17,10 @@ public class Visit {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @OneToOne
+    @JoinColumn(name = "lead_id")
+    private Lead lead;
+
     private LocalDate visitDate;
     private boolean isVisited;
     private boolean hasPaidVisitFee;
