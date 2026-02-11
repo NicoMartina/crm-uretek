@@ -7,8 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller // Tells Spring this is an API door.
+@RestController // Tells Spring this is an API door.
 @RequestMapping("/api/dashboard") // All URLs here start with api/dashboard
 @CrossOrigin("*") // allows your React App  to talk to this door
 public class DashboardController {

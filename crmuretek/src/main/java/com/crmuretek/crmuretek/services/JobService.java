@@ -43,6 +43,13 @@ public class JobService {
         job.setBalanceAmount(total - paid);
     }
 
+    public Job saveJob(Job job){
+        if (job.getVisit() != null  && job.getCustomer() == null) {
+            job.setCustomer(job.getVisit().getCustomer());
+        }
+        return jobRepository.save(job);
+    }
+
     // We use this in the Controller  with POST  and PUT
     @Transactional
     public Job createJobFromVisit(Long visitId, Job  jobDetails){
