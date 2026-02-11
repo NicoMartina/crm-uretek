@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react"; // Nice to have an X icon
 
 interface QuoteFormProps {
@@ -17,11 +17,21 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
   const [workDate, setWorkDate] = useState("2026-01-23");
   const [description, setDescription] = useState("");
 
+  // Inside QuoteForm.tsx, before the return
+  useEffect(() => {
+    // If the 'lead' passed in actually has job details (from an existing job)
+    if (lead?.existingJob) {
+      setAmount(lead.existingJob.totalAmount);
+      setMaterial(lead.existingJob.estimateMaterialKg);
+      setDescription(lead.existingJob.jobDescription);
+    }
+  }, [lead]);
+
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-100 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black">Crear Trabajo</h2>
+          <h2 className="text-2xl font-black text-slate-800">Crear Trabajo</h2>
           <button
             onClick={onCancel}
             className="text-slate-400 hover:text-slate-600"

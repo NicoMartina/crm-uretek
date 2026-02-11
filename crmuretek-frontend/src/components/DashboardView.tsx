@@ -8,6 +8,7 @@ interface DashboardViewProps {
   totalQuoted: number;
   totalActive: number;
   materialTotal: number;
+  data: any;
 }
 
 export const DashboardView = ({
@@ -84,7 +85,7 @@ export const DashboardView = ({
             Presupuestado
           </span>
           <h3 className="text-2xl font-black text-slate-800 mt-1">
-            ${totalQuoted.toLocaleString()}
+            ${(totalQuoted || 0).toLocaleString()}
           </h3>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -92,7 +93,7 @@ export const DashboardView = ({
             En Obra
           </span>
           <h3 className="text-2xl font-black text-slate-800 mt-1">
-            ${totalActive.toLocaleString()}
+            ${(totalActive || 0).toLocaleString()}
           </h3>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -100,7 +101,7 @@ export const DashboardView = ({
             Material Requerido
           </span>
           <h3 className="text-2xl font-black text-orange-500 mt-1">
-            {materialTotal.toLocaleString()} kg
+            {(materialTotal || 0).toLocaleString()} kg
           </h3>
         </div>
       </div>

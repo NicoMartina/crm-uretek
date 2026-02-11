@@ -7,6 +7,7 @@ interface JobsTableProps {
   onUpdateStatus: (id: number, status: string) => void;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
+  onRefresh: () => void;
 }
 
 export const JobsTable = ({
@@ -15,6 +16,7 @@ export const JobsTable = ({
   onUpdateStatus,
   onDelete,
   onEdit,
+  onRefresh,
 }: JobsTableProps) => {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -74,8 +76,12 @@ export const JobsTable = ({
                     >
                       <Edit size={16} />
                     </button>
+
                     <button
-                      onClick={() => onDelete(job.id)}
+                      onClick={async () => {
+                        await onDelete(job.id);
+                        onRefresh(); // This uses the "unused" prop to trigger the sync
+                      }}
                       className="p-2 text-slate-400 hover:text-red-500 transition-colors"
                     >
                       <Trash2 size={16} />

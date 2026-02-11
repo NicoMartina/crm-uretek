@@ -4,9 +4,14 @@ import axios from "axios";
 interface LeadFormProps {
   onRefresh: () => void;
   initialData?: any; // If this exists, we are in "Edit Mode"
+  onCancel: () => void;
 }
 
-export default function LeadForm({ onRefresh, initialData }: LeadFormProps) {
+export default function LeadForm({
+  initialData,
+  onRefresh,
+  onCancel,
+}: LeadFormProps) {
   const [formData, setFormData] = useState({
     name: "",
     phoneNumber: "",
@@ -27,29 +32,23 @@ export default function LeadForm({ onRefresh, initialData }: LeadFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Basic frontend validation before even hitting the server
-    if (!formData.name.trim()) return alert("El nombre no puede estar vacío");
-
     try {
       if (initialData?.id) {
         await axios.put(
           `http://localhost:8080/api/customers/${initialData.id}`,
           formData
         );
-        alert("✅ ¡Cambios guardados con éxito!");
       } else {
         await axios.post("http://localhost:8080/api/customers", formData);
-        alert("✅ ¡Nuevo prospecto registrado!");
       }
+
+      // IMPORTANT: This must be called to tell App.tsx to run syncAllData()
       onRefresh();
-    } catch (error: any) {
-      // If Java returns a 400 Bad Request (Validation failed)
-      if (error.response?.status === 400) {
-        alert("❌ Error: Datos inválidos. Revisa que el nombre esté completo.");
-      } else {
-        alert("❌ Ups! Algo salió mal en el servidor.");
-      }
+
+      alert("✅ Procesado con éxito");
+    } catch (error) {
+      console.error("Error saving lead:", error);
+      alert("❌ Error al guardar");
     }
   };
 
@@ -166,7 +165,14 @@ export default function LeadForm({ onRefresh, initialData }: LeadFormProps) {
         />
       </div>
 
-      <div className="md:col-span-2 pt-4">
+      <div className="md:col-span-2 pt-4 gap-3">
+        <button
+          type="button"
+          onClick={onCancel} // This uses the "unused" prop
+          className="flex-1 bg-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-300 transition"
+        >
+          Cancelar
+        </button>
         <button
           type="submit"
           className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition"

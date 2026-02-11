@@ -49,7 +49,7 @@ export const VisitsTable = ({
                   </div>
                 </td>
                 <td className="p-4 font-black text-slate-700">
-                  {visit.customer.name}
+                  {visit.customer?.name || "Sin Cliente"}
                 </td>
                 <td className="p-4">
                   <span
@@ -73,7 +73,9 @@ export const VisitsTable = ({
                       </button>
                     )}
                     <button
-                      onClick={() => onConvert(visit.customer)}
+                      onClick={() =>
+                        visit.customer && onConvert(visit.customer)
+                      }
                       className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"
                     >
                       <Briefcase size={12} /> Convertir
