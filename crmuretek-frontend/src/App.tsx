@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { LayoutDashboard, Users, Calendar, Briefcase } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Calendar,
+  Briefcase,
+  Plus,
+} from "lucide-react";
 
 // Services
 import { jobService } from "./services/jobService";
@@ -33,6 +39,7 @@ export default function App() {
   const [isAddingQuote, setIsAddingQuote] = useState(false);
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [selectedLead, setSelectedLead] = useState<any>(null);
+  const [viewingLead, setViewingLead] = useState<any>(null);
 
   // Visit Modal State
   const [visitDate, setVisitDate] = useState(
@@ -53,6 +60,7 @@ export default function App() {
       if (res[1].status === "fulfilled") setVisits(res[1].value || []);
       if (res[2].status === "fulfilled") {
         const all = res[2].value || [];
+        // Filtering leads that don't have active jobs
         setLeads(all.filter((c: any) => !c.jobs || c.jobs.length === 0));
       }
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
@@ -127,28 +135,46 @@ export default function App() {
           ))}
 
         {activeTab === "leads" && (
-          <LeadsTable
-            leads={leads}
-            onView={(l) => setSelectedLead(l)}
-            onEdit={(l) => {
-              setSelectedLead(l);
-              setIsAddingLead(true);
-            }}
-            onDelete={async (id) => {
-              if (window.confirm("¿Borrar?")) {
-                await customerService.delete(id);
-                syncAllData();
-              }
-            }}
-            onScheduleVisit={(l) => {
-              setSelectedLead(l);
-              setIsSchedulingVisit(true);
-            }}
-            onQuote={(l) => {
-              setSelectedLead(l);
-              setIsAddingQuote(true);
-            }}
-          />
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800">Prospectos</h2>
+              <button
+                onClick={() => {
+                  setSelectedLead(null);
+                  setIsAddingLead(true);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
+              >
+                <Plus size={20} /> NUEVO PROSPECTO
+              </button>
+            </div>
+
+            <LeadsTable
+              leads={leads}
+              onView={(l) => {
+                setViewingLead(l);
+                setSelectedLead(l);
+              }}
+              onEdit={(l) => {
+                setSelectedLead(l);
+                setIsAddingLead(true);
+              }}
+              onDelete={async (id) => {
+                if (window.confirm("¿Borrar?")) {
+                  await customerService.delete(id);
+                  syncAllData();
+                }
+              }}
+              onScheduleVisit={(l) => {
+                setSelectedLead(l);
+                setIsSchedulingVisit(true);
+              }}
+              onQuote={(l) => {
+                setSelectedLead(l);
+                setIsAddingQuote(true);
+              }}
+            />
+          </div>
         )}
 
         {activeTab === "visits" && (
@@ -185,9 +211,17 @@ export default function App() {
                 syncAllData();
               }
             }}
-            onEdit={(job) => {
-              setSelectedLead(job);
-              setIsAddingQuote(true);
+            onEdit={(id) => {
+              const jobToEdit = jobs.find((j) => j.id === id);
+              if (jobToEdit) {
+                setSelectedLead({
+                  ...jobToEdit.customer,
+                  jobId: jobToEdit.id,
+                  existingAmount: jobToEdit.totalAmount,
+                  existingDescription: jobToEdit.jobDescription,
+                });
+                setIsAddingQuote(true);
+              }
             }}
             onRefresh={syncAllData}
           />
@@ -195,10 +229,9 @@ export default function App() {
 
         {/* --- MODALS --- */}
 
-        {/* LeadForm Modal Wrapper */}
         {isAddingLead && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl">
+            <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[90vh]">
               <h2 className="text-2xl font-black mb-4">Gestión de Prospecto</h2>
               <LeadForm
                 initialData={selectedLead}
@@ -206,17 +239,73 @@ export default function App() {
                   setIsAddingLead(false);
                   setSelectedLead(null);
                 }}
-                onRefresh={() => {
-                  setIsAddingLead(false);
-                  setSelectedLead(null);
-                  syncAllData();
+                onSubmit={async (formData: any) => {
+                  try {
+                    if (selectedLead?.id) {
+                      // Call your update logic
+                      await customerService.update(selectedLead.id, formData);
+                    } else {
+                      // Call your create logic
+                      await customerService.create(formData);
+                    }
+                    await syncAllData();
+                    setIsAddingLead(false);
+                    setSelectedLead(null);
+                  } catch (error) {
+                    console.error("Error saving lead:", error);
+                  }
+                }}
+                onRefresh={function (): void {
+                  throw new Error("Function not implemented.");
                 }}
               />
             </div>
           </div>
         )}
 
-        {/* QuoteForm handles its own background */}
+        {viewingLead && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+              <button
+                onClick={() => setViewingLead(null)}
+                className="absolute top-4 right-4 text-slate-400"
+              >
+                ✕
+              </button>
+              <h2 className="text-2xl font-black mb-4">
+                Detalles del Prospecto
+              </h2>
+              <div className="space-y-3 text-sm">
+                <p>
+                  <strong>Nombre:</strong> {viewingLead.name}
+                </p>
+                <p>
+                  <strong>Teléfono:</strong> {viewingLead.phoneNumber}
+                </p>
+                <p>
+                  <strong>Dirección:</strong> {viewingLead.address}
+                </p>
+                <p>
+                  <strong>Problema:</strong> {viewingLead.problemDescription}
+                </p>
+                <p>
+                  <strong>Origen:</strong> {viewingLead.source}
+                </p>
+                <p>
+                  <strong>Fecha Contacto:</strong>{" "}
+                  {viewingLead.contactDate || "Sin fecha"}
+                </p>
+              </div>
+              <button
+                onClick={() => setViewingLead(null)}
+                className="w-full mt-6 bg-slate-900 text-white py-3 rounded-xl font-bold"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
+
         {isAddingQuote && selectedLead && (
           <QuoteForm
             lead={selectedLead}
@@ -235,7 +324,6 @@ export default function App() {
           />
         )}
 
-        {/* VisitModal handles its own background */}
         {isSchedulingVisit && selectedLead && (
           <VisitModal
             lead={selectedLead}

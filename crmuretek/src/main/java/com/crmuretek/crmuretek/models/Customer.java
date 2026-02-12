@@ -1,5 +1,6 @@
 package com.crmuretek.crmuretek.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -21,7 +22,7 @@ public class Customer {
     private long id;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("customer-jobs")
+    @JsonIgnoreProperties("customer")
     private List<Job> jobs;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL,orphanRemoval = true)

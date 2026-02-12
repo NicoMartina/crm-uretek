@@ -19,9 +19,9 @@
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private long id;
 
-        @ManyToOne
+        @ManyToOne(fetch = FetchType.EAGER)
         @JoinColumn(name = "customer_id")
-        @JsonBackReference("customer-jobs")
+        @JsonIgnoreProperties("jobs")
         private Customer customer;
 
         @OneToOne

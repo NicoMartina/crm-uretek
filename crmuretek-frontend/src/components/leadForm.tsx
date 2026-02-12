@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 interface LeadFormProps {
-  onRefresh: () => void;
-  initialData?: any; // If this exists, we are in "Edit Mode"
+  initialData?: any;
   onCancel: () => void;
+  onSubmit: (formData: any) => Promise<void>; // Add this line
+  // If you have onRefresh, you can keep it or remove it if we use onSubmit
+  onRefresh: () => void;
 }
 
 export default function LeadForm({
@@ -13,14 +15,15 @@ export default function LeadForm({
   onCancel,
 }: LeadFormProps) {
   const [formData, setFormData] = useState({
-    name: "",
-    phoneNumber: "",
-    email: "",
-    address: "",
-    problemDescription: "",
-    source: "",
-    contactChannel: "",
-    contactDate: new Date().toISOString().split("T")[0],
+    name: initialData?.name || "",
+    phoneNumber: initialData?.phoneNumber || "",
+    email: initialData?.email || "",
+    address: initialData?.address || "",
+    problemDescription: initialData?.problemDescription || "",
+    source: initialData?.source || "",
+    contactChannel: initialData?.contactChannel || "",
+    contactDate:
+      initialData?.contactDate || new Date().toISOString().split("T")[0], // Default to today's date
   });
 
   // When the component opens, if we have initialData, fill the form
@@ -167,17 +170,17 @@ export default function LeadForm({
 
       <div className="md:col-span-2 pt-4 gap-3">
         <button
-          type="button"
-          onClick={onCancel} // This uses the "unused" prop
-          className="flex-1 bg-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-300 transition"
-        >
-          Cancelar
-        </button>
-        <button
           type="submit"
           className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition"
         >
           {initialData?.id ? "Guardar Cambios" : "Crear Prospecto"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel} // This uses the "unused" prop
+          className="w-full bg-slate-200 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-300 transition"
+        >
+          Cancelar
         </button>
       </div>
     </form>

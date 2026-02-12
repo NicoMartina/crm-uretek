@@ -4,6 +4,7 @@
     import com.crmuretek.crmuretek.models.Job;
     import com.crmuretek.crmuretek.models.JobStatus;
     import com.crmuretek.crmuretek.repositories.JobRepository;
+    import com.crmuretek.crmuretek.services.CustomerService;
     import com.crmuretek.crmuretek.services.InventoryService;
     import com.crmuretek.crmuretek.services.JobService;
     import jakarta.validation.Valid;
@@ -21,22 +22,32 @@
         private final JobRepository jobRepository;
         private final InventoryService inventoryService;
         private final JobService jobService;
+        private final CustomerService customerService;
 
-        public JobController(JobRepository jobRepository, InventoryService inventoryService, JobService jobService){
+        public JobController(JobRepository jobRepository, InventoryService inventoryService, JobService jobService, CustomerService customerService){
             this.jobRepository = jobRepository;
             this.inventoryService = inventoryService;
             this.jobService = jobService;
+            this.customerService = customerService;
         }
 
         @PostMapping
         public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
-            // Basic validation: Ensure we have a customer linked
+            // 1. Basic validation: Ensure we have a customer linked
             if (job.getCustomer() == null || job.getCustomer().getId() <= 0){
                 return ResponseEntity.badRequest().build();
             }
-            job.setJobStatus(JobStatus.QUOTED);
+            // 2. Fetch the REAL customer from the DB
+            return customerService.findById(job.getCustomer().getId())
+                            .map(customer -> {
+                                job.setCustomer(customer);
+                                job.setJobStatus(JobStatus.QUOTED);
 
-            return ResponseEntity.ok(jobService.saveJob(job));
+                                // 3. Save and Return
+                                Job savedJob = jobService.saveJob(job);
+                                return ResponseEntity.ok(savedJob);
+                            })
+                    .orElse(ResponseEntity.notFound().build());
         }
 
         @GetMapping

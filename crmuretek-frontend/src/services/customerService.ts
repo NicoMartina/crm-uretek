@@ -1,3 +1,4 @@
+import axios from "axios";
 import api from "./api";
 
 export const customerService = {
@@ -5,6 +6,11 @@ export const customerService = {
   getAll: async () => {
     const response = await api.get("/customers");
     return response.data;
+  },
+
+  create: async (data: any) => {
+    const res = await axios.post(`/customers`, data);
+    return res.data;
   },
 
   // Delete a customer

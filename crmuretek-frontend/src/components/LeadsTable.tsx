@@ -45,7 +45,9 @@ export const LeadsTable = ({
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
-                  {lead.contactDate || "---"}
+                  {lead.contactDate
+                    ? new Date(lead.contactDate).toLocaleDateString()
+                    : "Sin fecha"}
                 </td>
                 <td className="p-4 font-black text-slate-800">
                   <button
