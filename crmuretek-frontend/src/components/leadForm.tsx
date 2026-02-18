@@ -6,12 +6,13 @@ interface LeadFormProps {
   onCancel: () => void;
   onSubmit: (formData: any) => Promise<void>; // Add this line
   // If you have onRefresh, you can keep it or remove it if we use onSubmit
-  onRefresh: () => void;
+  onRefresh: () => Promise<void> | void;
 }
 
 export default function LeadForm({
   initialData,
   onRefresh,
+  onSubmit,
   onCancel,
 }: LeadFormProps) {
   const [formData, setFormData] = useState({
@@ -20,7 +21,7 @@ export default function LeadForm({
     email: initialData?.email || "",
     address: initialData?.address || "",
     problemDescription: initialData?.problemDescription || "",
-    source: initialData?.source || "",
+    source: initialData?.source || "WHATSAPP",
     contactChannel: initialData?.contactChannel || "",
     contactDate:
       initialData?.contactDate || new Date().toISOString().split("T")[0], // Default to today's date
@@ -36,16 +37,10 @@ export default function LeadForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (initialData?.id) {
-        await axios.put(
-          `http://localhost:8080/api/customers/${initialData.id}`,
-          formData
-        );
-      } else {
-        await axios.post("http://localhost:8080/api/customers", formData);
-      }
+      // We call the function passed down from App.tsx
+      await onSubmit(formData);
 
-      // IMPORTANT: This must be called to tell App.tsx to run syncAllData()
+      // We tell App to refresh the list
       onRefresh();
 
       alert("✅ Procesado con éxito");
@@ -127,17 +122,25 @@ export default function LeadForm({
           required
         />
       </div>
-      {/* Input Group 6 */}
+      {/* Input Group 6 - Production Grade Select */}
       <div>
         <label className="text-[10px] font-bold uppercase text-slate-400">
           Como nos conocio
         </label>
-        <input
-          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+        <select
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
           value={formData.source}
           onChange={(e) => setFormData({ ...formData, source: e.target.value })}
           required
-        />
+        >
+          <option value="">Seleccione una opción</option>
+          <option value="WHATSAPP">WhatsApp</option>
+          <option value="FACEBOOK">Facebook</option>
+          <option value="GOOGLE">Google</option>
+          <option value="WEBSITE">Website</option>
+          <option value="REFERRAL">Recomendado</option>
+          <option value="PHONE">Llamada</option>
+        </select>
       </div>
       {/* Input Group 7 */}
       <div>

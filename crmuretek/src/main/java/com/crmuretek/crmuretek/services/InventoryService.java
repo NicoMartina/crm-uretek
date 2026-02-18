@@ -2,13 +2,10 @@ package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
 public class InventoryService {
 

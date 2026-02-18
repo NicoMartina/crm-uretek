@@ -10,7 +10,7 @@ import {
 // Services
 import { jobService } from "./services/jobService";
 import { visitService } from "./services/visitService";
-import { customerService } from "./services/customerService";
+import { leadsService } from "./services/leadsService";
 
 // Components
 import { DashboardView } from "./components/DashboardView";
@@ -52,7 +52,7 @@ export default function App() {
       const res = await Promise.allSettled([
         jobService.getAll(),
         visitService.getAll(),
-        customerService.getAll(),
+        leadsService.getAll(),
         jobService.getDashboardSummary(),
       ]);
 
@@ -161,7 +161,7 @@ export default function App() {
               }}
               onDelete={async (id) => {
                 if (window.confirm("¿Borrar?")) {
-                  await customerService.delete(id);
+                  await leadsService.delete(id);
                   syncAllData();
                 }
               }}
@@ -243,10 +243,10 @@ export default function App() {
                   try {
                     if (selectedLead?.id) {
                       // Call your update logic
-                      await customerService.update(selectedLead.id, formData);
+                      await leadsService.update(selectedLead.id, formData);
                     } else {
                       // Call your create logic
-                      await customerService.create(formData);
+                      await leadsService.create(formData);
                     }
                     await syncAllData();
                     setIsAddingLead(false);
@@ -255,9 +255,7 @@ export default function App() {
                     console.error("Error saving lead:", error);
                   }
                 }}
-                onRefresh={function (): void {
-                  throw new Error("Function not implemented.");
-                }}
+                onRefresh={syncAllData}
               />
             </div>
           </div>
@@ -316,7 +314,7 @@ export default function App() {
             onCreate={async (data) => {
               await jobService.create({
                 ...data,
-                customer: { id: selectedLead.id },
+                lead: { id: selectedLead.id },
               });
               setIsAddingQuote(false);
               syncAllData();

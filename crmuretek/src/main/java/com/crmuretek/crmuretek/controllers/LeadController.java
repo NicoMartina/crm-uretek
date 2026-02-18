@@ -21,8 +21,8 @@ public class LeadController {
     }
 
     @PostMapping
-    public ResponseEntity<Lead> createLead(@RequestBody Lead lead){
-        return ResponseEntity.ok(leadRepository.save(lead));
+    public ResponseEntity<Lead> create(@RequestBody Lead lead){
+        return ResponseEntity.ok(leadService.create(lead));
     }
 
     @GetMapping
@@ -31,7 +31,7 @@ public class LeadController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lead> updateLead(@PathVariable Long id, @RequestBody Lead lead){
+    public ResponseEntity<Lead> update(@PathVariable Long id, @RequestBody Lead lead){
         return ResponseEntity.ok(leadService.update(id, lead));
     }
 }

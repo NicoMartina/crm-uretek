@@ -30,7 +30,6 @@ public class VisitService {
 
         // Automatically pull the customer from the Lead!
         visitDetails.setLead(lead);
-        visitDetails.setCustomer(lead.getCustomer());
         visitDetails.setStatus(VisitStatus.VISITED);
 
         return visitRepository.save(visitDetails);
@@ -39,6 +38,6 @@ public class VisitService {
     public List<Visit> getUnpaidVisits(){
         return visitRepository.findAll().stream()
                 .filter(visit -> !visit.isHasPaidVisitFee())
-                .collect(Collectors.toList());
+                .toList();
     }
 }

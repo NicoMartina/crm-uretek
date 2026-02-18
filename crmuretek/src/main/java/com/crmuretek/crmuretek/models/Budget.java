@@ -15,8 +15,8 @@ public class Budget {
     private String budgetNumber;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(name = "lead_id")
+    private Lead lead;
 
     @OneToOne
     @JoinColumn(name = "visit_id")
