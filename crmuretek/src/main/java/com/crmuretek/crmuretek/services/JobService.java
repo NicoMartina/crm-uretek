@@ -73,12 +73,12 @@ public class JobService {
             double requiredIso = job.getEstimateMaterialKg() * 0.63;
             double requiredResina = job.getEstimateMaterialKg() * 0.37;
 
-            if (stock.getIso_stock() < requiredIso || stock.getResina_stock() < requiredResina){
+            if (stock.getIsoStock() < requiredIso || stock.getResinaStock() < requiredResina){
                 throw new InsuffcientMaterialException("Insufficient stock to start the job.");
             }
 
-            stock.setIso_stock(stock.getIso_stock() - requiredIso);
-            stock.setResina_stock(stock.getResina_stock() - requiredResina);
+            stock.setIsoStock(stock.getIsoStock() - requiredIso);
+            stock.setResinaStock(stock.getResinaStock() - requiredResina);
             stock.setLastUpdated(java.time.LocalDateTime.now());
         }
         job.setJobStatus(newStatus);

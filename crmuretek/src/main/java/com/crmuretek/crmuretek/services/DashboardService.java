@@ -22,8 +22,8 @@ public class DashboardService {
                 .findFirst()
                 .orElseGet(() -> {
                     Inventory mock = new Inventory();
-                    mock.setIso_stock(0.0);
-                    mock.setResina_stock(0.0);
+                    mock.setIsoStock(0.0);
+                    mock.setResinaStock(0.0);
                     return mock;
                 });
 
@@ -33,8 +33,8 @@ public class DashboardService {
         Double materialNeeded = jobRepository.sumRequiredMaterial();
 
         // 3. Business Logic
-        double isoStock = (inventory.getIso_stock() != null) ? inventory.getIso_stock() : 0.0;
-        double resinaStock = (inventory.getResina_stock() != null) ? inventory.getResina_stock() : 0.0;
+        double isoStock = (inventory.getIsoStock() != null) ? inventory.getIsoStock() : 0.0;
+        double resinaStock = (inventory.getResinaStock() != null) ? inventory.getResinaStock() : 0.0;
 
         double isoRatio = 0.63;
         double resinaRatio = 0.37;
