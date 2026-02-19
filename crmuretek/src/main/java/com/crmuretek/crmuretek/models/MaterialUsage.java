@@ -13,17 +13,15 @@ import java.time.LocalDate;
 public class MaterialUsage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "job_id")
     @JsonBackReference("job-materials")
     private Job job;
 
-    private Double iSOQuantity;
+    private Double isoQuantity;
     private Double resinQuantity;
-
-    private String unitOfMeasure;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
