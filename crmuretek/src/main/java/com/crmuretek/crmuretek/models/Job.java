@@ -17,7 +17,7 @@
     public class Job {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private long id;
+        private Long id;
 
         @ManyToOne
         @JoinColumn(name = "lead_id")
@@ -77,7 +77,7 @@
             }
 
             double downPayment = (this.downPaymentAmount != null) ? this.downPaymentAmount : 0.0;
-            double balanceAmount = this.totalAmount - downPayment;
+            this.balanceAmount = this.totalAmount - downPayment;
         }
 
     }

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "customer_visits")
+@Table(name = "leads_visits")
 @Data
 public class Visit {
     @Id
@@ -19,7 +19,6 @@ public class Visit {
     private Lead lead;
 
     private LocalDate visitDate;
-    private boolean isVisited;
     private boolean hasPaidVisitFee;
     private Double visitFeeAmount;
     private String paymentMethod;
