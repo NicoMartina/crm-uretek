@@ -37,8 +37,6 @@ public class Lead {
     private LocalDate contactDate;
     @Enumerated(EnumType.STRING)
     private SourceEnum source;
-    private Boolean visitRequested;
-    private LocalDate visitDate;
 
     @PrePersist
     protected void onCreate(){

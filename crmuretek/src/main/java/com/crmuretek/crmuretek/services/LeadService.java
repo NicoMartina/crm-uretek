@@ -48,7 +48,6 @@ public class LeadService {
                     existing.setContactChannel(details.getContactChannel());
                     existing.setContactDate(details.getContactDate());
                     existing.setSource(details.getSource());
-                    existing.setVisitDate(details.getVisitDate());
 
                     return existing;
                 })
