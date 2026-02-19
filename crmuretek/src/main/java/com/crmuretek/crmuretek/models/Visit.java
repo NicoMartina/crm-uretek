@@ -13,11 +13,8 @@ public class Visit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "lead_id")
     private Lead lead;
 

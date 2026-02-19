@@ -23,6 +23,6 @@ public class Interaction {
     private String type; // e.g., "Phone Call", "Email", "Visit"
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(name = "lead_id")
+    private Lead lead;
 }

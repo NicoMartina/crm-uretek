@@ -1,12 +1,13 @@
     package com.crmuretek.crmuretek.controllers;
 
-    import com.crmuretek.crmuretek.models.Customer;
+
     import com.crmuretek.crmuretek.models.Job;
     import com.crmuretek.crmuretek.models.JobStatus;
+    import com.crmuretek.crmuretek.models.Lead;
     import com.crmuretek.crmuretek.repositories.JobRepository;
-    import com.crmuretek.crmuretek.services.CustomerService;
     import com.crmuretek.crmuretek.services.InventoryService;
     import com.crmuretek.crmuretek.services.JobService;
+    import com.crmuretek.crmuretek.services.LeadService;
     import jakarta.validation.Valid;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.ResponseEntity;
@@ -22,25 +23,25 @@
         private final JobRepository jobRepository;
         private final InventoryService inventoryService;
         private final JobService jobService;
-        private final CustomerService customerService;
+        private final LeadService leadService;
 
-        public JobController(JobRepository jobRepository, InventoryService inventoryService, JobService jobService, CustomerService customerService){
+        public JobController(JobRepository jobRepository, InventoryService inventoryService, JobService jobService, LeadService leadService){
             this.jobRepository = jobRepository;
             this.inventoryService = inventoryService;
             this.jobService = jobService;
-            this.customerService = customerService;
+            this.leadService = leadService;
         }
 
         @PostMapping
         public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
             // 1. Basic validation: Ensure we have a customer linked
-            if (job.getCustomer() == null || job.getCustomer().getId() <= 0){
+            if (job.getLead() == null || job.getLead().getId() <= 0){
                 return ResponseEntity.badRequest().build();
             }
             // 2. Fetch the REAL customer from the DB
-            return customerService.findById(job.getCustomer().getId())
-                            .map(customer -> {
-                                job.setCustomer(customer);
+            return leadService.findById(job.getLead().getId())
+                            .map(lead -> {
+                                job.setLead(lead);
                                 job.setJobStatus(JobStatus.QUOTED);
 
                                 // 3. Save and Return
@@ -83,23 +84,33 @@
 
 
         @PatchMapping("{id}/status")
-        public ResponseEntity<Job> updateJobStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
+        public ResponseEntity<?> updateJobStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
             // 1.Find job in database
             return jobRepository.findById(id).map(job -> {
                 try {
                     // 2. Convert the String from React (e.g., "IN_PROGRESS") to Java Enum
                     // We strip quotes just in case the body comes in as "IN_PROGRESS"
-                    String cleanStatus =  body.get("status").toUpperCase();
-                    job.setJobStatus(JobStatus.valueOf(cleanStatus));
+                    String statusValue =  body.get("status");
+                    if (statusValue == null) {
+                        return ResponseEntity.badRequest().build();
+                    }
 
-                    if ("COMPLETED".equals(cleanStatus) && job.getJobStatus() != JobStatus.COMPLETED) {
+                    JobStatus previousStatus = job.getJobStatus();
+                    JobStatus newStatus = JobStatus.valueOf(statusValue.toUpperCase());
+
+                    // only consume material if status is COMPLETED
+                    if (previousStatus != JobStatus.COMPLETED && newStatus == JobStatus.COMPLETED) {
                         inventoryService.consumeMaterial(job.getEstimateMaterialKg());
                     }
+
+                    job.setJobStatus(newStatus);
+
                     // 3. Save the updated job
                     jobRepository.save(job);
                     return ResponseEntity.ok(job);
+
                 } catch(IllegalArgumentException e){
-                    return ResponseEntity.badRequest().<Job>build();
+                    return ResponseEntity.badRequest().build();
                 }
             }).orElse(ResponseEntity.notFound().build());
         }

@@ -9,26 +9,24 @@ import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.awt.*;
 
 @Service
 public class JobService {
 
-    @Autowired
+
     private JobRepository jobRepository;
-
-    @Autowired
     private InventoryRepository inventoryRepository;
-
-    @Autowired
     private VisitRepository visitRepository;
+
+    public JobService(JobRepository jobRepository, InventoryRepository inventoryRepository, VisitRepository visitRepository) {
+        this.jobRepository = jobRepository;
+        this.inventoryRepository = inventoryRepository;
+        this.visitRepository = visitRepository;
+    }
 
     public void syncFinancials(Job job){
         // 1. Calculate Total: Kg * Price
@@ -44,8 +42,8 @@ public class JobService {
     }
 
     public Job saveJob(Job job){
-        if (job.getVisit() != null  && job.getCustomer() == null) {
-            job.setCustomer(job.getVisit().getCustomer());
+        if (job.getVisit() != null  && job.getLead() == null) {
+            job.setLead(job.getVisit().getLead());
         }
         return jobRepository.save(job);
     }
@@ -57,7 +55,7 @@ public class JobService {
                 .orElseThrow(() -> new RuntimeException("Visit Not Found"));
 
         jobDetails.setVisit(visit);
-        jobDetails.setCustomer(visit.getCustomer());
+        jobDetails.setLead(visit.getLead());
         jobDetails.setJobStatus(JobStatus.QUOTED);
 
         return jobRepository.save(jobDetails);

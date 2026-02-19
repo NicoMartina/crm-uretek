@@ -19,10 +19,9 @@
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private long id;
 
-        @ManyToOne(fetch = FetchType.EAGER)
-        @JoinColumn(name = "customer_id")
-        @JsonIgnoreProperties("jobs")
-        private Customer customer;
+        @ManyToOne
+        @JoinColumn(name = "lead_id")
+        private Lead lead;
 
         @OneToOne
         @JoinColumn(name = "visit_id")
@@ -69,9 +68,6 @@
         private String observations;
 
 
-        public String getCustomerName() {
-            return this.customer != null ? this.customer.getName() : "No Customer";
-        }
 
         public void calculateTotals(){
             if (this.estimateMaterialKg != null &&  this.pricePerKilo != null) {
