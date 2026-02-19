@@ -4,17 +4,19 @@ import com.crmuretek.crmuretek.dto.DashboardSummaryDTO;
 import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DashboardService {
 
-    @Autowired
-    private JobRepository jobRepository;
 
-    @Autowired
+    private JobRepository jobRepository;
     private InventoryRepository inventoryRepository;
+
+    public DashboardService(JobRepository jobRepository, InventoryRepository inventoryRepository) {
+        this.jobRepository = jobRepository;
+        this.inventoryRepository = inventoryRepository;
+    }
 
     public DashboardSummaryDTO getDashboardSummary(){
         // 1. Safety check for Inventory (Prevents crash if table is empty)

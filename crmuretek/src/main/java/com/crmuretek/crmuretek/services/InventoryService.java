@@ -17,24 +17,6 @@ public class InventoryService {
         this.inventoryRepository = inventoryRepository;
     }
 
-    public void consumeMaterial(Double totalMixUsed){
-        // 1. Get the current stock (assuming ID 1 is our only warehouse)
-        Inventory inventory = inventoryRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Inventory not initialized."));
-
-        // 2. Do the math
-        Double isoToSubstract = totalMixUsed * .63;
-        Double resinaToSubstract = totalMixUsed * .37;
-
-        // 3. Update the levels
-        inventory.setIsoStock(inventory.getIsoStock() - isoToSubstract);
-        inventory.setResinaStock(inventory.getResinaStock() - resinaToSubstract);
-
-        // 4. Tell the Librarian to save the new numbers
-        inventoryRepository.save(inventory);
-
-    }
-
     // This helper method removes the duplicate code!
     private Inventory getOrCreateInventory(){
         return inventoryRepository.findById(DEFAULT_INVENTORY_ID)
@@ -56,6 +38,7 @@ public class InventoryService {
         inventoryRepository.save(inventory);
     }
 
+    @Transactional
     public void addResina(Double amount){
         Inventory inventory = getOrCreateInventory();
         Double currentStock = (inventory.getResinaStock() != null) ? inventory.getResinaStock() : 0.0;

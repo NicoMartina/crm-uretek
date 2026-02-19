@@ -12,8 +12,6 @@ import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
-
 @Service
 public class JobService {
 
@@ -40,7 +38,7 @@ public class JobService {
 
         job.setBalanceAmount(total - paid);
     }
-
+    @Transactional
     public Job saveJob(Job job){
         if (job.getVisit() != null  && job.getLead() == null) {
             job.setLead(job.getVisit().getLead());
@@ -52,7 +50,7 @@ public class JobService {
     @Transactional
     public Job createJobFromVisit(Long visitId, Job  jobDetails){
         Visit visit = visitRepository.findById(visitId)
-                .orElseThrow(() -> new RuntimeException("Visit Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Visit Not Found"));
 
         jobDetails.setVisit(visit);
         jobDetails.setLead(visit.getLead());
@@ -85,7 +83,7 @@ public class JobService {
         return jobRepository.save(job);
     }
 
-    //LAMBDAS/STREAM VERSION:
+    // TO BE REMOVED ON A FUTURE TICKET
     public Double calculateTotalCompanyOutstandingBalance(){
         return jobRepository.findAll().stream()
                 .map(job -> job.getBalanceAmount() != null ? job.getBalanceAmount() : 0.0)

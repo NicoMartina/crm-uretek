@@ -1,10 +1,10 @@
 package com.crmuretek.crmuretek.services;
 
+import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Lead;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class LeadService {
     private LeadRepository leadRepository;
     private JobRepository jobRepository;
@@ -32,11 +31,12 @@ public class LeadService {
         return leadRepository.findById(id);
     }
 
+    @Transactional
     public Lead create(Lead lead){
         return leadRepository.save(lead);
     }
 
-
+    @Transactional
     public Lead update(Long id, Lead details){
         return leadRepository.findById(id)
                 .map(existing -> {
@@ -54,13 +54,14 @@ public class LeadService {
                 .orElseThrow(() -> new RuntimeException("Lead not found with id: " + id));
     }
 
+    @Transactional
     public void delete(Long id){
         if (jobRepository.existsByLeadId(id)){
-            throw new RuntimeException("cannot delete lead with exisiting jobs");
+            throw new ResourceNotFoundException("cannot delete lead with existing jobs");
         }
 
         if (visitRepository.existsByLeadId(id)){
-            throw new RuntimeException("cannot delete lead with exisiting visits");
+            throw new RuntimeException("cannot delete lead with existing visits");
         }
 
         leadRepository.deleteById(id);
