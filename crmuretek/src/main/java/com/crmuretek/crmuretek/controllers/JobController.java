@@ -98,10 +98,7 @@
                     JobStatus previousStatus = job.getJobStatus();
                     JobStatus newStatus = JobStatus.valueOf(statusValue.toUpperCase());
 
-                    // only consume material if status is COMPLETED
-                    if (previousStatus != JobStatus.COMPLETED && newStatus == JobStatus.COMPLETED) {
-                        inventoryService.consumeMaterial(job.getEstimateMaterialKg());
-                    }
+
 
                     job.setJobStatus(newStatus);
 

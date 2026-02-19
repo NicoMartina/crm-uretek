@@ -7,8 +7,11 @@ import com.crmuretek.crmuretek.models.VisitStatus;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,5 +44,12 @@ public class VisitService {
         return visitRepository.findAll().stream()
                 .filter(visit -> !visit.isHasPaidVisitFee())
                 .toList();
+    }
+
+    @Transactional
+    public Visit updateStatus(Long id, String status){
+        Visit visit = visitRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Visit not found."));
+        visit.setStatus(VisitStatus.valueOf(status.toUpperCase()));
+        return visitRepository.save(visit);
     }
 }
