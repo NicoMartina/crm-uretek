@@ -27,11 +27,17 @@ public class LeadController {
 
     @GetMapping
     public List<Lead> getAllLeads(){
-        return leadRepository.findAll();
+        return leadService.findAll();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Lead> update(@PathVariable Long id, @RequestBody Lead lead){
         return ResponseEntity.ok(leadService.update(id, lead));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+        leadService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
