@@ -9,8 +9,11 @@ import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
+import com.sun.source.doctree.ThrowsTree;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class JobService {
@@ -24,6 +27,10 @@ public class JobService {
         this.jobRepository = jobRepository;
         this.inventoryRepository = inventoryRepository;
         this.visitRepository = visitRepository;
+    }
+
+    public List<Job> findAll(){
+        return jobRepository.findAll();
     }
 
     public void syncFinancials(Job job){
@@ -81,6 +88,19 @@ public class JobService {
         }
         job.setJobStatus(newStatus);
         return jobRepository.save(job);
+    }
+
+    @Transactional
+    public Job update(Long id, Job details){
+        return jobRepository.findById(id)
+                .map(job -> {
+                    job.setObservations(details.getObservations());
+                    job.setEstimateMaterialKg(details.getEstimateMaterialKg());
+                    job.setPricePerKilo(details.getPricePerKilo());
+                    job.setDownPaymentAmount(details.getDownPaymentAmount());
+                    return jobRepository.save(job);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
     }
 
     // TO BE REMOVED ON A FUTURE TICKET
