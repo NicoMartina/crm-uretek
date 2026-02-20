@@ -15,8 +15,8 @@ public class DataInitializer {
         return args -> {
             if (inventoryRepository.count() == 0){
                 Inventory initialStock = new Inventory();
-                initialStock.setIso_stock(0.0);
-                initialStock.setResina_stock(0.0);
+                initialStock.setIsoStock(0.0);
+                initialStock.setResinaStock(0.0);
                 initialStock.setLastUpdated(LocalDateTime.now());
                 inventoryRepository.save(initialStock);
 

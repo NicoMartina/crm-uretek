@@ -20,8 +20,8 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double iso_stock;    // 63%
-    private Double resina_stock; // 37%
+    private Double isoStock;    // 63%
+    private Double resinaStock; // 37%
 
     private LocalDateTime lastUpdated;
 }

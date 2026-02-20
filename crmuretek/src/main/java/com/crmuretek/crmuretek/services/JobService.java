@@ -9,10 +9,11 @@ import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
+import com.sun.source.doctree.ThrowsTree;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
+import java.util.List;
 
 @Service
 public class JobService {
@@ -28,6 +29,10 @@ public class JobService {
         this.visitRepository = visitRepository;
     }
 
+    public List<Job> findAll(){
+        return jobRepository.findAll();
+    }
+
     public void syncFinancials(Job job){
         // 1. Calculate Total: Kg * Price
         double kg = (job.getEstimateMaterialKg() != null) ? job.getEstimateMaterialKg() : 0.0;
@@ -40,7 +45,7 @@ public class JobService {
 
         job.setBalanceAmount(total - paid);
     }
-
+    @Transactional
     public Job saveJob(Job job){
         if (job.getVisit() != null  && job.getLead() == null) {
             job.setLead(job.getVisit().getLead());
@@ -52,7 +57,7 @@ public class JobService {
     @Transactional
     public Job createJobFromVisit(Long visitId, Job  jobDetails){
         Visit visit = visitRepository.findById(visitId)
-                .orElseThrow(() -> new RuntimeException("Visit Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Visit Not Found"));
 
         jobDetails.setVisit(visit);
         jobDetails.setLead(visit.getLead());
@@ -73,19 +78,32 @@ public class JobService {
             double requiredIso = job.getEstimateMaterialKg() * 0.63;
             double requiredResina = job.getEstimateMaterialKg() * 0.37;
 
-            if (stock.getIso_stock() < requiredIso || stock.getResina_stock() < requiredResina){
+            if (stock.getIsoStock() < requiredIso || stock.getResinaStock() < requiredResina){
                 throw new InsuffcientMaterialException("Insufficient stock to start the job.");
             }
 
-            stock.setIso_stock(stock.getIso_stock() - requiredIso);
-            stock.setResina_stock(stock.getResina_stock() - requiredResina);
+            stock.setIsoStock(stock.getIsoStock() - requiredIso);
+            stock.setResinaStock(stock.getResinaStock() - requiredResina);
             stock.setLastUpdated(java.time.LocalDateTime.now());
         }
         job.setJobStatus(newStatus);
         return jobRepository.save(job);
     }
 
-    //LAMBDAS/STREAM VERSION:
+    @Transactional
+    public Job update(Long id, Job details){
+        return jobRepository.findById(id)
+                .map(job -> {
+                    job.setObservations(details.getObservations());
+                    job.setEstimateMaterialKg(details.getEstimateMaterialKg());
+                    job.setPricePerKilo(details.getPricePerKilo());
+                    job.setDownPaymentAmount(details.getDownPaymentAmount());
+                    return jobRepository.save(job);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
+    }
+
+    // TO BE REMOVED ON A FUTURE TICKET
     public Double calculateTotalCompanyOutstandingBalance(){
         return jobRepository.findAll().stream()
                 .map(job -> job.getBalanceAmount() != null ? job.getBalanceAmount() : 0.0)

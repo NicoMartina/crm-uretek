@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
-    // Check your JobRepository.java - Copy this exactly
+
     @Query("SELECT SUM(j.totalAmount) FROM Job j WHERE j.jobStatus = 'QUOTED'")
     Double sumQuotedAmount();
 
