@@ -6,7 +6,6 @@ export const jobService = {
     return response.data;
   },
 
-  // This is the part that was missing!
   create: async (jobData: any) => {
     const response = await api.post("/jobs", jobData);
     return response.data;
@@ -21,12 +20,12 @@ export const jobService = {
     return await api.delete(`/jobs/${id}`);
   },
 
-  // Add this inside the jobService object in src/services/jobService.ts
   getMaterialTotal: async (): Promise<number> => {
     const response = await api.get("/jobs/stats/material-total");
     return response.data;
   },
 
+  //should be in a separate service but for simplicity we can keep it here. We'll move it later.
   getDashboardSummary: async () => {
     const response = await api.get("/dashboard/summary");
     return response.data;
