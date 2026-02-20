@@ -61,7 +61,7 @@ export default function App() {
       if (res[2].status === "fulfilled") {
         const all = res[2].value || [];
         // Filtering leads that don't have active jobs
-        setLeads(all.filter((c: any) => !c.jobs || c.jobs.length === 0));
+        setLeads(all);
       }
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
     } catch (e) {
