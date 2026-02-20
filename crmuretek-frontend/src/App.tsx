@@ -126,7 +126,7 @@ export default function App() {
               onAddStock={() => {}}
               totalQuoted={dashboardData.totalQuoted || 0}
               totalActive={dashboardData.totalActive || 0}
-              materialTotal={dashboardData.materialNeeded || 0}
+              materialTotal={dashboardData.materialNeededTotal || 0}
             />
           ) : (
             <div className="text-slate-500 font-bold p-10 text-center">

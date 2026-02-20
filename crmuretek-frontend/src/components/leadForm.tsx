@@ -146,14 +146,24 @@ export default function LeadForm({
         <label className="text-[10px] font-bold uppercase text-slate-400">
           Como se contacto
         </label>
-        <input
-          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+        <select
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
           value={formData.contactChannel}
           onChange={(e) =>
             setFormData({ ...formData, contactChannel: e.target.value })
           }
           required
-        />
+        >
+          <option value="">Seleccione una opción</option>
+          <option value={"GOOGLE"}>Google</option>
+          <option value={"WEBSITE"}>Website</option>
+          <option value={"FACEBOOK"}>Facebook</option>
+          <option value={"INSTAGRAM"}>Instagram</option>
+          <option value={"WHATSAPP"}>WhatsApp</option>
+          <option value={"PHONE"}>Llamada</option>
+          <option value={"REFERRAL"}>Recomendacion</option>
+          <option value={"OTHER"}>Trabajo Previo</option>
+        </select>
       </div>
       {/* Input Group 8 */}
       <div>
