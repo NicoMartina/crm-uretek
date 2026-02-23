@@ -1,4 +1,3 @@
-import React from "react";
 import { Calendar, Trash2, Edit } from "lucide-react";
 
 interface LeadsTableProps {
