@@ -61,7 +61,7 @@ export default function App() {
       if (res[2].status === "fulfilled") {
         const all = res[2].value || [];
         // Filtering leads that don't have active jobs
-        setLeads(all.filter((c: any) => !c.jobs || c.jobs.length === 0));
+        setLeads(all);
       }
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
     } catch (e) {
@@ -117,16 +117,15 @@ export default function App() {
         {activeTab === "dashboard" &&
           (dashboardData ? (
             <DashboardView
-              data={dashboardData}
               inventory={{
-                iso_stock: dashboardData.isoStock || 0,
-                resina_stock: dashboardData.resinaStock || 0,
+                isoStock: dashboardData.isoStock || 0,
+                resinaStock: dashboardData.resinaStock || 0,
               }}
               totalPossibleMix={dashboardData.possibleMix || 0}
               onAddStock={() => {}}
               totalQuoted={dashboardData.totalQuoted || 0}
               totalActive={dashboardData.totalActive || 0}
-              materialTotal={dashboardData.materialNeeded || 0}
+              materialTotal={dashboardData.materialNeededTotal || 0}
             />
           ) : (
             <div className="text-slate-500 font-bold p-10 text-center">
@@ -215,10 +214,11 @@ export default function App() {
               const jobToEdit = jobs.find((j) => j.id === id);
               if (jobToEdit) {
                 setSelectedLead({
-                  ...jobToEdit.customer,
                   jobId: jobToEdit.id,
                   existingAmount: jobToEdit.totalAmount,
-                  existingDescription: jobToEdit.jobDescription,
+                  existingMaterial: jobToEdit.estimateMaterialKg,
+                  existingDescription: jobToEdit.observations,
+                  ...jobToEdit.lead,
                 });
                 setIsAddingQuote(true);
               }
@@ -312,10 +312,14 @@ export default function App() {
               setSelectedLead(null);
             }}
             onCreate={async (data) => {
-              await jobService.create({
-                ...data,
-                lead: { id: selectedLead.id },
-              });
+              if (selectedLead.jobId) {
+                await jobService.update(selectedLead.jobId, data);
+              } else {
+                await jobService.create({
+                  ...data,
+                  lead: { id: selectedLead.id },
+                });
+              }
               setIsAddingQuote(false);
               syncAllData();
             }}
@@ -332,9 +336,9 @@ export default function App() {
             onClose={() => setIsSchedulingVisit(false)}
             onConfirm={async () => {
               await visitService.create({
-                customer: { id: selectedLead.id },
+                lead: { id: selectedLead.id },
                 visitDate,
-                notes: visitNotes,
+                observations: visitNotes,
               });
               setIsSchedulingVisit(false);
               syncAllData();

@@ -18,5 +18,5 @@ public class DashboardSummaryDTO {
     // Financial Data
     private double totalQuoted;
     private double totalActive;
-    private double metarialNeededTotal;
+    private double materialNeededTotal;
 }

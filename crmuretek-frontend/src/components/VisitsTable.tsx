@@ -4,7 +4,7 @@ import { Trash2, Briefcase } from "lucide-react";
 interface VisitsTableProps {
   visits: any[];
   onUpdateStatus: (id: number, status: string) => void;
-  onConvert: (customer: any) => void;
+  onConvert: (lead: any) => void;
   onDelete: (id: number) => void;
 }
 
@@ -49,7 +49,7 @@ export const VisitsTable = ({
                   </div>
                 </td>
                 <td className="p-4 font-black text-slate-700">
-                  {visit.customer?.name || "Sin Cliente"}
+                  {visit.lead?.name || "Sin Cliente"}
                 </td>
                 <td className="p-4">
                   <span
@@ -73,9 +73,7 @@ export const VisitsTable = ({
                       </button>
                     )}
                     <button
-                      onClick={() =>
-                        visit.customer && onConvert(visit.customer)
-                      }
+                      onClick={() => visit.lead && onConvert(visit.lead)}
                       className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"
                     >
                       <Briefcase size={12} /> Convertir

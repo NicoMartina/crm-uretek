@@ -1,8 +1,8 @@
 import api from "./api"; // Import our central Axios config
 
 export interface Inventory {
-  iso_stock: number;
-  resina_stock: number;
+  isoStock: number;
+  resinaStock: number;
 }
 export const inventoryService = {
   // GET current stock
