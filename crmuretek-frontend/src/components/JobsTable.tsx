@@ -49,7 +49,7 @@ export const JobsTable = ({
                 </td>
                 <td className="p-4">
                   <div className="font-bold text-slate-800">
-                    {job.lead?.name || job.client?.name || "Sin nombre"}
+                    {job.lead?.name || "Sin nombre"}
                   </div>
                   <div className="text-[10px] text-slate-500">
                     {job.lead?.phoneNumber}
