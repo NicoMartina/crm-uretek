@@ -20,6 +20,7 @@ import { JobsTable } from "./components/JobsTable";
 import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
 import { VisitModal } from "./components/VisitModal";
+import { inventoryService } from "./services/inventoryService";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-blue-100 text-blue-700" },
@@ -40,6 +41,9 @@ export default function App() {
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [selectedLead, setSelectedLead] = useState<any>(null);
   const [viewingLead, setViewingLead] = useState<any>(null);
+  const [isAddingStock, setIsAddingStock] = useState(false);
+  const [stockType, setStockType] = useState<"iso" | "resina">("iso");
+  const [stockAmount, setStockAmount] = useState("");
 
   // Visit Modal State
   const [visitDate, setVisitDate] = useState(
@@ -122,7 +126,10 @@ export default function App() {
                 resinaStock: dashboardData.resinaStock || 0,
               }}
               totalPossibleMix={dashboardData.possibleMix || 0}
-              onAddStock={() => {}}
+              onAddStock={(type) => {
+                setStockType(type);
+                setIsAddingStock(true);
+              }}
               totalQuoted={dashboardData.totalQuoted || 0}
               totalActive={dashboardData.totalActive || 0}
               materialTotal={dashboardData.materialNeededTotal || 0}
@@ -344,6 +351,44 @@ export default function App() {
               syncAllData();
             }}
           />
+        )}
+        {isAddingStock && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+              <h2 className="text-2xl font-black mb-4">
+                Cargar {stockType === "iso" ? "ISO" : "Resina"}
+              </h2>
+              <input
+                type="number"
+                className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Cantidad en kg"
+                value={stockAmount}
+                onChange={(e) => setStockAmount(e.target.value)}
+              />
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setIsAddingStock(false)}
+                  className="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={async () => {
+                    await inventoryService.addStock(
+                      stockType,
+                      Number(stockAmount)
+                    );
+                    setIsAddingStock(false);
+                    setStockAmount("");
+                    syncAllData();
+                  }}
+                  className="flex-1 py-3 bg-orange-500 text-white font-bold rounded-xl"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>
