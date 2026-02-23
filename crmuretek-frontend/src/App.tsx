@@ -117,10 +117,9 @@ export default function App() {
         {activeTab === "dashboard" &&
           (dashboardData ? (
             <DashboardView
-              data={dashboardData}
               inventory={{
-                iso_stock: dashboardData.isoStock || 0,
-                resina_stock: dashboardData.resinaStock || 0,
+                isoStock: dashboardData.isoStock || 0,
+                resinaStock: dashboardData.resinaStock || 0,
               }}
               totalPossibleMix={dashboardData.possibleMix || 0}
               onAddStock={() => {}}

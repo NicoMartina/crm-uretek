@@ -8,7 +8,6 @@ interface DashboardViewProps {
   totalQuoted: number;
   totalActive: number;
   materialTotal: number;
-  data: any;
 }
 
 export const DashboardView = ({
