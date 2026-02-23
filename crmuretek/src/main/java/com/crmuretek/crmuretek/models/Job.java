@@ -67,6 +67,9 @@
         @Column(columnDefinition = "TEXT")
         private String observations;
 
+        @Enumerated(EnumType.STRING)
+        private Currency currency;
+
 
 
         public void calculateTotals(){

@@ -8,6 +8,10 @@ public enum SourceEnum {
     @JsonCreator
     public static SourceEnum fromString(String value) {
         if (value == null || value.isEmpty()) return null;
-        return SourceEnum.valueOf(value.toUpperCase().trim());
+        try{
+            return SourceEnum.valueOf(value.toUpperCase().trim());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }
