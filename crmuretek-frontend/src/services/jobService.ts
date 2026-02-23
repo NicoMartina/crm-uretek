@@ -11,6 +11,11 @@ export const jobService = {
     return response.data;
   },
 
+  update: async (id: number, jobData: any) => {
+    const response = await api.put(`/jobs/${id}`, jobData);
+    return response.data;
+  },
+
   updateStatus: async (id: number, status: string) => {
     const response = await api.patch(`/jobs/${id}/status`, { status });
     return response.data;

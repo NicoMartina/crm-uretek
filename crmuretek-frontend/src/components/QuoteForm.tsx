@@ -14,16 +14,18 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
 }) => {
   const [amount, setAmount] = useState("");
   const [material, setMaterial] = useState("");
-  const [workDate, setWorkDate] = useState("2026-01-23");
+  const [workDate, setWorkDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [description, setDescription] = useState("");
 
   // Inside QuoteForm.tsx, before the return
   useEffect(() => {
-    // If the 'lead' passed in actually has job details (from an existing job)
-    if (lead?.existingJob) {
-      setAmount(lead.existingJob.totalAmount);
-      setMaterial(lead.existingJob.estimateMaterialKg);
-      setDescription(lead.existingJob.jobDescription);
+    console.log("lead received in QuoteForm:", lead);
+    if (lead?.existingAmount) {
+      setAmount(lead.existingAmount);
+      setMaterial(lead.existingMaterial || "");
+      setDescription(lead.existingDescription || "");
     }
   }, [lead]);
 
@@ -110,7 +112,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
                 totalAmount: Number(amount),
                 estimateMaterialKg: Number(material),
                 workDate: workDate,
-                jobDescription: description,
+                observations: description,
               })
             }
             className="flex-1 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all"

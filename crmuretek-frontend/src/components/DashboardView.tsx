@@ -49,7 +49,7 @@ export const DashboardView = ({
               Stock ISO (63%)
             </p>
             <p className="text-xl font-black text-blue-400">
-              {inventory?.iso_stock?.toLocaleString() || 0} kg
+              {inventory?.isoStock?.toLocaleString() || 0} kg
             </p>
           </div>
           <div>
@@ -57,7 +57,7 @@ export const DashboardView = ({
               Stock Resina (37%)
             </p>
             <p className="text-xl font-black text-emerald-400">
-              {inventory?.resina_stock?.toLocaleString() || 0} kg
+              {inventory?.resinaStock?.toLocaleString() || 0} kg
             </p>
           </div>
         </div>

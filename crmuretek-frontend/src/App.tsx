@@ -215,10 +215,11 @@ export default function App() {
               const jobToEdit = jobs.find((j) => j.id === id);
               if (jobToEdit) {
                 setSelectedLead({
-                  ...jobToEdit.lead,
                   jobId: jobToEdit.id,
                   existingAmount: jobToEdit.totalAmount,
-                  existingDescription: jobToEdit.jobDescription,
+                  existingMaterial: jobToEdit.estimateMaterialKg,
+                  existingDescription: jobToEdit.observations,
+                  ...jobToEdit.lead,
                 });
                 setIsAddingQuote(true);
               }
@@ -312,10 +313,14 @@ export default function App() {
               setSelectedLead(null);
             }}
             onCreate={async (data) => {
-              await jobService.create({
-                ...data,
-                lead: { id: selectedLead.id },
-              });
+              if (selectedLead.jobId) {
+                await jobService.update(selectedLead.jobId, data);
+              } else {
+                await jobService.create({
+                  ...data,
+                  lead: { id: selectedLead.id },
+                });
+              }
               setIsAddingQuote(false);
               syncAllData();
             }}
