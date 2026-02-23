@@ -4,7 +4,7 @@ import { Trash2, Briefcase } from "lucide-react";
 interface VisitsTableProps {
   visits: any[];
   onUpdateStatus: (id: number, status: string) => void;
-  onConvert: (customer: any) => void;
+  onConvert: (lead: any) => void;
   onDelete: (id: number) => void;
 }
 

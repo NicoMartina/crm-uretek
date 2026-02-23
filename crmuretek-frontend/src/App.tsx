@@ -215,7 +215,7 @@ export default function App() {
               const jobToEdit = jobs.find((j) => j.id === id);
               if (jobToEdit) {
                 setSelectedLead({
-                  ...jobToEdit.customer,
+                  ...jobToEdit.lead,
                   jobId: jobToEdit.id,
                   existingAmount: jobToEdit.totalAmount,
                   existingDescription: jobToEdit.jobDescription,
@@ -332,9 +332,9 @@ export default function App() {
             onClose={() => setIsSchedulingVisit(false)}
             onConfirm={async () => {
               await visitService.create({
-                customer: { id: selectedLead.id },
+                lead: { id: selectedLead.id },
                 visitDate,
-                notes: visitNotes,
+                observations: visitNotes,
               });
               setIsSchedulingVisit(false);
               syncAllData();
