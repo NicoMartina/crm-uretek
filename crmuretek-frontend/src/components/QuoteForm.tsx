@@ -18,6 +18,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
     new Date().toISOString().split("T")[0]
   );
   const [description, setDescription] = useState("");
+  const [currency, setCurrency] = useState("ARS");
 
   // Inside QuoteForm.tsx, before the return
   useEffect(() => {
@@ -83,6 +84,20 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
               onChange={(e) => setMaterial(e.target.value)}
             />
           </div>
+          <div>
+            <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
+              Moneda
+            </label>
+            <select
+              className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
+              <option value="">Seleccione una opción</option>
+              <option value="ARS">Pesos</option>
+              <option value="USD">Dolares</option>
+            </select>
+          </div>
 
           <div>
             <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
@@ -113,6 +128,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
                 estimateMaterialKg: Number(material),
                 workDate: workDate,
                 observations: description,
+                currency: currency,
               })
             }
             className="flex-1 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all"
