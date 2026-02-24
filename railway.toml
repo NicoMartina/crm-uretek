@@ -1,0 +1,6 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "crmuretek/Dockerfile"
+
+[deploy]
+startCommand = "java -jar /crmuretek/crmuretek.jar"
