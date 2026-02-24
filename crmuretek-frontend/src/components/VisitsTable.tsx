@@ -1,4 +1,3 @@
-import React from "react";
 import { Trash2, Briefcase } from "lucide-react";
 
 interface VisitsTableProps {

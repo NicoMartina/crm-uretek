@@ -20,7 +20,7 @@ public class CrmuretekApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/api/**")
-						.allowedOrigins("http://localhost:5173", "http://localhost:5174") // Your Vite React port
+						.allowedOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost") // Your Vite React port
 						.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
 						.allowedHeaders("*");
 			}
