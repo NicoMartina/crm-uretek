@@ -1,10 +1,17 @@
 package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.dto.DashboardSummaryDTO;
+import com.crmuretek.crmuretek.dto.StatsDTO;
 import com.crmuretek.crmuretek.models.Inventory;
+import com.crmuretek.crmuretek.models.Lead;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
+import com.crmuretek.crmuretek.repositories.LeadRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class DashboardService {
@@ -12,10 +19,12 @@ public class DashboardService {
 
     private JobRepository jobRepository;
     private InventoryRepository inventoryRepository;
-
-    public DashboardService(JobRepository jobRepository, InventoryRepository inventoryRepository) {
+    private LeadRepository leadRepository;
+;
+    public DashboardService(JobRepository jobRepository, InventoryRepository inventoryRepository, LeadRepository leadRepository) {
         this.jobRepository = jobRepository;
         this.inventoryRepository = inventoryRepository;
+        this.leadRepository = leadRepository;
     }
 
     public DashboardSummaryDTO getDashboardSummary(){
@@ -55,6 +64,30 @@ public class DashboardService {
                 totalActive != null ? totalActive : 0.0,
                 materialNeeded != null ? materialNeeded : 0.0
         );
+    }
+
+    public StatsDTO getStats(){
+        Map<String, Long> leadsPerMonth = new LinkedHashMap<>();
+        Map<String, Long> leadsBySource = new LinkedHashMap<>();
+        Map<String, Long> jobsPerMonth = new LinkedHashMap<>();
+        Map<String, Double> revenuePerMonth = new LinkedHashMap<>();
+
+        for (Object[] row : leadRepository.countLeadsPerMonth()) {
+            leadsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
+        }
+
+        for (Object[] row : leadRepository.countLeadsBySource()) {
+            String source = row[0] != null ? row[0].toString() : "Sin Fuente";
+            leadsBySource.put(source, ((Number) row[1]).longValue());
+        }
+
+        for (Object[] row : jobRepository.countJobsAndRevenuePerMonth()) {
+            jobsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
+            revenuePerMonth.put((String) row[0], row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
+        }
+
+        return new StatsDTO(leadsPerMonth, jobsPerMonth, leadsBySource, revenuePerMonth);
+
     }
 
 }

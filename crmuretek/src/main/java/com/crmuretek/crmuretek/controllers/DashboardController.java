@@ -1,6 +1,7 @@
 package com.crmuretek.crmuretek.controllers;
 
 import com.crmuretek.crmuretek.dto.DashboardSummaryDTO;
+import com.crmuretek.crmuretek.dto.StatsDTO;
 import com.crmuretek.crmuretek.services.DashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,5 +21,10 @@ public class DashboardController {
     @GetMapping("/summary")
     public DashboardSummaryDTO getSummary(){
         return dashboardService.getDashboardSummary();
+    }
+
+    @GetMapping("/stats")
+    public StatsDTO getStats(){
+        return dashboardService.getStats();
     }
 }
