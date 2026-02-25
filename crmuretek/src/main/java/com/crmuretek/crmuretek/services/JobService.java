@@ -31,8 +31,8 @@ public class JobService {
         this.materialUsageRepository = materialUsageRepository;
     }
 
-    public List<Job> findAll(){
-        return jobRepository.findAll();
+    public List<Job> findAllByOrderByIdDesc(){
+        return jobRepository.findAllByOrderByIdDesc();
     }
 
     public void syncFinancials(Job job){

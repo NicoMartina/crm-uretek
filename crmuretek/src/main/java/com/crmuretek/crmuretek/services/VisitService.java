@@ -26,6 +26,10 @@ public class VisitService {
         this.leadRepository = leadRepository;
     }
 
+    public List<Visit> findAllByVisitDesc(){
+        return visitRepository.findAllByOrderByVisitDateDesc();
+    }
+
     @Transactional
     public  Visit scheduleVisitFromLead(Long leadId, Visit visitDetails){
         //Find the lead first

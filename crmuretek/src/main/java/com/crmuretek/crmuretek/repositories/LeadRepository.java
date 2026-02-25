@@ -11,4 +11,5 @@ public interface LeadRepository extends JpaRepository<Lead, Long> {
     Optional<Email> findByEmail(String email);
     List<Lead> findByNameContaining(String name);
     List<Lead> findByPhoneNumber(String phoneNumber);
+    List<Lead> findAllByOrderByContactDateDesc();
 }
