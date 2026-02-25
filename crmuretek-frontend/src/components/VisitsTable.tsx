@@ -51,26 +51,21 @@ export const VisitsTable = ({
                   {visit.lead?.name || "Sin Cliente"}
                 </td>
                 <td className="p-4">
-                  <span
-                    className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${
+                  <select
+                    value={visit.jobStatus}
+                    onChange={(e) => onUpdateStatus(visit.id, e.target.value)}
+                    className={`text-[10px] font-black uppercase px-2 py-1 rounded-md outline-none cursor-pointer border-none ${
                       visit.status === "VISITED"
                         ? "bg-blue-100 text-blue-700"
                         : "bg-orange-100 text-orange-700"
                     }`}
                   >
-                    {visit.status}
-                  </span>
+                    <option value="SCHEDULED">Programada</option>
+                    <option value="VISITED">Visitada</option>
+                  </select>
                 </td>
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
-                    {visit.status === "SCHEDULED" && (
-                      <button
-                        onClick={() => onUpdateStatus(visit.id, "VISITED")}
-                        className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-blue-700 transition-all"
-                      >
-                        Marcar Visitado
-                      </button>
-                    )}
                     <button
                       onClick={() => visit.lead && onConvert(visit.lead)}
                       className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"

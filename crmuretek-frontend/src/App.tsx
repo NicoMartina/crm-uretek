@@ -44,6 +44,49 @@ export default function App() {
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [stockType, setStockType] = useState<"iso" | "resina">("iso");
   const [stockAmount, setStockAmount] = useState("");
+  const [leadSearch, setLeadSearch] = useState("");
+  const [visitSearch, setVisitSearch] = useState("");
+  const [jobSearch, setJobSearch] = useState("");
+
+  // Filter leads based on search input
+  const filteredLeads = leads.filter(
+    (lead) =>
+      lead.name?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      lead.phoneNumber?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      lead.address?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      lead.problemDescription
+        ?.toLowerCase()
+        .includes(leadSearch.toLowerCase()) ||
+      lead.source?.toLowerCase().includes(leadSearch.toLowerCase())
+  );
+  const visitStatusMap: Record<string, string> = {
+    SCHEDULED: "programada",
+    VISITED: "visitada",
+  };
+
+  const filteredVisits = visits.filter((visit) => {
+    const translatedStatus = visitStatusMap[visit.status] || visit.status;
+    return (
+      visit.lead?.name?.toLowerCase().includes(visitSearch.toLowerCase()) ||
+      translatedStatus.toLowerCase().includes(visitSearch.toLowerCase()) ||
+      visit.observations?.toLowerCase().includes(visitSearch.toLowerCase())
+    );
+  });
+
+  const jobStatusMap: Record<string, string> = {
+    QUOTED: "presupuestado",
+    IN_PROGRESS: "en obra",
+    COMPLETED: "finalizado",
+  };
+
+  const filteredJobs = jobs.filter((job) => {
+    const translatedStatus = jobStatusMap[job.jobStatus] || job.jobStatus;
+    return (
+      job.lead?.name?.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      translatedStatus.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      job.observations?.toLowerCase().includes(jobSearch.toLowerCase())
+    );
+  });
 
   // Visit Modal State
   const [visitDate, setVisitDate] = useState(
@@ -88,7 +131,7 @@ export default function App() {
             activeTab === "dashboard" ? "bg-orange-600" : "hover:bg-slate-800"
           }`}
         >
-          <LayoutDashboard className="mr-2" /> Dashboard
+          <LayoutDashboard className="mr-2" /> Inicio
         </button>
         <button
           onClick={() => setActiveTab("leads")}
@@ -96,7 +139,7 @@ export default function App() {
             activeTab === "leads" ? "bg-orange-600" : "hover:bg-slate-800"
           }`}
         >
-          <Users className="mr-2" /> Prospectos
+          <Users className="mr-2" /> Consultas
         </button>
         <button
           onClick={() => setActiveTab("visits")}
@@ -143,7 +186,7 @@ export default function App() {
         {activeTab === "leads" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-black text-slate-800">Prospectos</h2>
+              <h2 className="text-2xl font-black text-slate-800">Consultas</h2>
               <button
                 onClick={() => {
                   setSelectedLead(null);
@@ -151,12 +194,18 @@ export default function App() {
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> NUEVO PROSPECTO
+                <Plus size={20} /> Nueva Consulta
               </button>
             </div>
-
+            <input
+              type="text"
+              placeholder="Buscar por nombre, teléfono o email..."
+              className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+              value={leadSearch}
+              onChange={(e) => setLeadSearch(e.target.value)}
+            />
             <LeadsTable
-              leads={leads}
+              leads={filteredLeads}
               onView={(l) => {
                 setViewingLead(l);
                 setSelectedLead(l);
@@ -184,58 +233,100 @@ export default function App() {
         )}
 
         {activeTab === "visits" && (
-          <VisitsTable
-            visits={visits}
-            onConvert={(cust) => {
-              setSelectedLead(cust);
-              setIsAddingQuote(true);
-            }}
-            onUpdateStatus={async (id, s) => {
-              await visitService.updateStatus(id, s);
-              syncAllData();
-            }}
-            onDelete={async (id) => {
-              if (window.confirm("¿Borrar visita?")) {
-                await visitService.delete(id);
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800">Visitas</h2>
+              <button
+                onClick={() => {
+                  setSelectedLead(null);
+                  setIsAddingLead(true);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
+              >
+                <Plus size={20} /> Nueva Visita
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar por nombre, teléfono o email..."
+              className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+              value={visitSearch}
+              onChange={(e) => setVisitSearch(e.target.value)}
+            />
+            <VisitsTable
+              visits={filteredVisits}
+              onConvert={(cust) => {
+                setSelectedLead(cust);
+                setIsAddingQuote(true);
+              }}
+              onUpdateStatus={async (id, s) => {
+                await visitService.updateStatus(id, s);
                 syncAllData();
-              }
-            }}
-          />
+              }}
+              onDelete={async (id) => {
+                if (window.confirm("¿Borrar visita?")) {
+                  await visitService.delete(id);
+                  syncAllData();
+                }
+              }}
+            />
+          </div>
         )}
 
         {activeTab === "jobs" && (
-          <JobsTable
-            jobs={jobs}
-            statusMap={JOB_STATUS_MAP}
-            onUpdateStatus={async (id, s) => {
-              try {
-                await jobService.updateStatus(id, s);
-                syncAllData();
-              } catch (error) {
-                console.error("Error updating job status:", error);
-              }
-            }}
-            onDelete={async (id) => {
-              if (window.confirm("¿Borrar obra?")) {
-                await jobService.delete(id);
-                syncAllData();
-              }
-            }}
-            onEdit={(id) => {
-              const jobToEdit = jobs.find((j) => j.id === id);
-              if (jobToEdit) {
-                setSelectedLead({
-                  jobId: jobToEdit.id,
-                  existingAmount: jobToEdit.totalAmount,
-                  existingMaterial: jobToEdit.estimateMaterialKg,
-                  existingDescription: jobToEdit.observations,
-                  ...jobToEdit.lead,
-                });
-                setIsAddingQuote(true);
-              }
-            }}
-            onRefresh={syncAllData}
-          />
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800">Trabajos</h2>
+              <button
+                onClick={() => {
+                  setSelectedLead(null);
+                  setIsAddingLead(true);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
+              >
+                <Plus size={20} /> Nueva Trabajo
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar por nombre, teléfono o email..."
+              className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+              value={jobSearch}
+              onChange={(e) => setJobSearch(e.target.value)}
+            />
+            <JobsTable
+              jobs={filteredJobs}
+              statusMap={JOB_STATUS_MAP}
+              onUpdateStatus={async (id, s) => {
+                try {
+                  await jobService.updateStatus(id, s);
+                  syncAllData();
+                } catch (error) {
+                  console.error("Error updating job status:", error);
+                }
+              }}
+              onDelete={async (id) => {
+                if (window.confirm("¿Borrar obra?")) {
+                  await jobService.delete(id);
+                  syncAllData();
+                }
+              }}
+              onEdit={(id) => {
+                const jobToEdit = jobs.find((j) => j.id === id);
+                if (jobToEdit) {
+                  setSelectedLead({
+                    jobId: jobToEdit.id,
+                    existingAmount: jobToEdit.totalAmount,
+                    existingMaterial: jobToEdit.estimateMaterialKg,
+                    existingDescription: jobToEdit.observations,
+                    ...jobToEdit.lead,
+                  });
+                  setIsAddingQuote(true);
+                }
+              }}
+              onRefresh={syncAllData}
+            />
+          </div>
         )}
 
         {/* --- MODALS --- */}
