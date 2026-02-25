@@ -2,17 +2,17 @@ package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.exceptions.InsuffcientMaterialException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
-import com.crmuretek.crmuretek.models.Inventory;
-import com.crmuretek.crmuretek.models.Job;
-import com.crmuretek.crmuretek.models.JobStatus;
-import com.crmuretek.crmuretek.models.Visit;
+import com.crmuretek.crmuretek.models.*;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
+import com.crmuretek.crmuretek.repositories.MaterialUsageRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import com.sun.source.doctree.ThrowsTree;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,11 +22,13 @@ public class JobService {
     private JobRepository jobRepository;
     private InventoryRepository inventoryRepository;
     private VisitRepository visitRepository;
+    private MaterialUsageRepository materialUsageRepository;
 
-    public JobService(JobRepository jobRepository, InventoryRepository inventoryRepository, VisitRepository visitRepository) {
+    public JobService(JobRepository jobRepository, InventoryRepository inventoryRepository, VisitRepository visitRepository, MaterialUsageRepository materialUsageRepository) {
         this.jobRepository = jobRepository;
         this.inventoryRepository = inventoryRepository;
         this.visitRepository = visitRepository;
+        this.materialUsageRepository = materialUsageRepository;
     }
 
     public List<Job> findAll(){
@@ -73,6 +75,7 @@ public class JobService {
         JobStatus newStatus = JobStatus.valueOf(statusName.toUpperCase());
 
         if (newStatus ==  JobStatus.IN_PROGRESS && job.getJobStatus() != JobStatus.IN_PROGRESS) {
+            System.out.println(">>> Entering IN_PROGRESS block for job: " + id);
             Inventory stock = inventoryRepository.findAll().stream().findFirst()
                     .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
             double requiredIso = job.getEstimateMaterialKg() * 0.63;
@@ -85,6 +88,13 @@ public class JobService {
             stock.setIsoStock(stock.getIsoStock() - requiredIso);
             stock.setResinaStock(stock.getResinaStock() - requiredResina);
             stock.setLastUpdated(java.time.LocalDateTime.now());
+
+            MaterialUsage materialUsage = new MaterialUsage();
+            materialUsage.setJob(job);
+            materialUsage.setIsoQuantity(requiredIso);
+            materialUsage.setResinQuantity(requiredResina);
+            materialUsage.setUsageDate(java.time.LocalDate.now());
+            materialUsageRepository.save(materialUsage);
         }
         job.setJobStatus(newStatus);
         return jobRepository.save(job);
