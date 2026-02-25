@@ -23,12 +23,12 @@ public class LeadService {
         this.visitRepository = visitRepository;
     }
 
-    public List<Lead> findAll(){
-        return leadRepository.findAll();
-    }
-
     public Optional<Lead> findById(Long id){
         return leadRepository.findById(id);
+    }
+
+    public List<Lead> findAllByContactDateDesc(){
+        return leadRepository.findAllByOrderByContactDateDesc();
     }
 
     @Transactional

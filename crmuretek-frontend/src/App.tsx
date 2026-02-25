@@ -208,8 +208,12 @@ export default function App() {
             jobs={jobs}
             statusMap={JOB_STATUS_MAP}
             onUpdateStatus={async (id, s) => {
-              await jobService.updateStatus(id, s);
-              syncAllData();
+              try {
+                await jobService.updateStatus(id, s);
+                syncAllData();
+              } catch (error) {
+                console.error("Error updating job status:", error);
+              }
             }}
             onDelete={async (id) => {
               if (window.confirm("¿Borrar obra?")) {

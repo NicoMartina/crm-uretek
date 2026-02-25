@@ -1,5 +1,6 @@
 package com.crmuretek.crmuretek.repositories;
 
+import com.crmuretek.crmuretek.models.Lead;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.models.VisitStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,6 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     boolean existsByLeadId(Long leadId);
     List<Visit> findByStatus(VisitStatus status);
     List<Visit> findByVisitDate(LocalDate date);
+    List<Visit> findAllByOrderByVisitDateDesc();
 
 }

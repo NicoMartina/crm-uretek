@@ -48,7 +48,7 @@
 
         @GetMapping
         public List<Job> getAllJobs(){
-            return jobService.findAll();
+            return jobService.findAllByOrderByIdDesc();
         }
 
         @GetMapping("/stats/material-total")

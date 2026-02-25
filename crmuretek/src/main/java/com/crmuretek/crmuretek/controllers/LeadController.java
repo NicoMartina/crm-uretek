@@ -27,7 +27,7 @@ public class LeadController {
 
     @GetMapping
     public List<Lead> getAllLeads(){
-        return leadService.findAll();
+        return leadService.findAllByContactDateDesc();
     }
 
     @PutMapping("/{id}")

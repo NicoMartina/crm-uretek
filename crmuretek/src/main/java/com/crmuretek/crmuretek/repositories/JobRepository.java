@@ -1,9 +1,12 @@
 package com.crmuretek.crmuretek.repositories;
 
 import com.crmuretek.crmuretek.models.Job;
+import com.crmuretek.crmuretek.models.Lead;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
@@ -18,5 +21,6 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     Double sumRequiredMaterial();
 
     boolean existsByLeadId(Long leadId);
+    List<Job> findAllByOrderByIdDesc();
 
 }
