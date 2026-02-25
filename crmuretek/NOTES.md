@@ -1,9 +1,3 @@
-# Git
-
-------
-
-# Docker
-
 # CRM Uretek - Dev Notes
 
 
