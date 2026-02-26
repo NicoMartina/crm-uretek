@@ -35,4 +35,9 @@ export const jobService = {
     const response = await api.get("/dashboard/summary");
     return response.data;
   },
+
+  getStats: async () => {
+    const response = await api.get("/dashboard/stats");
+    return response.data;
+  },
 };

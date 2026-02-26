@@ -4,6 +4,7 @@ import com.crmuretek.crmuretek.models.Lead;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.models.VisitStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -16,5 +17,8 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     List<Visit> findByStatus(VisitStatus status);
     List<Visit> findByVisitDate(LocalDate date);
     List<Visit> findAllByOrderByVisitDateDesc();
+
+    @Query(value = "SELECT TO_CHAR(visit_date, 'YYYY-MM'), COUNT(*) FROM leads_visits  GROUP BY TO_CHAR(visit_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
+    List<Object[]> countVisitsPerMonth();
 
 }

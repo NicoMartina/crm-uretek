@@ -7,6 +7,7 @@ import com.crmuretek.crmuretek.models.Lead;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
+import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -19,12 +20,15 @@ public class DashboardService {
 
     private JobRepository jobRepository;
     private InventoryRepository inventoryRepository;
+    private VisitRepository visitRepository;
     private LeadRepository leadRepository;
 ;
-    public DashboardService(JobRepository jobRepository, InventoryRepository inventoryRepository, LeadRepository leadRepository) {
+    public DashboardService(JobRepository jobRepository, VisitRepository visitRepository, InventoryRepository inventoryRepository, LeadRepository leadRepository) {
         this.jobRepository = jobRepository;
+        this.visitRepository = visitRepository;
         this.inventoryRepository = inventoryRepository;
         this.leadRepository = leadRepository;
+
     }
 
     public DashboardSummaryDTO getDashboardSummary(){
@@ -69,6 +73,7 @@ public class DashboardService {
     public StatsDTO getStats(){
         Map<String, Long> leadsPerMonth = new LinkedHashMap<>();
         Map<String, Long> leadsBySource = new LinkedHashMap<>();
+        Map<String, Long> visitsPerMonth = new LinkedHashMap<>();
         Map<String, Long> jobsPerMonth = new LinkedHashMap<>();
         Map<String, Double> revenuePerMonth = new LinkedHashMap<>();
 
@@ -81,12 +86,16 @@ public class DashboardService {
             leadsBySource.put(source, ((Number) row[1]).longValue());
         }
 
+        for (Object[] row : visitRepository.countVisitsPerMonth()) {
+            visitsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
+        }
+
         for (Object[] row : jobRepository.countJobsAndRevenuePerMonth()) {
             jobsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
             revenuePerMonth.put((String) row[0], row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
         }
 
-        return new StatsDTO(leadsPerMonth, jobsPerMonth, leadsBySource, revenuePerMonth);
+        return new StatsDTO(leadsPerMonth, visitsPerMonth, jobsPerMonth, leadsBySource, revenuePerMonth);
 
     }
 

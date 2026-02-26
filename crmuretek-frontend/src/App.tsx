@@ -47,6 +47,7 @@ export default function App() {
   const [leadSearch, setLeadSearch] = useState("");
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
+  const [statsData, setStatsData] = useState<any>(null);
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
@@ -101,6 +102,7 @@ export default function App() {
         visitService.getAll(),
         leadsService.getAll(),
         jobService.getDashboardSummary(),
+        jobService.getStats(),
       ]);
 
       if (res[0].status === "fulfilled") setJobs(res[0].value || []);
@@ -111,6 +113,7 @@ export default function App() {
         setLeads(all);
       }
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
+      if (res[4].status === "fulfilled") setStatsData(res[4].value);
     } catch (e) {
       console.error("Sync Error:", e);
     }
@@ -176,6 +179,7 @@ export default function App() {
               totalQuoted={dashboardData.totalQuoted || 0}
               totalActive={dashboardData.totalActive || 0}
               materialTotal={dashboardData.materialNeededTotal || 0}
+              statsData={statsData}
             />
           ) : (
             <div className="text-slate-500 font-bold p-10 text-center">
@@ -216,8 +220,14 @@ export default function App() {
               }}
               onDelete={async (id) => {
                 if (window.confirm("¿Borrar?")) {
-                  await leadsService.delete(id);
-                  syncAllData();
+                  try {
+                    await leadsService.delete(id);
+                    syncAllData();
+                  } catch (error) {
+                    alert(
+                      "No se puede eliminar un prospecto con visitas u obras asociadas."
+                    );
+                  }
                 }
               }}
               onScheduleVisit={(l) => {
