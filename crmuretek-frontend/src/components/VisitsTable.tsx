@@ -29,7 +29,7 @@ export const VisitsTable = ({
                 Estado
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
-                Gestión
+                Acciones Rápidas
               </th>
             </tr>
           </thead>

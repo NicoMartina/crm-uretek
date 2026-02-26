@@ -33,7 +33,7 @@ export const JobsTable = ({
                 Estado
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
-                Acciones
+                Acciones Rápidas
               </th>
             </tr>
           </thead>
