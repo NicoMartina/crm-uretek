@@ -253,7 +253,7 @@ export default function App() {
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nueva Visita
+                <Plus size={20} /> Nueva Consulta
               </button>
             </div>
             <input
@@ -294,7 +294,7 @@ export default function App() {
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nueva Trabajo
+                <Plus size={20} /> Nueva Consulta
               </button>
             </div>
             <input
