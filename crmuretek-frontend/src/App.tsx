@@ -48,6 +48,7 @@ export default function App() {
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
   const [statsData, setStatsData] = useState<any>(null);
+  const [viewingJob, setViewingJob] = useState<any>(null);
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
@@ -307,6 +308,7 @@ export default function App() {
             <JobsTable
               jobs={filteredJobs}
               statusMap={JOB_STATUS_MAP}
+              onView={(job) => setViewingJob(job)}
               onUpdateStatus={async (id, s) => {
                 try {
                   await jobService.updateStatus(id, s);
@@ -409,6 +411,91 @@ export default function App() {
               <button
                 onClick={() => setViewingLead(null)}
                 className="w-full mt-6 bg-slate-900 text-white py-3 rounded-xl font-bold"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {viewingJob && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+              <button
+                onClick={() => setViewingJob(null)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                ✕
+              </button>
+
+              <h2 className="text-2xl font-black mb-1">Detalles de la Obra</h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-6">
+                #{viewingJob.id}
+              </p>
+
+              {/* Job Info */}
+              <div className="space-y-3 text-sm mb-6">
+                <p>
+                  <strong>Estado:</strong>{" "}
+                  {JOB_STATUS_MAP[
+                    viewingJob.jobStatus as keyof typeof JOB_STATUS_MAP
+                  ]?.label || viewingJob.jobStatus}
+                </p>
+                <p>
+                  <strong>Fecha de Obra:</strong>{" "}
+                  {viewingJob.workDate?.split("-").reverse().join("/") ||
+                    "Sin fecha"}
+                </p>
+                <p>
+                  <strong>Monto Total:</strong>{" "}
+                  {viewingJob.totalAmount
+                    ? `$${viewingJob.totalAmount}`
+                    : "Sin monto"}
+                </p>
+                <p>
+                  <strong>Material Estimado:</strong>{" "}
+                  {viewingJob.estimateMaterialKg
+                    ? `${viewingJob.estimateMaterialKg} kg`
+                    : "Sin dato"}
+                </p>
+                <p>
+                  <strong>Observaciones:</strong>{" "}
+                  {viewingJob.observations || "Sin observaciones"}
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-slate-100 pt-4 mb-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                  Datos del Cliente
+                </p>
+                <div className="space-y-3 text-sm">
+                  <p>
+                    <strong>Nombre:</strong>{" "}
+                    {viewingJob.lead?.name || "Sin nombre"}
+                  </p>
+                  <p>
+                    <strong>Teléfono:</strong>{" "}
+                    {viewingJob.lead?.phoneNumber || "Sin teléfono"}
+                  </p>
+                  <p>
+                    <strong>Dirección:</strong>{" "}
+                    {viewingJob.lead?.address || "Sin dirección"}
+                  </p>
+                  <p>
+                    <strong>Problema:</strong>{" "}
+                    {viewingJob.lead?.problemDescription || "Sin descripción"}
+                  </p>
+                  <p>
+                    <strong>Origen:</strong>{" "}
+                    {viewingJob.lead?.source || "Sin origen"}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setViewingJob(null)}
+                className="w-full mt-2 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors"
               >
                 Cerrar
               </button>
