@@ -23,4 +23,12 @@ export const visitService = {
   delete: async (id: number) => {
     return await api.delete(`/visits/${id}`);
   },
+
+  // This handles: UPDATE /api/visits/{id}/observation
+  updateObservations: async (id: number, observation: string) => {
+    const response = await api.patch(`/visits/${id}/observation`, {
+      observation,
+    });
+    return response.data;
+  },
 };

@@ -3,6 +3,7 @@ import { Trash2, Briefcase } from "lucide-react";
 interface VisitsTableProps {
   visits: any[];
   onUpdateStatus: (id: number, status: string) => void;
+  onView: (visit: any) => void;
   onConvert: (lead: any) => void;
   onDelete: (id: number) => void;
 }
@@ -10,6 +11,7 @@ interface VisitsTableProps {
 export const VisitsTable = ({
   visits,
   onUpdateStatus,
+  onView,
   onConvert,
   onDelete,
 }: VisitsTableProps) => {
@@ -46,8 +48,13 @@ export const VisitsTable = ({
                       : "Sin fecha"}
                   </div>
                 </td>
-                <td className="p-4 font-black text-slate-700">
-                  {visit.lead?.name || "Sin Cliente"}
+                <td className="p-4">
+                  <button
+                    onClick={() => onView(visit)}
+                    className="font-black text-slate-700 hover:text-orange-500 transition-colors text-left"
+                  >
+                    {visit.lead?.name || "Sin Cliente"}
+                  </button>
                 </td>
                 <td className="p-4">
                   <select
