@@ -42,7 +42,7 @@ export const VisitsTable = ({
                 <td className="p-4">
                   <div className="font-bold text-slate-800">
                     {visit.visitDate
-                      ? visit.visitdate.split("-").reverse().join("/")
+                      ? visit.visitDate.split("-").reverse().join("/")
                       : "Sin fecha"}
                   </div>
                 </td>
