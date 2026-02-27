@@ -45,7 +45,7 @@ export const LeadsTable = ({
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
                   {lead.contactDate
-                    ? new Date(lead.contactDate).toLocaleDateString()
+                    ? lead.contactDate.split("-").reverse().join("/")
                     : "Sin fecha"}
                 </td>
                 <td className="p-4 font-black text-slate-800">
