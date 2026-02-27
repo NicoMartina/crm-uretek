@@ -17,7 +17,7 @@ public interface LeadRepository extends JpaRepository<Lead, Long> {
     @Query(value = "SELECT TO_CHAR(contact_date, 'YYYY-MM'), COUNT(*) FROM leads GROUP BY TO_CHAR(contact_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
     List<Object[]> countLeadsPerMonth();
 
-    @Query(value = "SELECT source, COUNT(*) FROM leads GROUP BY source", nativeQuery = true)
+    @Query(value = "SELECT TO_CHAR(contact_date, 'YYYY-MM'), source, COUNT(*) FROM leads GROUP BY TO_CHAR(contact_date, 'YYYY-MM'), source", nativeQuery = true)
     List<Object[]> countLeadsBySource();
 
 }

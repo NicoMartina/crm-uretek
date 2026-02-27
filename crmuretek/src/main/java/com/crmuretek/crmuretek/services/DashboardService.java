@@ -72,7 +72,7 @@ public class DashboardService {
 
     public StatsDTO getStats(){
         Map<String, Long> leadsPerMonth = new LinkedHashMap<>();
-        Map<String, Long> leadsBySource = new LinkedHashMap<>();
+        Map<String, Map<String, Long>> leadsBySource = new LinkedHashMap<>();
         Map<String, Long> visitsPerMonth = new LinkedHashMap<>();
         Map<String, Long> jobsPerMonth = new LinkedHashMap<>();
         Map<String, Double> revenuePerMonth = new LinkedHashMap<>();
@@ -82,8 +82,10 @@ public class DashboardService {
         }
 
         for (Object[] row : leadRepository.countLeadsBySource()) {
-            String source = row[0] != null ? row[0].toString() : "Sin Fuente";
-            leadsBySource.put(source, ((Number) row[1]).longValue());
+            String month = row[0] != null ? row[0].toString() : "Sin Fecha";
+            String source = row[1] != null ? row[1].toString() : "Sin fuente";
+            Long count = ((Number) row[2]).longValue();
+            leadsBySource.computeIfAbsent(month, k -> new LinkedHashMap<>()).put(source, count);
         }
 
         for (Object[] row : visitRepository.countVisitsPerMonth()) {
@@ -95,7 +97,7 @@ public class DashboardService {
             revenuePerMonth.put((String) row[0], row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
         }
 
-        return new StatsDTO(leadsPerMonth, visitsPerMonth, jobsPerMonth, leadsBySource, revenuePerMonth);
+        return new StatsDTO(leadsPerMonth, leadsBySource, visitsPerMonth, jobsPerMonth, revenuePerMonth);
 
     }
 
