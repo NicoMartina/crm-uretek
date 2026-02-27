@@ -20,14 +20,10 @@ public class Lead {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    @NotBlank(message = "El nombre es obligatorio")
+
     private String name;
-    @NotBlank(message = "El email es obligatorio")
     private String email;
-    @NotBlank(message = "La direccion es obligatorio")
     private String address;
-    @NotBlank(message = "El numero de telefono es obligatorio")
     private String phoneNumber;
 
     @Column(columnDefinition = "TEXT")

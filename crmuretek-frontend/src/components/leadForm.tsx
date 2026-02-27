@@ -63,7 +63,6 @@ export default function LeadForm({
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
         />
       </div>
 
@@ -78,7 +77,6 @@ export default function LeadForm({
           onChange={(e) =>
             setFormData({ ...formData, phoneNumber: e.target.value })
           }
-          required
         />
       </div>
       {/* Input Group 3 */}
@@ -90,7 +88,6 @@ export default function LeadForm({
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
         />
       </div>
       {/* Input Group 4 */}
@@ -104,7 +101,6 @@ export default function LeadForm({
           onChange={(e) =>
             setFormData({ ...formData, address: e.target.value })
           }
-          required
         />
       </div>
       {/* Input Group 5 */}
@@ -118,7 +114,6 @@ export default function LeadForm({
           onChange={(e) =>
             setFormData({ ...formData, problemDescription: e.target.value })
           }
-          required
         />
       </div>
       {/* Input Group 6 - Production Grade Select */}
@@ -130,7 +125,6 @@ export default function LeadForm({
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
           value={formData.source}
           onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-          required
         >
           <option value="">Seleccione una opción</option>
           <option value="WHATSAPP">WhatsApp</option>
@@ -152,7 +146,6 @@ export default function LeadForm({
           onChange={(e) =>
             setFormData({ ...formData, contactChannel: e.target.value })
           }
-          required
         >
           <option value="">Seleccione una opción</option>
           <option value={"GOOGLE"}>Google</option>
@@ -176,7 +169,6 @@ export default function LeadForm({
           onChange={(e) =>
             setFormData({ ...formData, contactDate: e.target.value })
           }
-          required
         />
       </div>
 
