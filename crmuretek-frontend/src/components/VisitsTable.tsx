@@ -51,12 +51,12 @@ export const VisitsTable = ({
                 </td>
                 <td className="p-4">
                   <select
-                    value={visit.jobStatus}
+                    value={visit.status}
                     onChange={(e) => onUpdateStatus(visit.id, e.target.value)}
                     className={`text-[10px] font-black uppercase px-2 py-1 rounded-md outline-none cursor-pointer border-none ${
-                      visit.status === "VISITED"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-orange-100 text-orange-700"
+                      visit.status === "SCHEDULED"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-emerald-100 text-emerald-700"
                     }`}
                   >
                     <option value="SCHEDULED">Programada</option>
