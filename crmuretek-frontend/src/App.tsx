@@ -49,6 +49,8 @@ export default function App() {
   const [jobSearch, setJobSearch] = useState("");
   const [statsData, setStatsData] = useState<any>(null);
   const [viewingJob, setViewingJob] = useState<any>(null);
+  const [viewingVisit, setViewingVisit] = useState<any>(null);
+  const [visitObservations, setVisitObservations] = useState("");
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
@@ -266,6 +268,10 @@ export default function App() {
             />
             <VisitsTable
               visits={filteredVisits}
+              onView={(v) => {
+                setViewingVisit(v);
+                setVisitObservations(v.observations || "");
+              }}
               onConvert={(cust) => {
                 setSelectedLead(cust);
                 setIsAddingQuote(true);
@@ -414,6 +420,89 @@ export default function App() {
               >
                 Cerrar
               </button>
+            </div>
+          </div>
+        )}
+
+        {viewingVisit && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative">
+              <button
+                onClick={() => setViewingVisit(null)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                ✕
+              </button>
+
+              <h2 className="text-2xl font-black mb-1">
+                Detalles de la Visita
+              </h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-6">
+                #{viewingVisit.id}
+              </p>
+
+              {/* Visit info */}
+              <div className="space-y-3 text-sm mb-6">
+                <p>
+                  <strong>Cliente:</strong>{" "}
+                  {viewingVisit.lead?.name || "Sin nombre"}
+                </p>
+                <p>
+                  <strong>Teléfono:</strong>{" "}
+                  {viewingVisit.lead?.phoneNumber || "Sin teléfono"}
+                </p>
+                <p>
+                  <strong>Dirección:</strong>{" "}
+                  {viewingVisit.lead?.address || "Sin dirección"}
+                </p>
+                <p>
+                  <strong>Fecha:</strong>{" "}
+                  {viewingVisit.visitDate?.split("-").reverse().join("/") ||
+                    "Sin fecha"}
+                </p>
+                <p>
+                  <strong>Estado:</strong>{" "}
+                  {viewingVisit.status === "SCHEDULED"
+                    ? "Programada"
+                    : "Visitada"}
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-slate-100 pt-4 mb-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">
+                  Observaciones
+                </label>
+                <textarea
+                  value={visitObservations}
+                  onChange={(e) => setVisitObservations(e.target.value)}
+                  rows={4}
+                  placeholder="Agregar observaciones..."
+                  className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setViewingVisit(null)}
+                  className="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={async () => {
+                    await visitService.updateObservations(
+                      viewingVisit.id,
+                      visitObservations
+                    );
+                    setViewingVisit(null);
+                    syncAllData();
+                  }}
+                  className="flex-1 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors"
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </div>
         )}

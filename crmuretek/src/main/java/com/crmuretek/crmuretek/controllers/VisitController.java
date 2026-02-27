@@ -43,6 +43,14 @@ public class VisitController {
         return ResponseEntity.ok(updated);
     }
 
+    @PatchMapping("/{id}/observations")
+    public ResponseEntity<Visit> updateObservations(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        return visitRepository.findById(id).map(visit -> {
+            visit.setObservations(body.get("observations"));
+            return ResponseEntity.ok(visitRepository.save(visit));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public  ResponseEntity<Void> deleteVisit(@PathVariable Long id){
         if (visitRepository.existsById(id)) {
