@@ -44,7 +44,9 @@ export const JobsTable = ({
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-bold text-slate-400">
-                  #{job.id}
+                  {job.workDate
+                    ? job.workDate.split("-").reverse().join("/")
+                    : "Sin fecha"}
                 </td>
                 <td className="p-4">
                   <div className="font-bold text-slate-800">

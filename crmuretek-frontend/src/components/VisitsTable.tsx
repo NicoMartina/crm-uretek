@@ -41,10 +41,9 @@ export const VisitsTable = ({
               >
                 <td className="p-4">
                   <div className="font-bold text-slate-800">
-                    {new Date(visit.visitDate).toLocaleDateString()}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-bold uppercase">
-                    Visita #{visit.id}
+                    {visit.contactDate
+                      ? visit.contactDate.split("-").reverse().join("/")
+                      : "Sin fecha"}
                   </div>
                 </td>
                 <td className="p-4 font-black text-slate-700">
