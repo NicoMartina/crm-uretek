@@ -3,6 +3,7 @@ import { Edit, Trash2 } from "lucide-react";
 interface JobsTableProps {
   jobs: any[];
   statusMap: Record<string, { label: string; color: string }>;
+  onView: (job: any) => void;
   onUpdateStatus: (id: number, status: string) => void;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;
@@ -12,6 +13,7 @@ interface JobsTableProps {
 export const JobsTable = ({
   jobs,
   statusMap,
+  onView,
   onUpdateStatus,
   onDelete,
   onEdit,
@@ -24,7 +26,7 @@ export const JobsTable = ({
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                ID
+                Fecha
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Cliente
@@ -49,12 +51,14 @@ export const JobsTable = ({
                     : "Sin fecha"}
                 </td>
                 <td className="p-4">
-                  <div className="font-bold text-slate-800">
-                    {job.lead?.name || "Sin nombre"}
-                  </div>
-                  <div className="text-[10px] text-slate-500">
-                    {job.lead?.phoneNumber}
-                  </div>
+                  <button onClick={() => onView(job)} className="text-left">
+                    <div className="font-bold text-slate-800 hover:text-orange-500 transition-colors">
+                      {job.lead?.name || "Sin nombre"}
+                    </div>
+                    <div className="text-[10px] text-slate-500">
+                      {job.lead?.phoneNumber}
+                    </div>
+                  </button>
                 </td>
                 <td className="p-4">
                   <select
