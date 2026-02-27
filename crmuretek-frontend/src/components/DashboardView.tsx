@@ -1,4 +1,5 @@
 import { Package } from "lucide-react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -37,12 +38,25 @@ export const DashboardView = ({
       }))
     : [];
 
+  const months = statsData ? Object.keys(statsData.leadsBySource) : [];
+  const lastMonth = months[months.length - 1] || "";
+  const [selectedMonth, setSelectedMonth] = useState(lastMonth);
+
   const sourceChartData = statsData
-    ? Object.entries(statsData.leadsBySource).map(([source, count]) => ({
-        name: source,
-        value: count,
-      }))
+    ? Object.entries(statsData.leadsBySource[selectedMonth]).map(
+        ([source, count]) => ({
+          name: source,
+          value: count,
+        })
+      )
     : [];
+
+  useEffect(() => {
+    if (statsData) {
+      const months = Object.keys(statsData.leadsBySource);
+      setSelectedMonth(months[months.length - 1] || "");
+    }
+  }, [statsData]);
 
   const COLORS = [
     "#f97316",
@@ -149,6 +163,17 @@ export const DashboardView = ({
             <h4 className="text-[10px] font-black uppercase text-slate-400 mb-4">
               Origen de las Consultas
             </h4>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="text-[10px] font-black uppercase px-2 py-1 rounded-md border border-slate-200 outline-none mb-4"
+            >
+              {months.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
