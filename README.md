@@ -172,13 +172,13 @@ cd crm-uretek
 ### 🎯 Project Purpose
 
 This project demonstrates:
-Backend system design using Spring Boot
-Clean separation of concerns
-Database modeling with JPA/Hibernate
-Transaction management
-RESTful API development
-Migration from spreadsheet-based operations to structured backend architecture
-It reflects practical, real-world software engineering experience.
+- Backend system design using Spring Boot
+- Clean separation of concerns
+- Database modeling with JPA/Hibernate
+- Transaction management
+- RESTful API development
+- Migration from spreadsheet-based operations to structured backend architecture
+- It reflects practical, real-world software engineering experience.
 
 ---
 
