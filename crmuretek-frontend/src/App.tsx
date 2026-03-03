@@ -23,8 +23,12 @@ import { VisitModal } from "./components/VisitModal";
 import { inventoryService } from "./services/inventoryService";
 
 const JOB_STATUS_MAP = {
-  QUOTED: { label: "Presupuestado", color: "bg-blue-100 text-blue-700" },
-  IN_PROGRESS: { label: "En Obra", color: "bg-orange-100 text-orange-700" },
+  QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
+  DEPOSIT_PAID: {
+    label: "Pago Adelanto",
+    color: "bg-green-100 text-green-300",
+  },
+  BALANCE_PAID: { label: "Pago Saldo", color: "bg-green-100 text-green-300" },
   COMPLETED: { label: "Finalizado", color: "bg-emerald-100 text-emerald-700" },
 };
 
@@ -79,7 +83,8 @@ export default function App() {
 
   const jobStatusMap: Record<string, string> = {
     QUOTED: "presupuestado",
-    IN_PROGRESS: "en obra",
+    DEPOSIT_PAID: "adelanto pagado",
+    BALANCE_PAID: "saldo pagado",
     COMPLETED: "finalizado",
   };
 
@@ -179,8 +184,6 @@ export default function App() {
                 setStockType(type);
                 setIsAddingStock(true);
               }}
-              totalQuoted={dashboardData.totalQuoted || 0}
-              totalActive={dashboardData.totalActive || 0}
               materialTotal={dashboardData.materialNeededTotal || 0}
               statsData={statsData}
             />
@@ -534,12 +537,6 @@ export default function App() {
                   <strong>Fecha de Obra:</strong>{" "}
                   {viewingJob.workDate?.split("-").reverse().join("/") ||
                     "Sin fecha"}
-                </p>
-                <p>
-                  <strong>Monto Total:</strong>{" "}
-                  {viewingJob.totalAmount
-                    ? `$${viewingJob.totalAmount}`
-                    : "Sin monto"}
                 </p>
                 <p>
                   <strong>Material Estimado:</strong>{" "}

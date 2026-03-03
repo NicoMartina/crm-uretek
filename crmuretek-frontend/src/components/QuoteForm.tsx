@@ -12,19 +12,16 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
   onCancel,
   onCreate,
 }) => {
-  const [amount, setAmount] = useState("");
   const [material, setMaterial] = useState("");
   const [workDate, setWorkDate] = useState(
     new Date().toISOString().split("T")[0]
   );
   const [description, setDescription] = useState("");
-  const [currency, setCurrency] = useState("ARS");
 
   // Inside QuoteForm.tsx, before the return
   useEffect(() => {
     console.log("lead received in QuoteForm:", lead);
     if (lead?.existingAmount) {
-      setAmount(lead.existingAmount);
       setMaterial(lead.existingMaterial || "");
       setDescription(lead.existingDescription || "");
     }
@@ -63,18 +60,6 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
 
           <div>
             <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
-              Monto Total ($)
-            </label>
-            <input
-              type="number"
-              className="w-full p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
               Material Est. (kg)
             </label>
             <input
@@ -83,20 +68,6 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
               value={material}
               onChange={(e) => setMaterial(e.target.value)}
             />
-          </div>
-          <div>
-            <label className="block text-xs font-bold uppercase text-slate-400 mb-1">
-              Moneda
-            </label>
-            <select
-              className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-            >
-              <option value="">Seleccione una opción</option>
-              <option value="ARS">Pesos</option>
-              <option value="USD">Dolares</option>
-            </select>
           </div>
 
           <div>
@@ -124,11 +95,9 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
             type="button"
             onClick={() =>
               onCreate({
-                totalAmount: Number(amount),
                 estimateMaterialKg: Number(material),
                 workDate: workDate,
                 observations: description,
-                currency: currency,
               })
             }
             className="flex-1 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-700 transition-all"

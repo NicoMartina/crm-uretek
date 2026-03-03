@@ -16,8 +16,6 @@ interface DashboardViewProps {
   inventory: any;
   totalPossibleMix: number;
   onAddStock: (type: "iso" | "resina") => void;
-  totalQuoted: number;
-  totalActive: number;
   materialTotal: number;
   statsData?: any;
 }
@@ -26,8 +24,6 @@ export const DashboardView = ({
   inventory,
   totalPossibleMix,
   onAddStock,
-  totalQuoted,
-  totalActive,
   materialTotal,
   statsData,
 }: DashboardViewProps) => {
@@ -228,17 +224,13 @@ export const DashboardView = ({
           <span className="text-slate-400 text-[10px] font-bold uppercase">
             Presupuestado
           </span>
-          <h3 className="text-2xl font-black text-slate-800 mt-1">
-            ${(totalQuoted || 0).toLocaleString()}
-          </h3>
+          <h3 className="text-2xl font-black text-slate-800 mt-1"></h3>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <span className="text-slate-400 text-[10px] font-bold uppercase">
             En Obra
           </span>
-          <h3 className="text-2xl font-black text-slate-800 mt-1">
-            ${(totalActive || 0).toLocaleString()}
-          </h3>
+          <h3 className="text-2xl font-black text-slate-800 mt-1"></h3>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <span className="text-slate-400 text-[10px] font-bold uppercase">

@@ -69,7 +69,8 @@ export const JobsTable = ({
                     }`}
                   >
                     <option value="QUOTED">Presupuestado</option>
-                    <option value="IN_PROGRESS">En Obra</option>
+                    <option value="DEPOSIT_PAID">Pago Deposito</option>
+                    <option value="BALANCE_PAID">Pago Saldo</option>
                     <option value="COMPLETED">Finalizado</option>
                   </select>
                 </td>
