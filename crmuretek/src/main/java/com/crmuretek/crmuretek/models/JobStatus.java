@@ -3,13 +3,10 @@ package com.crmuretek.crmuretek.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum JobStatus {
-    LEAD,
     QUOTED,
-    SCHEDULED,
-    IN_PROGRESS,
-    COMPLETED,
-    INVOICED,
-    PAID;
+    DEPOSIT_PAID,
+    BALANCE_PAID,
+    COMPLETED;
 
     @JsonCreator
     public static JobStatus fromString(String value){

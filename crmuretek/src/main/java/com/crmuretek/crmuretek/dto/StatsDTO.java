@@ -14,6 +14,5 @@ public class StatsDTO {
     private Map<String, Map<String, Long>>  leadsBySource;
     private Map<String, Long> visitsPerMonth;
     private Map<String, Long>  jobsPerMonth;
-    private Map<String, Double>  revenuePerMonth;
 
 }
