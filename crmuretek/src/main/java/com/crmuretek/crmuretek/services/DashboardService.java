@@ -16,7 +16,8 @@ import java.util.Objects;
 
 @Service
 public class DashboardService {
-
+    private static final double ISO_RATIO = 0.63;
+    private static final double RESINA_RATIO = 0.37;
 
     private JobRepository jobRepository;
     private InventoryRepository inventoryRepository;
@@ -43,19 +44,15 @@ public class DashboardService {
                 });
 
         // 2. Fetch Job Totals (Handling NULLs from SQL)
-        Double totalQuoted = jobRepository.sumQuotedAmount();
-        Double totalActive = jobRepository.sumActiveAmount();
         Double materialNeeded = jobRepository.sumRequiredMaterial();
 
         // 3. Business Logic
         double isoStock = (inventory.getIsoStock() != null) ? inventory.getIsoStock() : 0.0;
         double resinaStock = (inventory.getResinaStock() != null) ? inventory.getResinaStock() : 0.0;
 
-        double isoRatio = 0.63;
-        double resinaRatio = 0.37;
 
-        double mixFromIso = isoStock / isoRatio;
-        double mixFromResina = resinaStock / resinaRatio;
+        double mixFromIso = isoStock / ISO_RATIO;
+        double mixFromResina = resinaStock / RESINA_RATIO;
 
         Double possibleMix = Math.min(mixFromIso, mixFromResina);
 
@@ -64,8 +61,6 @@ public class DashboardService {
                 isoStock,
                 resinaStock,
                 possibleMix,
-                totalQuoted != null ? totalQuoted : 0.0,
-                totalActive != null ? totalActive : 0.0,
                 materialNeeded != null ? materialNeeded : 0.0
         );
     }
@@ -75,7 +70,6 @@ public class DashboardService {
         Map<String, Map<String, Long>> leadsBySource = new LinkedHashMap<>();
         Map<String, Long> visitsPerMonth = new LinkedHashMap<>();
         Map<String, Long> jobsPerMonth = new LinkedHashMap<>();
-        Map<String, Double> revenuePerMonth = new LinkedHashMap<>();
 
         for (Object[] row : leadRepository.countLeadsPerMonth()) {
             leadsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
@@ -92,12 +86,11 @@ public class DashboardService {
             visitsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
         }
 
-        for (Object[] row : jobRepository.countJobsAndRevenuePerMonth()) {
+        for (Object[] row : jobRepository.countJobsPerMonth()) {
             jobsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
-            revenuePerMonth.put((String) row[0], row[2] != null ? ((Number) row[2]).doubleValue() : 0.0);
         }
 
-        return new StatsDTO(leadsPerMonth, leadsBySource, visitsPerMonth, jobsPerMonth, revenuePerMonth);
+        return new StatsDTO(leadsPerMonth, leadsBySource, visitsPerMonth, jobsPerMonth);
 
     }
 

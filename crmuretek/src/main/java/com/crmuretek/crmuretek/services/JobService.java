@@ -35,18 +35,6 @@ public class JobService {
         return jobRepository.findAllByOrderByIdDesc();
     }
 
-    public void syncFinancials(Job job){
-        // 1. Calculate Total: Kg * Price
-        double kg = (job.getEstimateMaterialKg() != null) ? job.getEstimateMaterialKg() : 0.0;
-        double price = (job.getPricePerKilo() != null) ? job.getPricePerKilo() : 0.0;
-        job.setTotalAmount(price * kg);
-
-        // 2. Calculate Balance  (saldo)  Total - Anticipo
-        Double total = (job.getTotalAmount() != null) ? job.getTotalAmount() : 0.0;
-        Double paid = (job.getDownPaymentAmount() != null) ? job.getDownPaymentAmount() : 0.0;
-
-        job.setBalanceAmount(total - paid);
-    }
     @Transactional
     public Job saveJob(Job job){
         if (job.getVisit() != null  && job.getLead() == null) {
@@ -70,32 +58,11 @@ public class JobService {
 
     @Transactional
     public Job updateJobStatus(Long id, String statusName){
+        System.out.println(">>> Updating job " + id + " to status: " + statusName);
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
         JobStatus newStatus = JobStatus.valueOf(statusName.toUpperCase());
-
-        if (newStatus ==  JobStatus.IN_PROGRESS && job.getJobStatus() != JobStatus.IN_PROGRESS) {
-            System.out.println(">>> Entering IN_PROGRESS block for job: " + id);
-            Inventory stock = inventoryRepository.findAll().stream().findFirst()
-                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
-            double requiredIso = job.getEstimateMaterialKg() * 0.63;
-            double requiredResina = job.getEstimateMaterialKg() * 0.37;
-
-            if (stock.getIsoStock() < requiredIso || stock.getResinaStock() < requiredResina){
-                throw new InsuffcientMaterialException("Insufficient stock to start the job.");
-            }
-
-            stock.setIsoStock(stock.getIsoStock() - requiredIso);
-            stock.setResinaStock(stock.getResinaStock() - requiredResina);
-            stock.setLastUpdated(java.time.LocalDateTime.now());
-
-            MaterialUsage materialUsage = new MaterialUsage();
-            materialUsage.setJob(job);
-            materialUsage.setIsoQuantity(requiredIso);
-            materialUsage.setResinQuantity(requiredResina);
-            materialUsage.setUsageDate(java.time.LocalDate.now());
-            materialUsageRepository.save(materialUsage);
-        }
+        System.out.println(">>> New status enum: " + newStatus);
         job.setJobStatus(newStatus);
         return jobRepository.save(job);
     }
@@ -106,17 +73,8 @@ public class JobService {
                 .map(job -> {
                     job.setObservations(details.getObservations());
                     job.setEstimateMaterialKg(details.getEstimateMaterialKg());
-                    job.setPricePerKilo(details.getPricePerKilo());
-                    job.setDownPaymentAmount(details.getDownPaymentAmount());
                     return jobRepository.save(job);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
-    }
-
-    // TO BE REMOVED ON A FUTURE TICKET
-    public Double calculateTotalCompanyOutstandingBalance(){
-        return jobRepository.findAll().stream()
-                .map(job -> job.getBalanceAmount() != null ? job.getBalanceAmount() : 0.0)
-                .reduce(0.0, Double::sum);
     }
 }

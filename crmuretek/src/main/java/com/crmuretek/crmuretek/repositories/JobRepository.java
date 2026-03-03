@@ -11,19 +11,13 @@ import java.util.List;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 
-    @Query("SELECT SUM(j.totalAmount) FROM Job j WHERE j.jobStatus = 'QUOTED'")
-    Double sumQuotedAmount();
-
-    @Query("SELECT SUM(j.totalAmount) FROM Job j WHERE j.jobStatus = 'IN_PROGRESS'")
-    Double sumActiveAmount();
-
     @Query("SELECT SUM(j.estimateMaterialKg) FROM Job j WHERE j.jobStatus = 'IN_PROGRESS'")
     Double sumRequiredMaterial();
 
     boolean existsByLeadId(Long leadId);
     List<Job> findAllByOrderByIdDesc();
 
-    @Query(value = "SELECT TO_CHAR(work_date, 'YYYY-MM'), COUNT(*), SUM(total_amount) FROM jobs GROUP BY TO_CHAR(work_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
-    List<Object[]> countJobsAndRevenuePerMonth();
+    @Query(value = "SELECT TO_CHAR(work_date, 'YYYY-MM'), COUNT(*) FROM jobs GROUP BY TO_CHAR(work_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
+    List<Object[]> countJobsPerMonth();
 
 }
