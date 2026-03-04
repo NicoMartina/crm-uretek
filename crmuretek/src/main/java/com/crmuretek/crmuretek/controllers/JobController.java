@@ -51,12 +51,6 @@
             return jobService.findAllByOrderByIdDesc();
         }
 
-        @GetMapping("/stats/material-total")
-        public ResponseEntity<Double> getTotalMaterial(){
-            Double total = jobRepository.sumRequiredMaterial();
-            return ResponseEntity.ok(total != null ? total : 0.0);
-        }
-
         @PutMapping("/{id}")
         public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody Job details) {
             return ResponseEntity.ok(jobService.update(id, details));
