@@ -44,7 +44,7 @@ export default function LeadForm({
 
       alert("✅ Procesado con éxito");
     } catch (error) {
-      console.error("Error saving lead:", error);
+      console.error("Error saving consulta:", error);
       alert("❌ Error al guardar");
     }
   };

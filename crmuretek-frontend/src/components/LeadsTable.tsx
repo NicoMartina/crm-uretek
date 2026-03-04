@@ -2,11 +2,11 @@ import { Calendar, Trash2, Edit } from "lucide-react";
 
 interface LeadsTableProps {
   leads: any[];
-  onView: (lead: any) => void;
-  onEdit: (lead: any) => void;
+  onView: (consulta: any) => void;
+  onEdit: (consulta: any) => void;
   onDelete: (id: number) => void;
-  onScheduleVisit: (lead: any) => void;
-  onQuote: (lead: any) => void;
+  onScheduleVisit: (consulta: any) => void;
+  onQuote: (consulta: any) => void;
 }
 
 export const LeadsTable = ({
@@ -38,31 +38,31 @@ export const LeadsTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {leads.map((lead) => (
+            {leads.map((consulta) => (
               <tr
-                key={lead.id}
+                key={consulta.id}
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
-                  {lead.contactDate
-                    ? lead.contactDate.split("-").reverse().join("/")
+                  {consulta.contactDate
+                    ? consulta.contactDate.split("-").reverse().join("/")
                     : "Sin fecha"}
                 </td>
                 <td className="p-4 font-black text-slate-800">
                   <button
-                    onClick={() => onView(lead)}
+                    onClick={() => onView(consulta)}
                     className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
                   >
-                    {lead.name}
+                    {consulta.name}
                   </button>
                 </td>
                 <td className="p-4 text-slate-500 font-medium">
-                  {lead.phoneNumber}
+                  {consulta.phoneNumber}
                 </td>
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <a
-                      href={`https://wa.me/54${lead.phoneNumber?.replace(
+                      href={`https://wa.me/54${consulta.phoneNumber?.replace(
                         /\D/g,
                         ""
                       )}`}
@@ -72,25 +72,25 @@ export const LeadsTable = ({
                       WhatsApp
                     </a>
                     <button
-                      onClick={() => onScheduleVisit(lead)}
+                      onClick={() => onScheduleVisit(consulta)}
                       className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg font-bold text-[10px] uppercase hover:bg-blue-200 transition-all flex items-center gap-1"
                     >
                       <Calendar size={12} /> Visita
                     </button>
                     <button
-                      onClick={() => onQuote(lead)}
+                      onClick={() => onQuote(consulta)}
                       className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg font-bold text-[10px] uppercase hover:bg-orange-200 transition-all"
                     >
                       + Obra
                     </button>
                     <button
-                      onClick={() => onEdit(lead)}
+                      onClick={() => onEdit(consulta)}
                       className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
                     >
                       <Edit size={18} />
                     </button>
                     <button
-                      onClick={() => onDelete(lead.id)}
+                      onClick={() => onDelete(consulta.id)}
                       className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
                       <Trash2 size={18} />

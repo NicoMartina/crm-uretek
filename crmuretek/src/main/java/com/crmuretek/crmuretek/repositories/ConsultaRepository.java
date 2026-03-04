@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface LeadRepository extends JpaRepository<Consulta, Long> {
+public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
 
     List<Consulta> findAllByOrderByIdDesc();
 
@@ -16,4 +16,5 @@ public interface LeadRepository extends JpaRepository<Consulta, Long> {
     @Query(value = "SELECT TO_CHAR(c.contact_date, 'YYYY-MM'), c.source, COUNT(*) FROM leads l JOIN customers c ON l.customer_id = c.id GROUP BY TO_CHAR(c.contact_date, 'YYYY-MM'), c.source", nativeQuery = true)
     List<Object[]> countLeadsBySource();
 
+    boolean existsByCustomer_Id(Long id);
 }

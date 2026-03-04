@@ -25,11 +25,6 @@ export const jobService = {
     return await api.delete(`/jobs/${id}`);
   },
 
-  getMaterialTotal: async (): Promise<number> => {
-    const response = await api.get("/jobs/stats/material-total");
-    return response.data;
-  },
-
   //should be in a separate service but for simplicity we can keep it here. We'll move it later.
   getDashboardSummary: async () => {
     const response = await api.get("/dashboard/summary");

@@ -3,7 +3,7 @@ package com.crmuretek.crmuretek.services;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.repositories.JobRepository;
-import com.crmuretek.crmuretek.repositories.LeadRepository;
+import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,33 +12,33 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class LeadService {
-    private LeadRepository leadRepository;
+public class ConsultaService {
+    private ConsultaRepository consultaRepository;
     private JobRepository jobRepository;
     private VisitRepository visitRepository;
 
-    public LeadService(LeadRepository leadRepository, JobRepository jobRepository, VisitRepository visitRepository) {
-        this.leadRepository = leadRepository;
+    public ConsultaService(ConsultaRepository consultaRepository, JobRepository jobRepository, VisitRepository visitRepository) {
+        this.consultaRepository = consultaRepository;
         this.jobRepository = jobRepository;
         this.visitRepository = visitRepository;
     }
 
     public Optional<Consulta> findById(Long id){
-        return leadRepository.findById(id);
+        return consultaRepository.findById(id);
     }
 
     public List<Consulta> findAllByContactDateDesc(){
-        return leadRepository.findAllByOrderByIdDesc();
+        return consultaRepository.findAllByOrderByIdDesc();
     }
 
     @Transactional
     public Consulta create(Consulta consulta){
-        return leadRepository.save(consulta);
+        return consultaRepository.save(consulta);
     }
 
     @Transactional
     public Consulta update(Long id, Consulta details){
-        return leadRepository.findById(id)
+        return consultaRepository.findById(id)
                 .map(existing -> {
                     existing.setProblemDescription(details.getProblemDescription());
                     return existing;
@@ -56,7 +56,7 @@ public class LeadService {
             throw new RuntimeException("cannot delete lead with existing visits");
         }
 
-        leadRepository.deleteById(id);
+        consultaRepository.deleteById(id);
     }
 
 

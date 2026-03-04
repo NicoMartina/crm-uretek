@@ -5,7 +5,7 @@
     import com.crmuretek.crmuretek.models.JobStatus;
     import com.crmuretek.crmuretek.repositories.JobRepository;
     import com.crmuretek.crmuretek.services.JobService;
-    import com.crmuretek.crmuretek.services.LeadService;
+    import com.crmuretek.crmuretek.services.ConsultaService;
     import jakarta.validation.Valid;
     import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
@@ -19,12 +19,12 @@
 
         private final JobRepository jobRepository;
         private final JobService jobService;
-        private final LeadService leadService;
+        private final ConsultaService consultaService;
 
-        public JobController(JobRepository jobRepository, JobService jobService, LeadService leadService){
+        public JobController(JobRepository jobRepository, JobService jobService, ConsultaService consultaService){
             this.jobRepository = jobRepository;
             this.jobService = jobService;
-            this.leadService = leadService;
+            this.consultaService = consultaService;
         }
 
         @PostMapping
@@ -34,7 +34,7 @@
                 return ResponseEntity.badRequest().build();
             }
             // 2. Fetch the REAL customer from the DB
-            return leadService.findById(job.getConsulta().getId())
+            return consultaService.findById(job.getConsulta().getId())
                             .map(lead -> {
                                 job.setConsulta(lead);
                                 job.setJobStatus(JobStatus.QUOTED);

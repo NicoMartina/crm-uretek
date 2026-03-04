@@ -4,7 +4,7 @@ import com.crmuretek.crmuretek.dto.DashboardSummaryDTO;
 import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
-import com.crmuretek.crmuretek.repositories.LeadRepository;
+import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,7 +27,7 @@ public class DashboardServiceTest {
     private JobRepository jobRepository;
 
     @Mock
-    private LeadRepository leadRepository;
+    private ConsultaRepository consultaRepository;
 
     @Mock
     private VisitRepository visitRepository;
