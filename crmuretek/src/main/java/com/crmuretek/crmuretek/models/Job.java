@@ -17,7 +17,7 @@
         private Long id;
 
         @ManyToOne
-        @JoinColumn(name = "lead_id")
+        @JoinColumn(name = "leads_id")
         private Consulta consulta;
 
         @OneToOne

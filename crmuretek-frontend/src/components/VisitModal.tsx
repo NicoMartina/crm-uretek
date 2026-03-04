@@ -1,5 +1,5 @@
 interface VisitModalProps {
-  lead: any;
+  consulta: any;
   visitDate: string;
   setVisitDate: (date: string) => void;
   visitNotes: string;
@@ -9,7 +9,7 @@ interface VisitModalProps {
 }
 
 export const VisitModal = ({
-  lead,
+  consulta,
   visitDate,
   setVisitDate,
   visitNotes,
@@ -17,14 +17,14 @@ export const VisitModal = ({
   onClose,
   onConfirm,
 }: VisitModalProps) => {
-  // If there is no lead selected, don't show anything
-  if (!lead) return null;
+  // If there is no consulta selected, don't show anything
+  if (!consulta) return null;
 
   return (
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
         <h3 className="text-2xl font-black mb-2">Agendar Visita</h3>
-        <p className="text-slate-500 mb-6">Cliente: {lead.name}</p>
+        <p className="text-slate-500 mb-6">Cliente: {consulta.name}</p>
 
         <div className="space-y-4">
           <div>

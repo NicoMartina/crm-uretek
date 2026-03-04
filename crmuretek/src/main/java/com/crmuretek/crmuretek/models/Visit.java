@@ -15,7 +15,7 @@ public class Visit {
 
 
     @ManyToOne
-    @JoinColumn(name = "lead_id")
+    @JoinColumn(name = "leads_id")
     private Consulta consulta;
 
     private LocalDate visitDate;

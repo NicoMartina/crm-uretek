@@ -5,7 +5,7 @@ import com.crmuretek.crmuretek.dto.StatsDTO;
 import com.crmuretek.crmuretek.models.Inventory;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
-import com.crmuretek.crmuretek.repositories.LeadRepository;
+import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +20,13 @@ public class DashboardService {
     private JobRepository jobRepository;
     private InventoryRepository inventoryRepository;
     private VisitRepository visitRepository;
-    private LeadRepository leadRepository;
+    private ConsultaRepository consultaRepository;
 ;
-    public DashboardService(JobRepository jobRepository, VisitRepository visitRepository, InventoryRepository inventoryRepository, LeadRepository leadRepository) {
+    public DashboardService(JobRepository jobRepository, VisitRepository visitRepository, InventoryRepository inventoryRepository, ConsultaRepository consultaRepository) {
         this.jobRepository = jobRepository;
         this.visitRepository = visitRepository;
         this.inventoryRepository = inventoryRepository;
-        this.leadRepository = leadRepository;
+        this.consultaRepository = consultaRepository;
 
     }
 
@@ -69,13 +69,13 @@ public class DashboardService {
         Map<String, Long> visitsPerMonth = new LinkedHashMap<>();
         Map<String, Long> jobsPerMonth = new LinkedHashMap<>();
 
-        for (Object[] row : leadRepository.countLeadsPerMonth()) {
+        for (Object[] row : consultaRepository.countLeadsPerMonth()) {
             String month = row[0] != null ? row[0].toString() : "Sin Fecha";
             Long leads = row[1] != null ? ((Number) row[1]).longValue() : 0L;
             leadsPerMonth.put(month, leads);
         }
 
-        for (Object[] row : leadRepository.countLeadsBySource()) {
+        for (Object[] row : consultaRepository.countLeadsBySource()) {
             String month = row[0] != null ? row[0].toString() : "Sin Fecha";
             String source = row[1] != null ? row[1].toString() : "Sin fuente";
             Long count = ((Number) row[2]).longValue();

@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react"; // Nice to have an X icon
 
 interface QuoteFormProps {
-  lead: any;
+  consulta: any;
   onCancel: () => void;
   onCreate: (jobData: any) => void;
 }
 
 export const QuoteForm: React.FC<QuoteFormProps> = ({
-  lead,
+  consulta,
   onCancel,
   onCreate,
 }) => {
@@ -20,12 +20,12 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
 
   // Inside QuoteForm.tsx, before the return
   useEffect(() => {
-    console.log("lead received in QuoteForm:", lead);
-    if (lead?.existingAmount) {
-      setMaterial(lead.existingMaterial || "");
-      setDescription(lead.existingDescription || "");
+    console.log("consulta received in QuoteForm:", consulta);
+    if (consulta?.existingAmount) {
+      setMaterial(consulta.existingMaterial || "");
+      setDescription(consulta.existingDescription || "");
     }
-  }, [lead]);
+  }, [consulta]);
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
@@ -41,7 +41,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
         </div>
 
         <p className="text-slate-500 mb-6">
-          Cliente: <span className="font-bold text-slate-800">{lead.name}</span>
+          Cliente: <span className="font-bold text-slate-800">{consulta.name}</span>
         </p>
 
         <div className="space-y-4">

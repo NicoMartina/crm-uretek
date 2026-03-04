@@ -22,7 +22,14 @@ public class Consulta {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonIgnoreProperties("consulta")
+    @JsonIgnoreProperties("leads")
     private Customer customer;
+
+    private LocalDate requestDate;
+
+    @PrePersist
+    protected void onCreate(){
+        this.requestDate = LocalDate.now();
+    }
 
 }

@@ -4,7 +4,7 @@ import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.models.VisitStatus;
-import com.crmuretek.crmuretek.repositories.LeadRepository;
+import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,11 +14,11 @@ import java.util.List;
 @Service
 public class VisitService {
     private VisitRepository visitRepository;
-    private LeadRepository leadRepository;
+    private ConsultaRepository consultaRepository;
 
-    public VisitService(VisitRepository visitRepository, LeadRepository leadRepository) {
+    public VisitService(VisitRepository visitRepository, ConsultaRepository consultaRepository) {
         this.visitRepository = visitRepository;
-        this.leadRepository = leadRepository;
+        this.consultaRepository = consultaRepository;
     }
 
     public List<Visit> findAllByVisitDesc(){
@@ -28,7 +28,7 @@ public class VisitService {
     @Transactional
     public  Visit scheduleVisitFromLead(Long leadId, Visit visitDetails){
         //Find the lead first
-        Consulta consulta = leadRepository.findById(leadId)
+        Consulta consulta = consultaRepository.findById(leadId)
                 .orElseThrow(()-> new ResourceNotFoundException("Lead Not Found."));
 
         // Automatically pull the customer from the Lead!

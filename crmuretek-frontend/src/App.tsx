@@ -58,14 +58,14 @@ export default function App() {
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
-    (lead) =>
-      lead.name?.toLowerCase().includes(leadSearch.toLowerCase()) ||
-      lead.phoneNumber?.toLowerCase().includes(leadSearch.toLowerCase()) ||
-      lead.address?.toLowerCase().includes(leadSearch.toLowerCase()) ||
-      lead.problemDescription
+    (consulta) =>
+      consulta.name?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      consulta.phoneNumber?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      consulta.address?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      consulta.problemDescription
         ?.toLowerCase()
         .includes(leadSearch.toLowerCase()) ||
-      lead.source?.toLowerCase().includes(leadSearch.toLowerCase())
+      consulta.source?.toLowerCase().includes(leadSearch.toLowerCase())
   );
   const visitStatusMap: Record<string, string> = {
     SCHEDULED: "programada",
@@ -75,7 +75,7 @@ export default function App() {
   const filteredVisits = visits.filter((visit) => {
     const translatedStatus = visitStatusMap[visit.status] || visit.status;
     return (
-      visit.lead?.name?.toLowerCase().includes(visitSearch.toLowerCase()) ||
+      visit.consulta?.name?.toLowerCase().includes(visitSearch.toLowerCase()) ||
       translatedStatus.toLowerCase().includes(visitSearch.toLowerCase()) ||
       visit.observations?.toLowerCase().includes(visitSearch.toLowerCase())
     );
@@ -91,7 +91,7 @@ export default function App() {
   const filteredJobs = jobs.filter((job) => {
     const translatedStatus = jobStatusMap[job.jobStatus] || job.jobStatus;
     return (
-      job.lead?.name?.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      job.consulta?.name?.toLowerCase().includes(jobSearch.toLowerCase()) ||
       translatedStatus.toLowerCase().includes(jobSearch.toLowerCase()) ||
       job.observations?.toLowerCase().includes(jobSearch.toLowerCase())
     );
@@ -340,7 +340,7 @@ export default function App() {
                     existingAmount: jobToEdit.totalAmount,
                     existingMaterial: jobToEdit.estimateMaterialKg,
                     existingDescription: jobToEdit.observations,
-                    ...jobToEdit.lead,
+                    ...jobToEdit.consulta,
                   });
                   setIsAddingQuote(true);
                 }
@@ -375,7 +375,7 @@ export default function App() {
                     setIsAddingLead(false);
                     setSelectedLead(null);
                   } catch (error) {
-                    console.error("Error saving lead:", error);
+                    console.error("Error saving consulta:", error);
                   }
                 }}
                 onRefresh={syncAllData}
@@ -448,15 +448,15 @@ export default function App() {
               <div className="space-y-3 text-sm mb-6">
                 <p>
                   <strong>Cliente:</strong>{" "}
-                  {viewingVisit.lead?.name || "Sin nombre"}
+                  {viewingVisit.consulta?.name || "Sin nombre"}
                 </p>
                 <p>
                   <strong>Teléfono:</strong>{" "}
-                  {viewingVisit.lead?.phoneNumber || "Sin teléfono"}
+                  {viewingVisit.consulta?.phoneNumber || "Sin teléfono"}
                 </p>
                 <p>
                   <strong>Dirección:</strong>{" "}
-                  {viewingVisit.lead?.address || "Sin dirección"}
+                  {viewingVisit.consulta?.address || "Sin dirección"}
                 </p>
                 <p>
                   <strong>Fecha:</strong>{" "}
@@ -558,23 +558,23 @@ export default function App() {
                 <div className="space-y-3 text-sm">
                   <p>
                     <strong>Nombre:</strong>{" "}
-                    {viewingJob.lead?.name || "Sin nombre"}
+                    {viewingJob.consulta?.name || "Sin nombre"}
                   </p>
                   <p>
                     <strong>Teléfono:</strong>{" "}
-                    {viewingJob.lead?.phoneNumber || "Sin teléfono"}
+                    {viewingJob.consulta?.phoneNumber || "Sin teléfono"}
                   </p>
                   <p>
                     <strong>Dirección:</strong>{" "}
-                    {viewingJob.lead?.address || "Sin dirección"}
+                    {viewingJob.consulta?.address || "Sin dirección"}
                   </p>
                   <p>
                     <strong>Problema:</strong>{" "}
-                    {viewingJob.lead?.problemDescription || "Sin descripción"}
+                    {viewingJob.consulta?.problemDescription || "Sin descripción"}
                   </p>
                   <p>
                     <strong>Origen:</strong>{" "}
-                    {viewingJob.lead?.source || "Sin origen"}
+                    {viewingJob.consulta?.source || "Sin origen"}
                   </p>
                 </div>
               </div>
@@ -591,7 +591,7 @@ export default function App() {
 
         {isAddingQuote && selectedLead && (
           <QuoteForm
-            lead={selectedLead}
+            consulta={selectedLead}
             onCancel={() => {
               setIsAddingQuote(false);
               setSelectedLead(null);
@@ -602,7 +602,7 @@ export default function App() {
               } else {
                 await jobService.create({
                   ...data,
-                  lead: { id: selectedLead.id },
+                  consulta: { id: selectedLead.id },
                 });
               }
               setIsAddingQuote(false);
@@ -613,7 +613,7 @@ export default function App() {
 
         {isSchedulingVisit && selectedLead && (
           <VisitModal
-            lead={selectedLead}
+            consulta={selectedLead}
             visitDate={visitDate}
             setVisitDate={setVisitDate}
             visitNotes={visitNotes}
@@ -621,7 +621,7 @@ export default function App() {
             onClose={() => setIsSchedulingVisit(false)}
             onConfirm={async () => {
               await visitService.create({
-                lead: { id: selectedLead.id },
+                consulta: { id: selectedLead.id },
                 visitDate,
                 observations: visitNotes,
               });
