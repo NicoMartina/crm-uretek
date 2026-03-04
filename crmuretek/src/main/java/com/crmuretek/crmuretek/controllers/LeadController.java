@@ -1,6 +1,6 @@
 package com.crmuretek.crmuretek.controllers;
 
-import com.crmuretek.crmuretek.models.Lead;
+import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
 import com.crmuretek.crmuretek.services.LeadService;
 import org.springframework.http.ResponseEntity;
@@ -21,18 +21,18 @@ public class LeadController {
     }
 
     @PostMapping
-    public ResponseEntity<Lead> create(@RequestBody Lead lead){
-        return ResponseEntity.ok(leadService.create(lead));
+    public ResponseEntity<Consulta> create(@RequestBody Consulta consulta){
+        return ResponseEntity.ok(leadService.create(consulta));
     }
 
     @GetMapping
-    public List<Lead> getAllLeads(){
+    public List<Consulta> getAllLeads(){
         return leadService.findAllByContactDateDesc();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lead> update(@PathVariable Long id, @RequestBody Lead lead){
-        return ResponseEntity.ok(leadService.update(id, lead));
+    public ResponseEntity<Consulta> update(@PathVariable Long id, @RequestBody Consulta consulta){
+        return ResponseEntity.ok(leadService.update(id, consulta));
     }
 
     @DeleteMapping("/{id}")

@@ -16,7 +16,7 @@ public class Visit {
 
     @ManyToOne
     @JoinColumn(name = "lead_id")
-    private Lead lead;
+    private Consulta consulta;
 
     private LocalDate visitDate;
     private boolean hasPaidVisitFee;
