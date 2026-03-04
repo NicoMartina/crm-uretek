@@ -3,7 +3,6 @@ package com.crmuretek.crmuretek.services;
 import com.crmuretek.crmuretek.dto.DashboardSummaryDTO;
 import com.crmuretek.crmuretek.dto.StatsDTO;
 import com.crmuretek.crmuretek.models.Inventory;
-import com.crmuretek.crmuretek.models.Lead;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 public class DashboardService {

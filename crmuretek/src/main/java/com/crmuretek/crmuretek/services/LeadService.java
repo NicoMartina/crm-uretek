@@ -1,7 +1,7 @@
 package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
-import com.crmuretek.crmuretek.models.Lead;
+import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
@@ -23,32 +23,24 @@ public class LeadService {
         this.visitRepository = visitRepository;
     }
 
-    public Optional<Lead> findById(Long id){
+    public Optional<Consulta> findById(Long id){
         return leadRepository.findById(id);
     }
 
-    public List<Lead> findAllByContactDateDesc(){
-        return leadRepository.findAllByOrderByContactDateDesc();
+    public List<Consulta> findAllByContactDateDesc(){
+        return leadRepository.findAllByOrderByIdDesc();
     }
 
     @Transactional
-    public Lead create(Lead lead){
-        return leadRepository.save(lead);
+    public Consulta create(Consulta consulta){
+        return leadRepository.save(consulta);
     }
 
     @Transactional
-    public Lead update(Long id, Lead details){
+    public Consulta update(Long id, Consulta details){
         return leadRepository.findById(id)
                 .map(existing -> {
-                    existing.setName(details.getName());
-                    existing.setEmail(details.getEmail());
-                    existing.setAddress(details.getAddress());
-                    existing.setPhoneNumber(details.getPhoneNumber());
                     existing.setProblemDescription(details.getProblemDescription());
-                    existing.setContactChannel(details.getContactChannel());
-                    existing.setContactDate(details.getContactDate());
-                    existing.setSource(details.getSource());
-
                     return existing;
                 })
                 .orElseThrow(() -> new RuntimeException("Lead not found with id: " + id));
@@ -56,11 +48,11 @@ public class LeadService {
 
     @Transactional
     public void delete(Long id){
-        if (jobRepository.existsByLeadId(id)){
+        if (jobRepository.existsByConsultaId(id)){
             throw new ResourceNotFoundException("cannot delete lead with existing jobs");
         }
 
-        if (visitRepository.existsByLeadId(id)){
+        if (visitRepository.existsByConsultaId(id)){
             throw new RuntimeException("cannot delete lead with existing visits");
         }
 

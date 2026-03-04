@@ -30,13 +30,13 @@
         @PostMapping
         public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
             // 1. Basic validation: Ensure we have a customer linked
-            if (job.getLead() == null || job.getLead().getId() <= 0){
+            if (job.getConsulta() == null || job.getConsulta().getId() <= 0){
                 return ResponseEntity.badRequest().build();
             }
             // 2. Fetch the REAL customer from the DB
-            return leadService.findById(job.getLead().getId())
+            return leadService.findById(job.getConsulta().getId())
                             .map(lead -> {
-                                job.setLead(lead);
+                                job.setConsulta(lead);
                                 job.setJobStatus(JobStatus.QUOTED);
 
                                 // 3. Save and Return

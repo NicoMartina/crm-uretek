@@ -1,20 +1,15 @@
 package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
-import com.crmuretek.crmuretek.models.Lead;
+import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.models.VisitStatus;
 import com.crmuretek.crmuretek.repositories.LeadRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VisitService {
@@ -33,11 +28,11 @@ public class VisitService {
     @Transactional
     public  Visit scheduleVisitFromLead(Long leadId, Visit visitDetails){
         //Find the lead first
-        Lead lead = leadRepository.findById(leadId)
+        Consulta consulta = leadRepository.findById(leadId)
                 .orElseThrow(()-> new ResourceNotFoundException("Lead Not Found."));
 
         // Automatically pull the customer from the Lead!
-        visitDetails.setLead(lead);
+        visitDetails.setConsulta(consulta);
         visitDetails.setStatus(VisitStatus.SCHEDULED);
 
         return visitRepository.save(visitDetails);

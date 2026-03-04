@@ -1,11 +1,8 @@
     package com.crmuretek.crmuretek.models;
 
-    import com.fasterxml.jackson.annotation.JsonBackReference;
-    import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
     import com.fasterxml.jackson.annotation.JsonManagedReference;
     import jakarta.persistence.*;
     import jakarta.validation.constraints.Min;
-    import jakarta.validation.constraints.Positive;
     import lombok.Data;
 
     import java.time.LocalDate;
@@ -21,7 +18,7 @@
 
         @ManyToOne
         @JoinColumn(name = "lead_id")
-        private Lead lead;
+        private Consulta consulta;
 
         @OneToOne
         @JoinColumn(name = "visit_id")

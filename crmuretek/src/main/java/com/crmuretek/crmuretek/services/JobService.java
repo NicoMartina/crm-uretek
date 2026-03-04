@@ -1,18 +1,14 @@
 package com.crmuretek.crmuretek.services;
 
-import com.crmuretek.crmuretek.exceptions.InsuffcientMaterialException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.*;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.MaterialUsageRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
-import com.sun.source.doctree.ThrowsTree;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,8 +33,8 @@ public class JobService {
 
     @Transactional
     public Job saveJob(Job job){
-        if (job.getVisit() != null  && job.getLead() == null) {
-            job.setLead(job.getVisit().getLead());
+        if (job.getVisit() != null  && job.getConsulta() == null) {
+            job.setConsulta(job.getVisit().getConsulta());
         }
         return jobRepository.save(job);
     }
@@ -50,7 +46,7 @@ public class JobService {
                 .orElseThrow(() -> new ResourceNotFoundException("Visit Not Found"));
 
         jobDetails.setVisit(visit);
-        jobDetails.setLead(visit.getLead());
+        jobDetails.setConsulta(visit.getConsulta());
         jobDetails.setJobStatus(JobStatus.QUOTED);
 
         return jobRepository.save(jobDetails);
