@@ -11,9 +11,6 @@ import java.util.List;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
 
-    @Query("SELECT SUM(j.estimateMaterialKg) FROM Job j WHERE j.jobStatus = 'IN_PROGRESS'")
-    Double sumRequiredMaterial();
-
     boolean existsByLeadId(Long leadId);
     List<Job> findAllByOrderByIdDesc();
 

@@ -44,7 +44,7 @@ public class DashboardService {
                 });
 
         // 2. Fetch Job Totals (Handling NULLs from SQL)
-        Double materialNeeded = jobRepository.sumRequiredMaterial();
+        Double materialNeeded = 0.0;
 
         // 3. Business Logic
         double isoStock = (inventory.getIsoStock() != null) ? inventory.getIsoStock() : 0.0;
@@ -72,7 +72,9 @@ public class DashboardService {
         Map<String, Long> jobsPerMonth = new LinkedHashMap<>();
 
         for (Object[] row : leadRepository.countLeadsPerMonth()) {
-            leadsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
+            String month = row[0] != null ? row[0].toString() : "Sin Fecha";
+            Long leads = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            leadsPerMonth.put(month, leads);
         }
 
         for (Object[] row : leadRepository.countLeadsBySource()) {
@@ -83,11 +85,15 @@ public class DashboardService {
         }
 
         for (Object[] row : visitRepository.countVisitsPerMonth()) {
-            visitsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
+            String month = row[0] != null ? row[0].toString() : "Sin fecha";
+            Long visits = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            visitsPerMonth.put(month, visits);
         }
 
         for (Object[] row : jobRepository.countJobsPerMonth()) {
-            jobsPerMonth.put((String) row[0], ((Number) row[1]).longValue());
+            String month = row[0] != null ? row[0].toString() : "Sin fecha";
+            Long jobs = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            jobsPerMonth.put(month, jobs);
         }
 
         return new StatsDTO(leadsPerMonth, leadsBySource, visitsPerMonth, jobsPerMonth);
