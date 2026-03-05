@@ -59,6 +59,7 @@ export default function App() {
   const [viewingVisit, setViewingVisit] = useState<any>(null);
   const [visitObservations, setVisitObservations] = useState("");
   const [customers, setCustomers] = useState<any[]>([]);
+  const [viewingCustomer, setViewingCustomer] = useState<any>(null);
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
@@ -371,7 +372,7 @@ export default function App() {
             </div>
             <CustomerTable
               customers={customers}
-              onView={(c) => console.log("view", c)}
+              onView={(c) => setViewingCustomer(c)}
               onEdit={(c) => console.log("edit", c)}
               onDelete={async (id) => {
                 if (window.confirm("¿Borrar cliente?")) {
@@ -622,6 +623,82 @@ export default function App() {
               <button
                 onClick={() => setViewingJob(null)}
                 className="w-full mt-2 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {viewingCustomer && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-y-auto max-h-[90vh]">
+              <button
+                onClick={() => setViewingCustomer(null)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                ✕
+              </button>
+              <h2 className="text-2xl font-black mb-1">
+                {viewingCustomer.name}
+              </h2>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-6">
+                Cliente #{viewingCustomer.id}
+              </p>
+
+              <div className="space-y-3 text-sm mb-6">
+                <p>
+                  <strong>Teléfono:</strong>{" "}
+                  {viewingCustomer.phoneNumber || "Sin teléfono"}
+                </p>
+                <p>
+                  <strong>Email:</strong> {viewingCustomer.email || "Sin email"}
+                </p>
+                <p>
+                  <strong>Canal de Contacto:</strong>{" "}
+                  {viewingCustomer.contactChannel || "-"}
+                </p>
+                <p>
+                  <strong>¿Cómo nos conoció?:</strong>{" "}
+                  {viewingCustomer.source || "-"}
+                </p>
+                <p>
+                  <strong>Fecha de Contacto:</strong>{" "}
+                  {viewingCustomer.contactDate
+                    ?.split("-")
+                    .reverse()
+                    .join("/") || "Sin fecha"}
+                </p>
+              </div>
+
+              <div className="border-t border-slate-100 pt-4">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                  Consultas
+                </p>
+                {viewingCustomer.consulta?.length > 0 ? (
+                  <div className="space-y-2">
+                    {viewingCustomer.consulta.map((c: any) => (
+                      <div
+                        key={c.id}
+                        className="bg-slate-50 rounded-xl p-3 text-sm"
+                      >
+                        <p>
+                          <strong>Problema:</strong>{" "}
+                          {c.problemDescription || "Sin descripción"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 text-sm">
+                    Sin consultas registradas
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={() => setViewingCustomer(null)}
+                className="w-full mt-6 bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors"
               >
                 Cerrar
               </button>

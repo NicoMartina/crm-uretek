@@ -58,6 +58,28 @@ export const CustomerTable = ({
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <button
+                      onClick={() => onView(customer)}
+                      className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg font-bold text-[10px] uppercase hover:bg-slate-200 transition-all"
+                    >
+                      Más Info
+                    </button>
+                    <button
+                      onClick={() => onEdit(customer)}
+                      className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
+                    >
+                      <Edit size={18} />
+                    </button>
+                    <button
+                      onClick={() => onDelete(customer.id)}
+                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="flex justify-end gap-2">
+                    <button
                       onClick={() => onEdit(customer)}
                       className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
                     >
