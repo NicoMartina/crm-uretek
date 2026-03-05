@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
+  UserCheck,
   Calendar,
   Briefcase,
   Plus,
@@ -21,6 +22,8 @@ import LeadForm from "./components/leadForm";
 import { QuoteForm } from "./components/QuoteForm";
 import { VisitModal } from "./components/VisitModal";
 import { inventoryService } from "./services/inventoryService";
+import { customerService } from "./services/customerService";
+import { CustomerTable } from "./components/CustomerTable";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -55,6 +58,7 @@ export default function App() {
   const [viewingJob, setViewingJob] = useState<any>(null);
   const [viewingVisit, setViewingVisit] = useState<any>(null);
   const [visitObservations, setVisitObservations] = useState("");
+  const [customers, setCustomers] = useState<any[]>([]);
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
@@ -111,6 +115,7 @@ export default function App() {
         leadsService.getAll(),
         jobService.getDashboardSummary(),
         jobService.getStats(),
+        customerService.getAll(),
       ]);
 
       if (res[0].status === "fulfilled") setJobs(res[0].value || []);
@@ -122,6 +127,7 @@ export default function App() {
       }
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
       if (res[4].status === "fulfilled") setStatsData(res[4].value);
+      if (res[5].status === "fulfilled") setCustomers(res[5].value || []);
     } catch (e) {
       console.error("Sync Error:", e);
     }
@@ -143,6 +149,14 @@ export default function App() {
           }`}
         >
           <LayoutDashboard className="mr-2" /> Inicio
+        </button>
+        <button
+          onClick={() => setActiveTab("customers")}
+          className={`flex p-3 rounded text-left transition ${
+            activeTab === "customers" ? "bg-orange-600" : "hover:bg-slate-800"
+          }`}
+        >
+          <UserCheck className="mr-2" /> Clientes
         </button>
         <button
           onClick={() => setActiveTab("leads")}
@@ -346,6 +360,31 @@ export default function App() {
                 }
               }}
               onRefresh={syncAllData}
+            />
+          </div>
+        )}
+
+        {activeTab === "customers" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800">Clientes</h2>
+            </div>
+            <CustomerTable
+              customers={customers}
+              onView={(c) => console.log("view", c)}
+              onEdit={(c) => console.log("edit", c)}
+              onDelete={async (id) => {
+                if (window.confirm("¿Borrar cliente?")) {
+                  try {
+                    await customerService.delete(id);
+                    syncAllData();
+                  } catch (error) {
+                    alert(
+                      "No se puede eliminar un cliente con consultas asociadas."
+                    );
+                  }
+                }
+              }}
             />
           </div>
         )}
@@ -570,7 +609,8 @@ export default function App() {
                   </p>
                   <p>
                     <strong>Problema:</strong>{" "}
-                    {viewingJob.consulta?.problemDescription || "Sin descripción"}
+                    {viewingJob.consulta?.problemDescription ||
+                      "Sin descripción"}
                   </p>
                   <p>
                     <strong>Origen:</strong>{" "}
