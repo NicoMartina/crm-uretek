@@ -44,8 +44,11 @@ export const LeadsTable = ({
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
-                  {consulta.contactDate
-                    ? consulta.contactDate.split("-").reverse().join("/")
+                  {consulta.customer?.contactDate
+                    ? consulta.customer.contactDate
+                        .split("-")
+                        .reverse()
+                        .join("/")
                     : "Sin fecha"}
                 </td>
                 <td className="p-4 font-black text-slate-800">
@@ -53,16 +56,16 @@ export const LeadsTable = ({
                     onClick={() => onView(consulta)}
                     className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
                   >
-                    {consulta.name}
+                    {consulta.customer.name}
                   </button>
                 </td>
                 <td className="p-4 text-slate-500 font-medium">
-                  {consulta.phoneNumber}
+                  {consulta.customer.phoneNumber}
                 </td>
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <a
-                      href={`https://wa.me/54${consulta.phoneNumber?.replace(
+                      href={`https://wa.me/54${consulta.customer.phoneNumber?.replace(
                         /\D/g,
                         ""
                       )}`}
