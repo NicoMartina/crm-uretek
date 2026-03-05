@@ -38,14 +38,15 @@ export const DashboardView = ({
   const lastMonth = months[months.length - 1] || "";
   const [selectedMonth, setSelectedMonth] = useState(lastMonth);
 
-  const sourceChartData = statsData
-    ? Object.entries(statsData.leadsBySource[selectedMonth]).map(
-        ([source, count]) => ({
-          name: source,
-          value: count,
-        })
-      )
-    : [];
+  const sourceChartData =
+    statsData && statsData.leadsBySource[selectedMonth]
+      ? Object.entries(statsData.leadsBySource[selectedMonth]).map(
+          ([source, count]) => ({
+            name: source,
+            value: count,
+          })
+        )
+      : [];
 
   useEffect(() => {
     if (statsData) {
