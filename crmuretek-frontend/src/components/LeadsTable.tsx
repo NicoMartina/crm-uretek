@@ -56,16 +56,16 @@ export const LeadsTable = ({
                     onClick={() => onView(consulta)}
                     className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
                   >
-                    {consulta.customer.name}
+                    {consulta.customer?.name}
                   </button>
                 </td>
                 <td className="p-4 text-slate-500 font-medium">
-                  {consulta.customer.phoneNumber}
+                  {consulta.customer?.phoneNumber}
                 </td>
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <a
-                      href={`https://wa.me/54${consulta.customer.phoneNumber?.replace(
+                      href={`https://wa.me/54${consulta.customer?.phoneNumber?.replace(
                         /\D/g,
                         ""
                       )}`}
