@@ -53,7 +53,7 @@ export const VisitsTable = ({
                     onClick={() => onView(visit)}
                     className="font-black text-slate-700 hover:text-orange-500 transition-colors text-left"
                   >
-                    {visit.consulta?.name || "Sin Cliente"}
+                    {visit.consulta?.customer?.name || "Sin Cliente"}
                   </button>
                 </td>
                 <td className="p-4">
@@ -73,7 +73,9 @@ export const VisitsTable = ({
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <button
-                      onClick={() => visit.consulta && onConvert(visit.consulta)}
+                      onClick={() =>
+                        visit.consulta && onConvert(visit.consulta)
+                      }
                       className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"
                     >
                       <Briefcase size={12} /> Convertir
