@@ -5,6 +5,7 @@ interface CustomerTableProps {
   onView: (customer: any) => void;
   onEdit: (customer: any) => void;
   onDelete: (id: number) => void;
+  onAddConsulta: (customer: any) => void;
 }
 
 export const CustomerTable = ({
@@ -12,6 +13,7 @@ export const CustomerTable = ({
   onView,
   onEdit,
   onDelete,
+  onAddConsulta,
 }: CustomerTableProps) => {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -57,6 +59,12 @@ export const CustomerTable = ({
                 </td>
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => onAddConsulta(customer)}
+                      className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg font-bold text-[10px] uppercase hover:bg-orange-200 transition-all"
+                    >
+                      + Consulta
+                    </button>
                     <button
                       onClick={() => onView(customer)}
                       className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg font-bold text-[10px] uppercase hover:bg-slate-200 transition-all"

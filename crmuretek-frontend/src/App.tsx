@@ -424,6 +424,10 @@ export default function App() {
                   }
                 }
               }}
+              onAddConsulta={(c) => {
+                setSelectedLead({ customer: { id: c.id }, customerId: c.id });
+                setIsAddingLead(true);
+              }}
             />
           </div>
         )}
