@@ -50,6 +50,8 @@ public class CustomerService {
                     customer.setAddress(details.getAddress());
                     customer.setContactChannel(details.getContactChannel());
                     customer.setSource(details.getSource());
+                    customer.setTitle((details.getTitle()));
+                    customer.setObservations(details.getObservations());
                     return customerRepository.save(customer);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Consulta not found."));

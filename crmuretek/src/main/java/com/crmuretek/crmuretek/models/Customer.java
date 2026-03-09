@@ -28,6 +28,9 @@ public class Customer {
     @Enumerated(EnumType.STRING)
     private SourceEnum source;
     private LocalDate contactDate;
+    private String title;
+    @Column(columnDefinition = "TEXT")
+    private String observations;
 
     @PrePersist
     protected void onCreate(){

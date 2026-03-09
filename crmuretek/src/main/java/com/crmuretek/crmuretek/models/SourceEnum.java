@@ -3,7 +3,9 @@ package com.crmuretek.crmuretek.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum SourceEnum {
-    FACEBOOK, GOOGLE, WEBSITE, REFERRAL, PHONE, WHATSAPP, OTHER;
+    GOOGLE, REDES_SOCIALES, LINKEDIN, RECOMENDACION,
+    TRABAJO_ANTERIOR, CONSULTA_ANTERIOR, CAMION,
+    OFICINA, BATEV, OTRO;
 
     @JsonCreator
     public static SourceEnum fromString(String value) {

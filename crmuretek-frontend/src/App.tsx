@@ -60,6 +60,17 @@ export default function App() {
   const [visitObservations, setVisitObservations] = useState("");
   const [customers, setCustomers] = useState<any[]>([]);
   const [viewingCustomer, setViewingCustomer] = useState<any>(null);
+  const [customerSearch, setCustomerSearch] = useState("");
+
+  // Filter customers based on search input
+  const filteredCustomers = customers.filter(
+    (customer) =>
+      customer.name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+      customer.phoneNumber
+        ?.toLowerCase()
+        .includes(customerSearch.toLowerCase()) ||
+      customer.email?.toLowerCase().includes(customerSearch.toLowerCase())
+  );
 
   // Filter leads based on search input
   const filteredLeads = leads.filter(
@@ -82,7 +93,7 @@ export default function App() {
     SCHEDULED: "programada",
     VISITED: "visitada",
   };
-
+  // Filter visits based on search input
   const filteredVisits = visits.filter((visit) => {
     const translatedStatus = visitStatusMap[visit.status] || visit.status;
     return (
@@ -101,6 +112,7 @@ export default function App() {
     COMPLETED: "finalizado",
   };
 
+  // Filter jobs based on search input
   const filteredJobs = jobs.filter((job) => {
     const translatedStatus = jobStatusMap[job.jobStatus] || job.jobStatus;
     return (
@@ -379,9 +391,25 @@ export default function App() {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-black text-slate-800">Clientes</h2>
+              <button
+                onClick={() => {
+                  setSelectedLead(null);
+                  setIsAddingLead(true);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
+              >
+                <Plus size={20} /> Nueva Consulta
+              </button>
             </div>
+            <input
+              type="text"
+              placeholder="Buscar por nombre, teléfono o email..."
+              className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+              value={customerSearch}
+              onChange={(e) => setCustomerSearch(e.target.value)}
+            />
             <CustomerTable
-              customers={customers}
+              customers={filteredCustomers}
               onView={(c) => setViewingCustomer(c)}
               onEdit={(c) => console.log("edit", c)}
               onDelete={async (id) => {
