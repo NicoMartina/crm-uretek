@@ -64,14 +64,20 @@ export default function App() {
   // Filter leads based on search input
   const filteredLeads = leads.filter(
     (consulta) =>
-      consulta.name?.toLowerCase().includes(leadSearch.toLowerCase()) ||
-      consulta.phoneNumber?.toLowerCase().includes(leadSearch.toLowerCase()) ||
-      consulta.address?.toLowerCase().includes(leadSearch.toLowerCase()) ||
-      consulta.problemDescription
+      consulta.customer?.name
         ?.toLowerCase()
         .includes(leadSearch.toLowerCase()) ||
-      consulta.source?.toLowerCase().includes(leadSearch.toLowerCase())
+      consulta.customer?.phoneNumber
+        ?.toLowerCase()
+        .includes(leadSearch.toLowerCase()) ||
+      consulta.customer?.email
+        ?.toLowerCase()
+        .includes(leadSearch.toLowerCase()) ||
+      consulta.problemDescription
+        ?.toLowerCase()
+        .includes(leadSearch.toLowerCase())
   );
+
   const visitStatusMap: Record<string, string> = {
     SCHEDULED: "programada",
     VISITED: "visitada",
@@ -80,7 +86,9 @@ export default function App() {
   const filteredVisits = visits.filter((visit) => {
     const translatedStatus = visitStatusMap[visit.status] || visit.status;
     return (
-      visit.consulta?.name?.toLowerCase().includes(visitSearch.toLowerCase()) ||
+      visit.consulta?.customer?.name
+        ?.toLowerCase()
+        .includes(visitSearch.toLowerCase()) ||
       translatedStatus.toLowerCase().includes(visitSearch.toLowerCase()) ||
       visit.observations?.toLowerCase().includes(visitSearch.toLowerCase())
     );
@@ -96,7 +104,9 @@ export default function App() {
   const filteredJobs = jobs.filter((job) => {
     const translatedStatus = jobStatusMap[job.jobStatus] || job.jobStatus;
     return (
-      job.consulta?.name?.toLowerCase().includes(jobSearch.toLowerCase()) ||
+      job.consulta?.customer?.name
+        ?.toLowerCase()
+        .includes(jobSearch.toLowerCase()) ||
       translatedStatus.toLowerCase().includes(jobSearch.toLowerCase()) ||
       job.observations?.toLowerCase().includes(jobSearch.toLowerCase())
     );
@@ -438,23 +448,23 @@ export default function App() {
               </h2>
               <div className="space-y-3 text-sm">
                 <p>
-                  <strong>Nombre:</strong> {viewingLead.name}
+                  <strong>Nombre:</strong> {viewingLead.customer?.name}
                 </p>
                 <p>
-                  <strong>Teléfono:</strong> {viewingLead.phoneNumber}
+                  <strong>Teléfono:</strong> {viewingLead.customer?.phoneNumber}
                 </p>
                 <p>
-                  <strong>Dirección:</strong> {viewingLead.address}
+                  <strong>Dirección:</strong> {viewingLead.customer?.address}
                 </p>
                 <p>
                   <strong>Problema:</strong> {viewingLead.problemDescription}
                 </p>
                 <p>
-                  <strong>Origen:</strong> {viewingLead.source}
+                  <strong>Origen:</strong> {viewingLead.customer?.source}
                 </p>
                 <p>
                   <strong>Fecha Contacto:</strong>{" "}
-                  {viewingLead.contactDate || "Sin fecha"}
+                  {viewingLead.customer?.contactDate || "Sin fecha"}
                 </p>
               </div>
               <button
@@ -488,15 +498,16 @@ export default function App() {
               <div className="space-y-3 text-sm mb-6">
                 <p>
                   <strong>Cliente:</strong>{" "}
-                  {viewingVisit.consulta?.name || "Sin nombre"}
+                  {viewingVisit.consulta?.customer?.name || "Sin nombre"}
                 </p>
                 <p>
                   <strong>Teléfono:</strong>{" "}
-                  {viewingVisit.consulta?.phoneNumber || "Sin teléfono"}
+                  {viewingVisit.consulta?.customer?.phoneNumber ||
+                    "Sin teléfono"}
                 </p>
                 <p>
                   <strong>Dirección:</strong>{" "}
-                  {viewingVisit.consulta?.address || "Sin dirección"}
+                  {viewingVisit.consulta?.customer?.address || "Sin dirección"}
                 </p>
                 <p>
                   <strong>Fecha:</strong>{" "}
@@ -598,15 +609,16 @@ export default function App() {
                 <div className="space-y-3 text-sm">
                   <p>
                     <strong>Nombre:</strong>{" "}
-                    {viewingJob.consulta?.name || "Sin nombre"}
+                    {viewingJob.consulta?.customer?.name || "Sin nombre"}
                   </p>
                   <p>
                     <strong>Teléfono:</strong>{" "}
-                    {viewingJob.consulta?.phoneNumber || "Sin teléfono"}
+                    {viewingJob.consulta?.customer?.phoneNumber ||
+                      "Sin teléfono"}
                   </p>
                   <p>
                     <strong>Dirección:</strong>{" "}
-                    {viewingJob.consulta?.address || "Sin dirección"}
+                    {viewingJob.consulta?.customer?.address || "Sin dirección"}
                   </p>
                   <p>
                     <strong>Problema:</strong>{" "}
@@ -615,7 +627,7 @@ export default function App() {
                   </p>
                   <p>
                     <strong>Origen:</strong>{" "}
-                    {viewingJob.consulta?.source || "Sin origen"}
+                    {viewingJob.consulta?.customer?.source || "Sin origen"}
                   </p>
                 </div>
               </div>

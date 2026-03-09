@@ -73,6 +73,12 @@ export const VisitsTable = ({
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <button
+                      onClick={() => onView(visit)}
+                      className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg font-bold text-[10px] uppercase hover:bg-slate-200 transition-all"
+                    >
+                      Más Info
+                    </button>
+                    <button
                       onClick={() =>
                         visit.consulta && onConvert(visit.consulta)
                       }
