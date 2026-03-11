@@ -239,12 +239,12 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">Consultas</h2>
               <button
                 onClick={() => {
-                  setSelectedLead(null);
-                  setIsAddingLead(true);
+                  setSelectedCustomer(null);
+                  setIsEditingCustomer(true);
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nueva Consulta
+                <Plus size={20} /> Nuevo Cliente
               </button>
             </div>
             <input
@@ -294,12 +294,12 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">Visitas</h2>
               <button
                 onClick={() => {
-                  setSelectedLead(null);
-                  setIsAddingLead(true);
+                  setSelectedCustomer(null);
+                  setIsEditingCustomer(true);
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nueva Consulta
+                <Plus size={20} /> Nuevo Cliente
               </button>
             </div>
             <input
@@ -339,12 +339,12 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">Trabajos</h2>
               <button
                 onClick={() => {
-                  setSelectedLead(null);
-                  setIsAddingLead(true);
+                  setSelectedCustomer(null);
+                  setIsEditingCustomer(true);
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nueva Consulta
+                <Plus size={20} /> Nuevo Cliente
               </button>
             </div>
             <input
@@ -396,12 +396,12 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">Clientes</h2>
               <button
                 onClick={() => {
-                  setSelectedLead(null);
-                  setIsAddingLead(true);
+                  setSelectedCustomer(null);
+                  setIsEditingCustomer(true);
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nueva Consulta
+                <Plus size={20} /> Nuevo Cliente
               </button>
             </div>
             <input
