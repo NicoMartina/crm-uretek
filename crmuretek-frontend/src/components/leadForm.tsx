@@ -54,13 +54,14 @@ export default function LeadForm({
             setFormData({ ...formData, customerId: e.target.value })
           }
           required
-        />
-        <option value="">Seleccione un Cliente</option>
-        {(customers || []).map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name} - {c.phoneNumber}
-          </option>
-        ))}
+        >
+          <option value="">Seleccione un Cliente</option>
+          {(customers || []).map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name} - {c.phoneNumber}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Input Group 2 */}
