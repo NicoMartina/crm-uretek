@@ -446,6 +446,7 @@ export default function App() {
               <h2 className="text-2xl font-black mb-4">Gestión de Consultas</h2>
               <LeadForm
                 initialData={selectedLead}
+                customers={customers}
                 onCancel={() => {
                   setIsAddingLead(false);
                   setSelectedLead(null);

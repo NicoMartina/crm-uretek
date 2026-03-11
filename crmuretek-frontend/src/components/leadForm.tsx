@@ -3,6 +3,7 @@ import { customerService } from "../services/customerService";
 
 interface LeadFormProps {
   initialData?: any;
+  customers: any[];
   onCancel: () => void;
   onSubmit: (formData: any) => Promise<void>;
   onRefresh: () => Promise<void> | void;
@@ -10,19 +11,15 @@ interface LeadFormProps {
 
 export default function LeadForm({
   initialData,
+  customers,
   onRefresh,
   onSubmit,
   onCancel,
 }: LeadFormProps) {
-  const [customers, setCustomers] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     customerId: initialData?.customer?.id || initialData?.customerId || "",
     problemDescription: initialData?.problemDescription || "", // Default to today's date
   });
-
-  useEffect(() => {
-    customerService.getAll().then(setCustomers);
-  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +57,7 @@ export default function LeadForm({
           required
         />
         <option value="">Seleccione un Cliente</option>
-        {customers.map((c) => (
+        {(customers || []).map((c) => (
           <option key={c.id} value={c.id}>
             {c.name} - {c.phoneNumber}
           </option>
