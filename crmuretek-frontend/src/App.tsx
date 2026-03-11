@@ -24,6 +24,7 @@ import { VisitModal } from "./components/VisitModal";
 import { inventoryService } from "./services/inventoryService";
 import { customerService } from "./services/customerService";
 import { CustomerTable } from "./components/CustomerTable";
+import CustomerForm from "./components/CustomerForm";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -61,6 +62,8 @@ export default function App() {
   const [customers, setCustomers] = useState<any[]>([]);
   const [viewingCustomer, setViewingCustomer] = useState<any>(null);
   const [customerSearch, setCustomerSearch] = useState("");
+  const [isEditingCustomer, setIsEditingCustomer] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
   // Filter customers based on search input
   const filteredCustomers = customers.filter(
@@ -411,7 +414,10 @@ export default function App() {
             <CustomerTable
               customers={filteredCustomers}
               onView={(c) => setViewingCustomer(c)}
-              onEdit={(c) => console.log("edit", c)}
+              onEdit={(c) => {
+                setSelectedCustomer(c);
+                setIsEditingCustomer(true);
+              }}
               onDelete={async (id) => {
                 if (window.confirm("¿Borrar cliente?")) {
                   try {
@@ -746,6 +752,28 @@ export default function App() {
               >
                 Cerrar
               </button>
+            </div>
+          </div>
+        )}
+
+        {isEditingCustomer && selectedCustomer && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[90vh]">
+              <h2 className="text-2xl font-black mb-4">Editar Cliente</h2>
+              <CustomerForm
+                initialData={selectedCustomer}
+                onCancel={() => {
+                  setIsEditingCustomer(false);
+                  setSelectedCustomer(null);
+                }}
+                onSubmit={async (formData) => {
+                  await customerService.update(selectedCustomer.id, formData);
+                  await syncAllData();
+                  setIsEditingCustomer(false);
+                  setSelectedCustomer(null);
+                }}
+                onRefresh={syncAllData}
+              />
             </div>
           </div>
         )}
