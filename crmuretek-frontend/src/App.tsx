@@ -756,7 +756,7 @@ export default function App() {
           </div>
         )}
 
-        {isEditingCustomer && selectedCustomer && (
+        {isEditingCustomer && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[90vh]">
               <h2 className="text-2xl font-black mb-4">Editar Cliente</h2>
@@ -767,7 +767,11 @@ export default function App() {
                   setSelectedCustomer(null);
                 }}
                 onSubmit={async (formData) => {
-                  await customerService.update(selectedCustomer.id, formData);
+                  if (selectedCustomer?.id) {
+                    await customerService.update(selectedCustomer.id, formData);
+                  } else {
+                    await customerService.create(formData);
+                  }
                   await syncAllData();
                   setIsEditingCustomer(false);
                   setSelectedCustomer(null);
