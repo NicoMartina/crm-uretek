@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { customerService } from "../services/customerService";
+import React, { useState } from "react";
 
 interface LeadFormProps {
   initialData?: any;
