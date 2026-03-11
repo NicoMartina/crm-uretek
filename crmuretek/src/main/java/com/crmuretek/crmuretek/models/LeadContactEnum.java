@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum LeadContactEnum {
     WHATSAPP, GOOGLE, TELEFONO, EMAIL, PAGINA_WEB,
-    REDES, TECNICO, RECOMENDACION, OTRO;
+    REDES_SOCIALES, TECNICO, RECOMENDACION, OTRO;
 
 
     @JsonCreator
