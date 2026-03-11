@@ -3,7 +3,7 @@ package com.crmuretek.crmuretek.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum SourceEnum {
-    GOOGLE, REDES_SOCIALES, LINKEDIN, RECOMENDACION,
+    GOOGLE, PAGINA_WEB, REDES, LINKEDIN, RECOMENDACION,
     TRABAJO_ANTERIOR, CONSULTA_ANTERIOR, CAMION,
     OFICINA, BATEV, OTRO;
 

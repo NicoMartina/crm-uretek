@@ -3,8 +3,8 @@ package com.crmuretek.crmuretek.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum LeadContactEnum {
-    WHATSAPP, TELEFONO, MAIL, PAGINA_WEB,
-    REDES, TECNICO, OTRO;
+    WHATSAPP, GOOGLE, TELEFONO, EMAIL, PAGINA_WEB,
+    REDES, TECNICO, RECOMENDACION, OTRO;
 
 
     @JsonCreator
