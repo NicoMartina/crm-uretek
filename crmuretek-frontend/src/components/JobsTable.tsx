@@ -1,4 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
+import { TITLE_MAP } from "../utils/Maps";
 
 interface JobsTableProps {
   jobs: any[];
@@ -53,7 +54,11 @@ export const JobsTable = ({
                 <td className="p-4">
                   <button onClick={() => onView(job)} className="text-left">
                     <div className="font-bold text-slate-800 hover:text-orange-500 transition-colors">
-                      {job.consulta?.customer?.name || "Sin nombre"}
+                      {job.consulta?.customer?.title
+                        ? `${TITLE_MAP[job.consulta?.customer?.title]} ${
+                            job.consulta?.customer?.name
+                          }`
+                        : job.consulta?.customer?.name || "Sin nombre"}
                     </div>
                     <div className="text-[10px] text-slate-500">
                       {job.consulta?.problemDescription}

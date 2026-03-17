@@ -1,4 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
+import { TITLE_MAP } from "../utils/Maps";
 
 interface CustomerTableProps {
   customers: any[];
@@ -51,7 +52,9 @@ export const CustomerTable = ({
                     onClick={() => onView(customer)}
                     className="font-black text-slate-700 hover:text-orange-500 transition-colors text-left"
                   >
-                    {customer.name || "Sin nombre"}
+                    {customer.title
+                      ? `${TITLE_MAP[customer.title]} ${customer.name}`
+                      : customer.name || "Sin nombre"}
                   </button>
                 </td>
                 <td className="p-4 text-slate-500 font-medium">

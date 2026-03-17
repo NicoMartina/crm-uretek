@@ -1,4 +1,5 @@
 import { Trash2, Briefcase } from "lucide-react";
+import { TITLE_MAP } from "../utils/Maps";
 
 interface VisitsTableProps {
   visits: any[];
@@ -53,7 +54,11 @@ export const VisitsTable = ({
                     onClick={() => onView(visit)}
                     className="font-black text-slate-700 hover:text-orange-500 transition-colors text-left"
                   >
-                    {visit.consulta?.customer?.name || "Sin Cliente"}
+                    {visit.consulta?.customer?.title
+                      ? `${TITLE_MAP[visit.consulta?.customer?.title]} ${
+                          visit.consulta?.customer?.name
+                        }`
+                      : visit.consulta?.customer?.name || "Sin nombre"}
                   </button>
                 </td>
                 <td className="p-4">

@@ -1,4 +1,5 @@
 import { Calendar, Trash2, Edit } from "lucide-react";
+import { TITLE_MAP } from "../utils/Maps";
 
 interface LeadsTableProps {
   leads: any[];
@@ -56,7 +57,11 @@ export const LeadsTable = ({
                     onClick={() => onView(consulta)}
                     className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
                   >
-                    {consulta.customer?.name}
+                    {consulta.customer?.title
+                      ? `${TITLE_MAP[consulta?.customer?.title]} ${
+                          consulta?.customer?.name
+                        }`
+                      : consulta?.customer?.name || "Sin nombre"}
                   </button>
                 </td>
                 <td className="p-4 text-slate-500 font-medium">

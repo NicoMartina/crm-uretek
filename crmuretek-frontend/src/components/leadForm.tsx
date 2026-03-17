@@ -83,7 +83,7 @@ export default function LeadForm({
           type="submit"
           className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition"
         >
-          {initialData?.id ? "Guardar Cambios" : "Crear Prospecto"}
+          {initialData?.id ? "Guardar Cambios" : "Crear Consulta"}
         </button>
         <button
           type="button"

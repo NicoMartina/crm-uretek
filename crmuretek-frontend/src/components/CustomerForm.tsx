@@ -201,7 +201,7 @@ export default function CustomerForm({
           type="submit"
           className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition"
         >
-          {initialData?.id ? "Guardar Cambios" : "Crear Prospecto"}
+          {initialData?.id ? "Guardar Cambios" : "Crear Cliente"}
         </button>
         <button
           type="button"

@@ -31,7 +31,7 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black text-slate-800">Crear Trabajo</h2>
+          <h2 className="text-2xl font-black text-slate-800">Editar Trabajo</h2>
           <button
             onClick={onCancel}
             className="text-slate-400 hover:text-slate-600"
@@ -41,7 +41,10 @@ export const QuoteForm: React.FC<QuoteFormProps> = ({
         </div>
 
         <p className="text-slate-500 mb-6">
-          Cliente: <span className="font-bold text-slate-800">{consulta.name}</span>
+          Cliente:{" "}
+          <span className="font-bold text-slate-800">
+            {consulta.customer?.name}
+          </span>
         </p>
 
         <div className="space-y-4">
