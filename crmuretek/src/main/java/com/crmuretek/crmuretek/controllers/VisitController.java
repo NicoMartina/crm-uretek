@@ -34,7 +34,7 @@ public class VisitController {
 
     @GetMapping
     public List<Visit> getAllVisits(){
-        return visitRepository.findAllByOrderByVisitDateDesc();
+        return visitRepository.findAllOrderedByStatusThenDate();
     }
 
     @PatchMapping("/{id}/status")

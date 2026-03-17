@@ -22,7 +22,7 @@ public class VisitService {
     }
 
     public List<Visit> findAllByVisitDesc(){
-        return visitRepository.findAllByOrderByVisitDateDesc();
+        return visitRepository.findAllOrderedByStatusThenDate();
     }
 
     @Transactional

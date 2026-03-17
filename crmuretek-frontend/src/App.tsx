@@ -145,7 +145,14 @@ export default function App() {
       ]);
 
       if (res[0].status === "fulfilled") setJobs(res[0].value || []);
-      if (res[1].status === "fulfilled") setVisits(res[1].value || []);
+      if (res[1].status === "fulfilled") {
+        const sorted = (res[1].value || []).sort((a: any, b: any) => {
+          if (a.status === "SCHEDULED" && b.status !== "SCHEDULED") return -1;
+          if (a.status !== "SCHEDULED" && b.status === "SCHEDULED") return 1;
+          return 0;
+        });
+        setVisits(sorted);
+      }
       if (res[2].status === "fulfilled") {
         const all = res[2].value || [];
         // Filtering leads that don't have active jobs
