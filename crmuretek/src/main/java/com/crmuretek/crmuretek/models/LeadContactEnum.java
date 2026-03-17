@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum LeadContactEnum {
     WHATSAPP, TELEFONO, EMAIL, PAGINA_WEB,
-    REDES_SOCIALES, TECNICO, OTRO;
+    REDES_SOCIALES, TECNICO, GOOGLE, OTRO;
 
 
     @JsonCreator
@@ -13,7 +13,7 @@ public enum LeadContactEnum {
         try {
             return LeadContactEnum.valueOf(value.toUpperCase().trim());
         } catch (IllegalArgumentException e) {
-            return null; // or throw, depending on your preference
+            return OTRO; // or throw, depending on your preference
         }
     }
 }
