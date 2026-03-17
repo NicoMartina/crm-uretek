@@ -28,7 +28,8 @@ public class Customer {
     @Enumerated(EnumType.STRING)
     private SourceEnum source;
     private LocalDate contactDate;
-    private String title;
+    @Enumerated(EnumType.STRING)
+    private TitleEnum title;
     @Column(columnDefinition = "TEXT")
     private String observations;
 

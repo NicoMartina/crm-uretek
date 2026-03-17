@@ -109,11 +109,17 @@ export default function CustomerForm({
         <label className="text-[10px] font-bold uppercase text-slate-400">
           Titulo del Cliente
         </label>
-        <input
+        <select
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-        />
+        >
+          <option value="">Seleccione una opción</option>
+          <option value="DUENO">Dueño</option>
+          <option value="ARQUITECTO">Arquitecto</option>
+          <option value="INGENIERO">Ingeniero</option>
+          <option value="OTRO">Otro</option>
+        </select>
       </div>
       {/* Input Group 6 - Production Grade Select */}
       <div>
