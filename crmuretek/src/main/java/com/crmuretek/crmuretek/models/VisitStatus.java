@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public enum VisitStatus {
     SCHEDULED,
     VISITED,
-    COMPLETED,
-    CANCELLED;
-
-
+    SOLICITADA;
 
     @JsonCreator
     public static VisitStatus fromString(String value){
