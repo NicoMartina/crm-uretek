@@ -16,6 +16,10 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     List<Visit> findByVisitDate(LocalDate date);
     List<Visit> findAllByOrderByVisitDateDesc();
 
+
+    @Query(value = "SELECT * FROM leads_visits ORDER BY CASE WHEN status = 'SCHEDULED' THEN 0 ELSE 1 END, visit_date DESC", nativeQuery = true)
+    List<Visit> findAllOrderedByStatusThenDate();
+
     @Query(value = "SELECT TO_CHAR(visit_date, 'YYYY-MM'), COUNT(*) FROM leads_visits  GROUP BY TO_CHAR(visit_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
     List<Object[]> countVisitsPerMonth();
 
