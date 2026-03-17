@@ -159,14 +159,10 @@ export default function CustomerForm({
         >
           <option value="">Seleccione una opción</option>
           <option value={"WHATSAPP"}>WhatsApp</option>
-          <option value={"GOOGLE"}>Google</option>
           <option value={"PAGINA_WEB"}>Sitio Web</option>
           <option value={"REDES_SOCIALES"}>Redes Sociales</option>
           <option value={"EMAIL"}>Email</option>
-          <option value={"TECNICO"}>Tecnico</option>
           <option value={"TELEFONO"}>Llamada</option>
-          <option value={"RECOMENDACION"}>Recomendacion</option>
-          <option value={"OTRO"}>Trabajo Previo</option>
         </select>
       </div>
       {/* Input Group 8 */}
