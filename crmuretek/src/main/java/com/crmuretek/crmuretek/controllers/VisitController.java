@@ -25,9 +25,14 @@ public class VisitController {
     @PostMapping
     public ResponseEntity<Visit> createVisit(@RequestBody Visit visit){
         // 1. If a lead is provided in the request, let's link it
+        System.out.println("Visit date received: " + visit.getVisitDate());
         if (visit.getConsulta() != null && visit.getConsulta().getId() != null){
             // We set the status based on our workflow
-            visit.setStatus(VisitStatus.SCHEDULED);
+            if (visit.getVisitDate() == null) {
+                visit.setStatus(VisitStatus.SOLICITADA);
+            } else {
+                visit.setStatus(VisitStatus.SCHEDULED);
+            }
         }
         return ResponseEntity.ok(visitRepository.save(visit));
     }
