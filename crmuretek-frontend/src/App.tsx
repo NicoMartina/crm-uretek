@@ -574,6 +574,20 @@ export default function App() {
               {/* Divider */}
               <div className="border-t border-slate-100 pt-4 mb-4">
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">
+                  Fecha de Visita
+                </label>
+                <input
+                  type="date"
+                  className="w-full border border-slate-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-orange-500 mb-4"
+                  value={viewingVisit.visitDate || ""}
+                  onChange={(e) =>
+                    setViewingVisit({
+                      ...viewingVisit,
+                      visitDate: e.target.value,
+                    })
+                  }
+                />
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">
                   Observaciones
                 </label>
                 <textarea
@@ -598,6 +612,12 @@ export default function App() {
                       viewingVisit.id,
                       visitObservations
                     );
+                    if (viewingVisit.visitDate) {
+                      await visitService.updateDate(
+                        viewingVisit.id,
+                        viewingVisit.visitDate
+                      );
+                    }
                     setViewingVisit(null);
                     syncAllData();
                   }}

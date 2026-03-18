@@ -8,6 +8,7 @@ import com.crmuretek.crmuretek.services.VisitService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -35,6 +36,14 @@ public class VisitController {
             }
         }
         return ResponseEntity.ok(visitRepository.save(visit));
+    }
+
+    @PatchMapping("/{id}/date")
+    public ResponseEntity<Visit> updateVisitDate(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
+        return visitRepository.findById(id).map(visit -> {
+            visit.setVisitDate(LocalDate.parse(body.get("visitDate")));
+            return ResponseEntity.ok(visitRepository.save(visit));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping

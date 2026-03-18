@@ -13,6 +13,13 @@ export const visitService = {
     return response.data;
   },
 
+  // This handles: PUT /api/visits/{id}/date
+
+  updateDate: async (id: number, visitDate: any) => {
+    const response = await api.patch(`/visits/${id}/date`, { visitDate });
+    return response.data;
+  },
+
   // This handles: PATCH /api/visits/{id}/status
   updateStatus: async (id: number, status: string) => {
     const response = await api.patch(`/visits/${id}/status`, { status });
@@ -26,8 +33,8 @@ export const visitService = {
 
   // This handles: UPDATE /api/visits/{id}/observation
   updateObservations: async (id: number, observation: string) => {
-    const response = await api.patch(`/visits/${id}/observation`, {
-      observation,
+    const response = await api.patch(`/visits/${id}/observations`, {
+      observations: observation,
     });
     return response.data;
   },
