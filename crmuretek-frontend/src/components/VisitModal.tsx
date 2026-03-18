@@ -24,7 +24,7 @@ export const VisitModal = ({
     <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
         <h3 className="text-2xl font-black mb-2">Agendar Visita</h3>
-        <p className="text-slate-500 mb-6">Cliente: {consulta.name}</p>
+        <p className="text-slate-500 mb-6">Cliente: {consulta.customer.name}</p>
 
         <div className="space-y-4">
           <div>

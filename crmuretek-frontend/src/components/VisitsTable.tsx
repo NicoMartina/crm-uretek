@@ -66,11 +66,14 @@ export const VisitsTable = ({
                     value={visit.status}
                     onChange={(e) => onUpdateStatus(visit.id, e.target.value)}
                     className={`text-[10px] font-black uppercase px-2 py-1 rounded-md outline-none cursor-pointer border-none ${
-                      visit.status === "SCHEDULED"
+                      visit.status === "SOLICITADA"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : visit.status === "SCHEDULED"
                         ? "bg-orange-100 text-orange-700"
                         : "bg-emerald-100 text-emerald-700"
                     }`}
                   >
+                    <option value="SOLICITADA">Solicitada</option>
                     <option value="SCHEDULED">Programada</option>
                     <option value="VISITED">Visitada</option>
                   </select>

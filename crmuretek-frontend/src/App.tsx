@@ -128,9 +128,7 @@ export default function App() {
   });
 
   // Visit Modal State
-  const [visitDate, setVisitDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [visitDate, setVisitDate] = useState("");
   const [visitNotes, setVisitNotes] = useState("");
 
   const syncAllData = async () => {
@@ -147,9 +145,12 @@ export default function App() {
       if (res[0].status === "fulfilled") setJobs(res[0].value || []);
       if (res[1].status === "fulfilled") {
         const sorted = (res[1].value || []).sort((a: any, b: any) => {
-          if (a.status === "SCHEDULED" && b.status !== "SCHEDULED") return -1;
-          if (a.status !== "SCHEDULED" && b.status === "SCHEDULED") return 1;
-          return 0;
+          const order: Record<string, number> = {
+            SOLICITADA: 0,
+            SCHEDULED: 1,
+            VISITED: 2,
+          };
+          return (order[a.status] ?? 3) - (order[b.status] ?? 3);
         });
         setVisits(sorted);
       }
@@ -284,8 +285,10 @@ export default function App() {
                 }
               }}
               onScheduleVisit={(l) => {
+                console.log("scheduling visit for:", l);
                 setSelectedLead(l);
                 setIsSchedulingVisit(true);
+                setVisitDate("");
               }}
               onQuote={(l) => {
                 setSelectedLead(l);
@@ -821,11 +824,14 @@ export default function App() {
             setVisitNotes={setVisitNotes}
             onClose={() => setIsSchedulingVisit(false)}
             onConfirm={async () => {
-              await visitService.create({
+              console.log("visitDate value:", visitDate);
+              const visitData = {
                 consulta: { id: selectedLead.id },
-                visitDate,
                 observations: visitNotes,
-              });
+                ...(visitDate ? { visitDate } : {}),
+              };
+              console.log("visitData being sent:", visitData);
+              await visitService.create(visitData);
               setIsSchedulingVisit(false);
               syncAllData();
             }}
