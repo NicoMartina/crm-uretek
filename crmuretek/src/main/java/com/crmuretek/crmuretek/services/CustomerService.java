@@ -40,7 +40,22 @@ public class CustomerService {
         return customerRepository.save(customer);
      }
 
-
+     @Transactional
+     public Customer update(Long id, Customer details){
+        return customerRepository.findById(id)
+                .map(customer -> {
+                    customer.setName(details.getName());
+                    customer.setEmail(details.getEmail());
+                    customer.setPhoneNumber(details.getPhoneNumber());
+                    customer.setAddress(details.getAddress());
+                    customer.setContactChannel(details.getContactChannel());
+                    customer.setSource(details.getSource());
+                    customer.setTitle((details.getTitle()));
+                    customer.setObservations(details.getObservations());
+                    return customerRepository.save(customer);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Consulta not found."));
+     }
 
      @Transactional
     public void delete(Long id){
