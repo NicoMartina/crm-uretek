@@ -38,7 +38,13 @@ export default function CustomerForm({
     e.preventDefault();
     try {
       // We call the function passed down from App.tsx
-      await onSubmit(formData);
+      const dataToSend = {
+        ...formData,
+        title: formData.title || null,
+        source: formData.source || null,
+        contactChannel: formData.contactChannel || null,
+      };
+      await onSubmit(dataToSend);
 
       // We tell App to refresh the list
       onRefresh();
