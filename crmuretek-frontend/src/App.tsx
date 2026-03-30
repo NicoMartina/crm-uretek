@@ -142,7 +142,18 @@ export default function App() {
         customerService.getAll(),
       ]);
 
-      if (res[0].status === "fulfilled") setJobs(res[0].value || []);
+      if (res[0].status === "fulfilled") {
+        const sorted = (res[0].value || []).sort((a: any, b: any) => {
+          const order: Record<string, number> = {
+            QUOTED: 0,
+            DEPOSIT_PAID: 1,
+            BALANCE_PAID: 2,
+            COMPLETED: 3,
+          };
+          return (order[a.jobStatus] ?? 4) - (order[b.jobStatus] ?? 4);
+        });
+        setJobs(sorted);
+      }
       if (res[1].status === "fulfilled") {
         const sorted = (res[1].value || []).sort((a: any, b: any) => {
           const order: Record<string, number> = {
