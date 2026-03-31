@@ -195,14 +195,7 @@ export default function App() {
         >
           <LayoutDashboard className="mr-2" /> Inicio
         </button>
-        <button
-          onClick={() => setActiveTab("customers")}
-          className={`flex p-3 rounded text-left transition ${
-            activeTab === "customers" ? "bg-orange-600" : "hover:bg-slate-800"
-          }`}
-        >
-          <UserCheck className="mr-2" /> Clientes
-        </button>
+
         <button
           onClick={() => setActiveTab("leads")}
           className={`flex p-3 rounded text-left transition ${
@@ -475,10 +468,17 @@ export default function App() {
                 onSubmit={async (formData: any) => {
                   try {
                     if (selectedLead?.id) {
-                      // Call your update logic
-                      await leadsService.update(selectedLead.id, formData);
+                      // Update consulta
+                      await leadsService.update(selectedLead.id, {
+                        problemDescription: formData.problemDescription,
+                        customer: { id: formData.customer.id },
+                      });
+                      // Also update customer
+                      await customerService.update(
+                        formData.customer.id,
+                        formData.customer
+                      );
                     } else {
-                      // Call your create logic
                       await leadsService.create(formData);
                     }
                     await syncAllData();
