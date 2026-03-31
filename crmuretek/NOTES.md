@@ -1,7 +1,7 @@
 # CRM Uretek - Dev Notes
 
 
-## Git Workflow
+
 **Start new work:**
 * git checkout main
 * git pull origin main
