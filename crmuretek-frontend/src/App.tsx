@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
-  UserCheck,
   Calendar,
   Briefcase,
   Plus,
@@ -308,7 +307,9 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">Visitas</h2>
               <button
                 onClick={() => {
+                  setIsSchedulingVisit(true);
                   setSelectedCustomer(null);
+
                   setIsEditingCustomer(true);
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
