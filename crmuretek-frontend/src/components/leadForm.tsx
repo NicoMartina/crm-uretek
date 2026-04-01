@@ -10,7 +10,6 @@ interface LeadFormProps {
 
 export default function LeadForm({
   initialData,
-  customers,
   onRefresh,
   onSubmit,
   onCancel,
