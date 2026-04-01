@@ -15,6 +15,7 @@ public class ConsultaController {
     private final ConsultaRepository consultaRepository;
     private final ConsultaService consultaService;
 
+
     public ConsultaController(ConsultaRepository consultaRepository, ConsultaService consultaService) {
         this.consultaRepository = consultaRepository;
         this.consultaService = consultaService;
@@ -24,6 +25,7 @@ public class ConsultaController {
     public ResponseEntity<Consulta> create(@RequestBody Consulta consulta){
         return ResponseEntity.ok(consultaService.create(consulta));
     }
+
 
     @GetMapping
     public List<Consulta> getAllLeads(){

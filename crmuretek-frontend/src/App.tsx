@@ -307,14 +307,12 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">Visitas</h2>
               <button
                 onClick={() => {
+                  setSelectedLead(null);
                   setIsSchedulingVisit(true);
-                  setSelectedCustomer(null);
-
-                  setIsEditingCustomer(true);
                 }}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
               >
-                <Plus size={20} /> Nuevo Cliente
+                <Plus size={20} /> Nueva Visita
               </button>
             </div>
             <input
@@ -847,22 +845,22 @@ export default function App() {
           />
         )}
 
-        {isSchedulingVisit && selectedLead && (
+        {isSchedulingVisit && (
           <VisitModal
+            allLeads={leads}
             consulta={selectedLead}
             visitDate={visitDate}
             setVisitDate={setVisitDate}
             visitNotes={visitNotes}
             setVisitNotes={setVisitNotes}
             onClose={() => setIsSchedulingVisit(false)}
+            onConsultaSelect={(c) => setSelectedLead(c)}
             onConfirm={async () => {
-              console.log("visitDate value:", visitDate);
               const visitData = {
                 consulta: { id: selectedLead.id },
                 observations: visitNotes,
                 ...(visitDate ? { visitDate } : {}),
               };
-              console.log("visitData being sent:", visitData);
               await visitService.create(visitData);
               setIsSchedulingVisit(false);
               syncAllData();
