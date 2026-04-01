@@ -31,6 +31,7 @@ export default function LeadForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submitting formData:", JSON.stringify(formData, null, 2));
     try {
       if (initialData?.id) {
         // Edit mode - send both customer and consulta data
@@ -55,7 +56,7 @@ export default function LeadForm({
           problemDescription: formData.problemDescription,
           customer: {
             name: formData.name,
-            phone: formData.phoneNumber,
+            phoneNumber: formData.phoneNumber,
             email: formData.email || null,
             address: formData.address || null,
             contactChannel: formData.contactChannel || null,

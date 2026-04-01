@@ -18,13 +18,11 @@ public class ConsultaService {
     private ConsultaRepository consultaRepository;
     private JobRepository jobRepository;
     private VisitRepository visitRepository;
-    private CustomerRepository customerRepository;
 
-    public ConsultaService(ConsultaRepository consultaRepository, JobRepository jobRepository, VisitRepository visitRepository, CustomerRepository customerRepository) {
+    public ConsultaService(ConsultaRepository consultaRepository, JobRepository jobRepository, VisitRepository visitRepository) {
         this.consultaRepository = consultaRepository;
         this.jobRepository = jobRepository;
         this.visitRepository = visitRepository;
-        this.customerRepository = customerRepository;
     }
 
     public Optional<Consulta> findById(Long id){
@@ -37,12 +35,6 @@ public class ConsultaService {
 
     @Transactional
     public Consulta create(Consulta consulta){
-        // check if a customer object is provided but has no id. We save it first.
-        if (consulta.getCustomer() != null && consulta.getCustomer().getId() == null) {
-            // New Customer - save it first
-            Customer savedCustomer = customerRepository.save(consulta.getCustomer());
-            consulta.setCustomer(savedCustomer);
-        }
         return consultaRepository.save(consulta);
     }
 
