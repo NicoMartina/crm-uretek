@@ -29,6 +29,7 @@ public class ConsultaController {
 
     @GetMapping
     public List<Consulta> getAllLeads(){
+
         return consultaService.findAllByContactDateDesc();
     }
 
