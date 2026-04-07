@@ -20,7 +20,7 @@ public class Consulta {
     @Column(columnDefinition = "TEXT")
     private String problemDescription;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("leads")
     private Customer customer;

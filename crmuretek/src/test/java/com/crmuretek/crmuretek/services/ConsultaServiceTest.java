@@ -52,4 +52,6 @@ public class ConsultaServiceTest {
         // Verify the repository  was actually touched
         verify(consultaRepository, times(1)).save(any(Consulta.class));
     }
+
+
 }

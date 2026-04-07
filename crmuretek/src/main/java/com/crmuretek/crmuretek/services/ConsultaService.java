@@ -7,6 +7,7 @@ import com.crmuretek.crmuretek.repositories.CustomerRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +19,13 @@ public class ConsultaService {
     private ConsultaRepository consultaRepository;
     private JobRepository jobRepository;
     private VisitRepository visitRepository;
+    private CustomerRepository customerRepository;
 
-    public ConsultaService(ConsultaRepository consultaRepository, JobRepository jobRepository, VisitRepository visitRepository) {
+    public ConsultaService(ConsultaRepository consultaRepository, JobRepository jobRepository, VisitRepository visitRepository, CustomerRepository customerRepository) {
         this.consultaRepository = consultaRepository;
         this.jobRepository = jobRepository;
         this.visitRepository = visitRepository;
+        this.customerRepository = customerRepository;
     }
 
     public Optional<Consulta> findById(Long id){
@@ -35,6 +38,19 @@ public class ConsultaService {
 
     @Transactional
     public Consulta create(Consulta consulta){
+        // 1. Check if the incoming request actually mentioned a customer
+        if (consulta.getCustomer() != null && consulta.getCustomer().getId() != null) {
+
+            // 2. GO to the database and get the Real customer that hibernate knows
+
+            Customer managedCustomer = customerRepository.findById(consulta.getCustomer().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + consulta.getCustomer().getId()));
+
+            // 3. Swap the fake customer for the real one
+            consulta.setCustomer(managedCustomer);
+        }
+
+        // 4. Now hibernate knows which customer to return
         return consultaRepository.save(consulta);
     }
 
