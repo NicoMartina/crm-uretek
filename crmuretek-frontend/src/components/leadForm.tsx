@@ -37,34 +37,30 @@ export default function LeadForm({
         // Edit mode - send both customer and consulta data
         await onSubmit({
           problemDescription: formData.problemDescription,
-          customer: {
-            id: initialData.customer.id,
-            name: formData.name,
-            phoneNumber: formData.phoneNumber,
-            email: formData.email,
-            address: formData.address,
-            contactChannel: formData.contactChannel || null,
-            source: formData.source || null,
-            title: formData.title || null,
-            contactDate: formData.contactDate,
-            observations: formData.observations,
-          },
+          id: initialData.customer.id,
+          name: formData.name,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          address: formData.address,
+          contactChannel: formData.contactChannel || null,
+          source: formData.source || null,
+          title: formData.title || null,
+          contactDate: formData.contactDate,
+          observations: formData.observations,
         });
       } else {
         // Create mode - just link existing customer
         await onSubmit({
           problemDescription: formData.problemDescription,
-          customer: {
-            name: formData.name,
-            phoneNumber: formData.phoneNumber,
-            email: formData.email || null,
-            address: formData.address || null,
-            contactChannel: formData.contactChannel || null,
-            source: formData.source || null,
-            title: formData.title || null,
-            contactDate: formData.contactDate,
-            observations: formData.observations || null,
-          },
+          name: formData.name,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email || null,
+          address: formData.address || null,
+          contactChannel: formData.contactChannel || null,
+          source: formData.source || null,
+          title: formData.title || null,
+          contactDate: formData.contactDate,
+          observations: formData.observations || null,
         });
       }
       onRefresh();
@@ -184,6 +180,7 @@ export default function LeadForm({
             >
               <option value="">Seleccione una opción</option>
               <option value="GOOGLE">Google</option>
+              <option value="PAGINA_WEB"> Sitio Web</option>
               <option value="REDES_SOCIALES">Redes Sociales</option>
               <option value="LINKEDIN">LinkedIn</option>
               <option value="RECOMENDACION">Recomendación</option>

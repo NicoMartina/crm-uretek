@@ -1,7 +1,7 @@
 package com.crmuretek.crmuretek.controllers;
 
-import com.crmuretek.crmuretek.models.Consulta;
-import com.crmuretek.crmuretek.repositories.ConsultaRepository;
+import com.crmuretek.crmuretek.dto.ConsultaRequestDTO;
+import com.crmuretek.crmuretek.dto.ConsultaResponseDTO;
 import com.crmuretek.crmuretek.services.ConsultaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,30 +12,28 @@ import java.util.List;
 @RequestMapping("/api/leads")
 public class ConsultaController {
 
-    private final ConsultaRepository consultaRepository;
     private final ConsultaService consultaService;
 
 
-    public ConsultaController(ConsultaRepository consultaRepository, ConsultaService consultaService) {
-        this.consultaRepository = consultaRepository;
+    public ConsultaController(ConsultaService consultaService) {
         this.consultaService = consultaService;
     }
 
     @PostMapping
-    public ResponseEntity<Consulta> create(@RequestBody Consulta consulta){
-        return ResponseEntity.ok(consultaService.create(consulta));
+    public ResponseEntity<ConsultaResponseDTO> create(@RequestBody ConsultaRequestDTO consulta) {
+            ConsultaResponseDTO created = consultaService.create(consulta);
+            return ResponseEntity.status(201).body(created);
     }
 
 
     @GetMapping
-    public List<Consulta> getAllLeads(){
-
-        return consultaService.findAllByContactDateDesc();
+    public ResponseEntity<List<ConsultaResponseDTO>> getAllLeads(){
+        return ResponseEntity.ok(consultaService.findAllByOrderByIdDesc());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Consulta> update(@PathVariable Long id, @RequestBody Consulta consulta){
-        return ResponseEntity.ok(consultaService.update(id, consulta));
+    public ResponseEntity<ConsultaResponseDTO> update(@PathVariable Long id, @RequestBody ConsultaRequestDTO request){
+        return ResponseEntity.ok(consultaService.update(id, request));
     }
 
     @DeleteMapping("/{id}")

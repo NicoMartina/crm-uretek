@@ -1,5 +1,6 @@
 package com.crmuretek.crmuretek.repositories;
 
+import com.crmuretek.crmuretek.dto.ConsultaResponseDTO;
 import com.crmuretek.crmuretek.models.Consulta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

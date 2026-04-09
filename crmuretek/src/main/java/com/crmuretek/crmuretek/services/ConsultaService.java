@@ -1,5 +1,7 @@
 package com.crmuretek.crmuretek.services;
 
+import com.crmuretek.crmuretek.dto.ConsultaRequestDTO;
+import com.crmuretek.crmuretek.dto.ConsultaResponseDTO;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ConsultaService {
@@ -32,35 +35,86 @@ public class ConsultaService {
         return consultaRepository.findById(id);
     }
 
-    public List<Consulta> findAllByContactDateDesc(){
-        return consultaRepository.findAllByOrderByIdDesc();
+    public List<ConsultaResponseDTO> findAllByOrderByIdDesc(){
+        return consultaRepository.findAllByOrderByIdDesc()
+                .stream()
+                .map(consulta -> toResponseDTO(consulta, consulta.getCustomer()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Consulta create(Consulta consulta){
-        // 1. Check if the incoming request actually mentioned a customer
-        if (consulta.getCustomer() != null && consulta.getCustomer().getId() != null) {
+    public ConsultaResponseDTO create(ConsultaRequestDTO request) {
+        // Step 1 — Build and save the Customer from the form data
+        Customer customer = new Customer();
+        customer.setName(request.getName());
+        customer.setEmail(request.getEmail());
+        customer.setPhoneNumber(request.getPhoneNumber());
+        customer.setAddress(request.getAddress());
+        customer.setContactChannel(request.getContactChannel());
+        customer.setSource(request.getSource());
+        customer.setContactDate(request.getContactDate());
+        customer.setTitle(request.getTitle());
+        customer.setObservations(request.getObservations());
 
-            // 2. GO to the database and get the Real customer that hibernate knows
+        Customer savedCustomer = customerRepository.save(customer);
 
-            Customer managedCustomer = customerRepository.findById(consulta.getCustomer().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Customer not found with id: " + consulta.getCustomer().getId()));
+        // Step 2 — Build and save the Consulta linked to that Customer
+        Consulta consulta = new Consulta();
+        consulta.setProblemDescription(request.getProblemDescription());
+        consulta.setCustomer(savedCustomer);
 
-            // 3. Swap the fake customer for the real one
-            consulta.setCustomer(managedCustomer);
+        Consulta savedConsulta = consultaRepository.save(consulta);
+
+        // Step 3 — Map to response DTO and return
+        return toResponseDTO(savedConsulta, savedCustomer);
+    }
+
+    // Private mapper — keeps the method clean
+    private ConsultaResponseDTO toResponseDTO(Consulta consulta, Customer customer) {
+        ConsultaResponseDTO dto =  new ConsultaResponseDTO();
+        dto.setConsultaId(consulta.getId());
+        dto.setRequestDate(consulta.getRequestDate());
+        dto.setProblemDescription(consulta.getProblemDescription());
+
+
+        if (customer != null) {
+            dto.setCustomerId(customer.getId());
+            dto.setName(customer.getName());
+            dto.setEmail(customer.getEmail());
+            dto.setPhoneNumber(customer.getPhoneNumber());
+            dto.setAddress(customer.getAddress());
+            dto.setContactChannel(customer.getContactChannel());
+            dto.setSource(customer.getSource());
+            dto.setTitle(customer.getTitle());
+            dto.setObservations(customer.getObservations());
+            dto.setContactDate(customer.getContactDate());
         }
 
-        // 4. Now hibernate knows which customer to return
-        return consultaRepository.save(consulta);
+        return dto;
     }
 
+
     @Transactional
-    public Consulta update(Long id, Consulta details){
+    public ConsultaResponseDTO update(Long id, ConsultaRequestDTO request){
         return consultaRepository.findById(id)
                 .map(existing -> {
-                    existing.setProblemDescription(details.getProblemDescription());
-                    return existing;
+                    // Update consulta fields
+                    existing.setProblemDescription(request.getProblemDescription());
+
+                    // Update customer fields
+                    existing.getCustomer().setName(request.getName());
+                    existing.getCustomer().setEmail(request.getEmail());
+                    existing.getCustomer().setPhoneNumber(request.getPhoneNumber());
+                    existing.getCustomer().setAddress(request.getAddress());
+                    existing.getCustomer().setContactChannel(request.getContactChannel());
+                    existing.getCustomer().setSource(request.getSource());
+                    existing.getCustomer().setTitle(request.getTitle());
+                    existing.getCustomer().setObservations(request.getObservations());
+
+                    Consulta saved = consultaRepository.save(existing);
+                    return toResponseDTO(saved, saved.getCustomer());
                 })
+
                 .orElseThrow(() -> new RuntimeException("Lead not found with id: " + id));
     }
 
