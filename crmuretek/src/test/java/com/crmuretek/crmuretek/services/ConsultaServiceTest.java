@@ -130,22 +130,27 @@ class ConsultaServiceTest {
         when(consultaRepository.save(any(Consulta.class))).thenReturn(savedConsulta);
 
         // ACT
+        ConsultaResponseDTO result = consultaService.create(validRequest);
 
         // ASSERT
+        assertThat(result.getEmail()).isEqualTo("maria@example.com");
 
+        // VERIFY
+        verify(customerRepository).save(any(Customer.class));
+        verify(consultaRepository).save(any(Consulta.class));
 
     }
 
     @Test
     void findAllByOrderByIdDesc_shouldReturnOneItem_whenOneConsultaExists() {
         // ARRANGE
-        when(customerRepository.save(any(Customer.class))).thenReturn(savedCustomer);
-        when(consultaRepository.save(any(Consulta.class))).thenReturn(savedConsulta);
+        when(consultaRepository.findAllByOrderByIdDesc()).thenReturn(List.of(savedConsulta));
 
         // ACT
+        List<ConsultaResponseDTO> result = consultaService.findAllByOrderByIdDesc();
 
         // ASSERT
-
+        assertThat(result).isNotEmpty();
 
     }
 
