@@ -65,7 +65,7 @@ export const LeadsTable = ({
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <a
-                      href={`https://wa.me/54${consulta.phoneNumber.replace(
+                      href={`https://wa.me/54${consulta.phoneNumber?.replace(
                         /\D/g,
                         ""
                       )}`}
