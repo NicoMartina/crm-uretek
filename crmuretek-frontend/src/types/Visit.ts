@@ -1,18 +1,34 @@
 // src/types/Visit.ts
 export interface Visit {
   id: number;
-  customer: {
+  consulta?: {
     id: number;
-    name: string;
-    phoneNumber: string;
-    address?: string;
+    problemDescription?: string;
+    customer: {
+      id: number;
+      consulta?: {
+        id: number;
+        problemDescription?: string;
+        requestDate: string;
+      };
+      name?: string;
+      email?: string;
+      phoneNumber?: string;
+      address?: string;
+      contactChannel?: string;
+      source?: string;
+      contactDate?: string;
+      title?: string | null;
+      observations?: string | null;
+    };
+    requestDate: string;
   };
-  visitDate: string; // ISO date string from Java LocalDate
+  visitDate?: string; // ISO date string from Java LocalDate
   visited: boolean;
-  hasPaidVisitFee: boolean;
-  visitFeeAmount: number;
+  hasPaidVisitFee?: boolean;
+  visitFeeAmount?: number;
   paymentMethod?: string;
   invoiceNumber?: string;
-  status: "SCHEDULED" | "VISITED" | "COMPLETED" | "CANCELLED";
+  status: "SOLICITADA" | "SCHEDULED" | "VISITED" | "COMPLETED" | "CANCELLED";
   observations?: string;
 }

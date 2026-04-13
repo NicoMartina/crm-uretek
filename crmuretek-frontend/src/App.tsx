@@ -25,6 +25,10 @@ import { customerService } from "./services/customerService";
 import { CustomerTable } from "./components/CustomerTable";
 import CustomerForm from "./components/CustomerForm";
 
+import type { Lead } from "./types/Lead";
+import type { Job } from "./types/Job";
+import type { Visit } from "./types/Visit";
+
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
   DEPOSIT_PAID: {
@@ -37,9 +41,9 @@ const JOB_STATUS_MAP = {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [visits, setVisits] = useState<any[]>([]);
-  const [leads, setLeads] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [dashboardData, setDashboardData] = useState<any>(null);
 
   // Modal Controls
@@ -384,8 +388,6 @@ export default function App() {
                 if (jobToEdit) {
                   setSelectedLead({
                     jobId: jobToEdit.id,
-                    existingAmount: jobToEdit.totalAmount,
-                    existingMaterial: jobToEdit.estimateMaterialKg,
                     existingDescription: jobToEdit.observations,
                     ...jobToEdit.consulta,
                   });

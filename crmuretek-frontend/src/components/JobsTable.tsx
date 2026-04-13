@@ -1,10 +1,11 @@
 import { Edit, Trash2 } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import type { Job } from "../types/Job";
 
 interface JobsTableProps {
-  jobs: any[];
+  jobs: Job[];
   statusMap: Record<string, { label: string; color: string }>;
-  onView: (job: any) => void;
+  onView: (job: Job) => void;
   onUpdateStatus: (id: number, status: string) => void;
   onDelete: (id: number) => void;
   onEdit: (id: number) => void;

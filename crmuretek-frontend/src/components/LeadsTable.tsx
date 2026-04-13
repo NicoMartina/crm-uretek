@@ -1,13 +1,14 @@
 import { Calendar, Trash2, Edit } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import type { Lead } from "../types/Lead";
 
 interface LeadsTableProps {
-  leads: any[];
-  onView: (consulta: any) => void;
-  onEdit: (consulta: any) => void;
+  leads: Lead[];
+  onView: (consulta: Lead) => void;
+  onEdit: (consulta: Lead) => void;
   onDelete: (id: number) => void;
-  onScheduleVisit: (consulta: any) => void;
-  onQuote: (consulta: any) => void;
+  onScheduleVisit: (consulta: Lead) => void;
+  onQuote: (consulta: Lead) => void;
 }
 
 export const LeadsTable = ({

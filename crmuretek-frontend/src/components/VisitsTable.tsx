@@ -1,8 +1,9 @@
 import { Trash2, Briefcase } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import type { Visit } from "../types/Visit";
 
 interface VisitsTableProps {
-  visits: any[];
+  visits: Visit[];
   onUpdateStatus: (id: number, status: string) => void;
   onView: (visit: any) => void;
   onConvert: (consulta: any) => void;
