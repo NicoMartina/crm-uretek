@@ -507,23 +507,23 @@ export default function App() {
               </h2>
               <div className="space-y-3 text-sm">
                 <p>
-                  <strong>Nombre:</strong> {viewingLead.customer?.name}
+                  <strong>Nombre:</strong> {viewingLead.name}
                 </p>
                 <p>
-                  <strong>Teléfono:</strong> {viewingLead.customer?.phoneNumber}
+                  <strong>Teléfono:</strong> {viewingLead.phoneNumber}
                 </p>
                 <p>
-                  <strong>Dirección:</strong> {viewingLead.customer?.address}
+                  <strong>Dirección:</strong> {viewingLead.address}
                 </p>
                 <p>
                   <strong>Problema:</strong> {viewingLead.problemDescription}
                 </p>
                 <p>
-                  <strong>Origen:</strong> {viewingLead.customer?.source}
+                  <strong>Origen:</strong> {viewingLead.source}
                 </p>
                 <p>
                   <strong>Fecha Contacto:</strong>{" "}
-                  {viewingLead.customer?.contactDate || "Sin fecha"}
+                  {viewingLead.contactDate || "Sin fecha"}
                 </p>
               </div>
               <button
