@@ -77,15 +77,9 @@ export default function App() {
   // Filter leads based on search input
   const filteredLeads = leads.filter(
     (consulta) =>
-      consulta.customer?.name
-        ?.toLowerCase()
-        .includes(leadSearch.toLowerCase()) ||
-      consulta.customer?.phoneNumber
-        ?.toLowerCase()
-        .includes(leadSearch.toLowerCase()) ||
-      consulta.customer?.email
-        ?.toLowerCase()
-        .includes(leadSearch.toLowerCase()) ||
+      consulta.name?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      consulta.phoneNumber?.toLowerCase().includes(leadSearch.toLowerCase()) ||
+      consulta.email?.toLowerCase().includes(leadSearch.toLowerCase()) ||
       consulta.problemDescription
         ?.toLowerCase()
         .includes(leadSearch.toLowerCase())
