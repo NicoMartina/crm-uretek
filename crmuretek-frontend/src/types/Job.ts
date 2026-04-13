@@ -1,10 +1,21 @@
 export interface Job {
-  customer: any;
-  workDate: string;
   id: number;
-  customerName: string; // Add this line!
-  totalAmount: number;
-  balanceAmount: number;
-  estimateMaterialKg: number;
+  consulta?: {
+    problemDescription?: string;
+    customer: {
+      id: number;
+      name?: string;
+      email?: string;
+      phoneNumber?: string;
+      address?: string;
+      source?: string;
+      contactDate?: string;
+      title?: string | null;
+      observations?: string | null;
+    };
+    requestDate?: string | null;
+  };
+  observations?: string;
   jobStatus: string;
+  workDate?: string;
 }
