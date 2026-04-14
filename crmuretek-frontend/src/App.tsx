@@ -852,8 +852,9 @@ export default function App() {
             onClose={() => setIsSchedulingVisit(false)}
             onConsultaSelect={(c) => setSelectedLead(c)}
             onConfirm={async () => {
+              console.log(selectedLead);
               const visitData = {
-                consulta: { id: selectedLead.id },
+                consulta: { id: selectedLead.consultaId },
                 observations: visitNotes,
                 ...(visitDate ? { visitDate } : {}),
               };
