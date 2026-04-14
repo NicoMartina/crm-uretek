@@ -30,7 +30,7 @@
         @PostMapping
         public ResponseEntity<Job> createJob(@Valid @RequestBody Job job) {
             // 1. Basic validation: Ensure we have a customer linked
-            if (job.getConsulta() == null || job.getConsulta().getId() <= 0){
+            if (job.getConsulta() == null || job.getConsulta().getId() == null || job.getConsulta().getId() <= 0){
                 return ResponseEntity.badRequest().build();
             }
             // 2. Fetch the REAL customer from the DB
