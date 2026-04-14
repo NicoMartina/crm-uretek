@@ -30,7 +30,9 @@ public class VisitController {
     @PostMapping
     public ResponseEntity<Visit> createVisit(@RequestBody Visit visit){
 
-        System.out.println("Visit date received: " + visit.getVisitDate());
+        System.out.println("Visit consulta object: " + visit.getConsulta());
+        System.out.println("Visit consulta id: " +
+                (visit.getConsulta() != null ? visit.getConsulta().getId() : null));
         if (visit.getConsulta() != null && visit.getConsulta().getId() != null){
             Consulta realConsulta = consultaRepository
                     .findById(visit.getConsulta().getId())
