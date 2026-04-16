@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import { formatDisplayDate } from "../utils/date";
 
 interface CustomerTableProps {
   customers: any[];
@@ -43,9 +44,7 @@ export const CustomerTable = ({
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
-                  {customer.contactDate
-                    ? customer.contactDate.split("-").reverse().join("/")
-                    : "Sin fecha"}
+                  {formatDisplayDate(customer.contactDate)}
                 </td>
                 <td className="p-4">
                   <button

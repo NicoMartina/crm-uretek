@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import { formatDisplayDate } from "../utils/date";
 import type { Job } from "../types/Job";
 
 interface JobsTableProps {
@@ -48,9 +49,7 @@ export const JobsTable = ({
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-bold text-slate-400">
-                  {job.workDate
-                    ? job.workDate.split("-").reverse().join("/")
-                    : "Sin fecha"}
+                  {formatDisplayDate(job.workDate)}
                 </td>
                 <td className="p-4">
                   <button onClick={() => onView(job)} className="text-left">

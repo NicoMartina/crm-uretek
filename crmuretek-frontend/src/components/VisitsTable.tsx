@@ -1,5 +1,6 @@
 import { Trash2, Briefcase } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import { formatDisplayDate } from "../utils/date";
 import type { Visit } from "../types/Visit";
 
 interface VisitsTableProps {
@@ -45,9 +46,7 @@ export const VisitsTable = ({
               >
                 <td className="p-4">
                   <div className="font-bold text-slate-800">
-                    {visit.visitDate
-                      ? visit.visitDate.split("-").reverse().join("/")
-                      : "Sin fecha"}
+                    {formatDisplayDate(visit.visitDate)}
                   </div>
                 </td>
                 <td className="p-4">

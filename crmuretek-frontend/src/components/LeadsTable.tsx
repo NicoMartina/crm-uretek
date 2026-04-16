@@ -1,5 +1,6 @@
 import { Calendar, Trash2, Edit } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
+import { formatDisplayDate } from "../utils/date";
 import type { Lead } from "../types/Lead";
 
 interface LeadsTableProps {
@@ -46,9 +47,7 @@ export const LeadsTable = ({
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
-                  {consulta.contactDate
-                    ? consulta.contactDate.split("-").reverse().join("/")
-                    : "Sin fecha"}
+                  {formatDisplayDate(consulta.contactDate)}
                 </td>
                 <td className="p-4 font-black text-slate-800">
                   <button

@@ -24,6 +24,7 @@ import { inventoryService } from "./services/inventoryService";
 import { customerService } from "./services/customerService";
 import { CustomerTable } from "./components/CustomerTable";
 import CustomerForm from "./components/CustomerForm";
+import { formatDisplayDate } from "./utils/date";
 
 import type { Lead } from "./types/Lead";
 import type { Job } from "./types/Job";
@@ -503,10 +504,17 @@ export default function App() {
               </h2>
               <div className="space-y-3 text-sm">
                 <p>
+                  <strong>Titulo:</strong>{" "}
+                  {viewingLead.customer?.title || "Sin título"}
+                </p>
+                <p>
                   <strong>Nombre:</strong> {viewingLead.name}
                 </p>
                 <p>
                   <strong>Teléfono:</strong> {viewingLead.phoneNumber}
+                </p>
+                <p>
+                  <strong>Email:</strong> {viewingLead.email || "Sin email"}
                 </p>
                 <p>
                   <strong>Dirección:</strong> {viewingLead.address}
@@ -515,7 +523,7 @@ export default function App() {
                   <strong>Problema:</strong> {viewingLead.problemDescription}
                 </p>
                 <p>
-                  <strong>Origen:</strong> {viewingLead.source}
+                  <strong>Como nos conoció:</strong> {viewingLead.source}
                 </p>
                 <p>
                   <strong>Fecha Contacto:</strong>{" "}
@@ -566,8 +574,7 @@ export default function App() {
                 </p>
                 <p>
                   <strong>Fecha:</strong>{" "}
-                  {viewingVisit.visitDate?.split("-").reverse().join("/") ||
-                    "Sin fecha"}
+                  {formatDisplayDate(viewingVisit.visitDate)}
                 </p>
                 <p>
                   <strong>Estado:</strong>{" "}
@@ -661,8 +668,7 @@ export default function App() {
                 </p>
                 <p>
                   <strong>Fecha de Obra:</strong>{" "}
-                  {viewingJob.workDate?.split("-").reverse().join("/") ||
-                    "Sin fecha"}
+                  {formatDisplayDate(viewingJob.workDate)}
                 </p>
                 <p>
                   <strong>Material Estimado:</strong>{" "}
