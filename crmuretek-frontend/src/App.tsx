@@ -523,7 +523,15 @@ export default function App() {
                   <strong>Problema:</strong> {viewingLead.problemDescription}
                 </p>
                 <p>
+                  <strong>Observaciones:</strong>{" "}
+                  {viewingLead.observations || "Sin observaciones"}
+                </p>
+                <p>
                   <strong>Como nos conoció:</strong> {viewingLead.source}
+                </p>
+                <p>
+                  <strong>Por que medio se contactó:</strong>{" "}
+                  {viewingLead.contactChannel}
                 </p>
                 <p>
                   <strong>Fecha Contacto:</strong>{" "}
