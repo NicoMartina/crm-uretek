@@ -352,7 +352,7 @@ export default function LeadForm({
       {/* Input Group 2 */}
       <div className="md:col-span-2">
         <label className="text-[10px] font-bold uppercase text-slate-400">
-          Problema del Cliente
+          El Problema
         </label>
         <textarea
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
@@ -365,7 +365,7 @@ export default function LeadForm({
       </div>
       <div className="md:col-span-2">
         <label className="text-[10px] font-bold uppercase text-slate-400">
-          Observaciones del Cliente
+          Observaciones
         </label>
         <textarea
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
