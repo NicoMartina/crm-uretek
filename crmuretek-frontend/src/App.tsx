@@ -527,7 +527,7 @@ export default function App() {
                 </p>
                 <p>
                   <strong>Fecha Contacto:</strong>{" "}
-                  {viewingLead.contactDate || "Sin fecha"}
+                  {formatDisplayDate(viewingLead.contactDate)}
                 </p>
               </div>
               <button
