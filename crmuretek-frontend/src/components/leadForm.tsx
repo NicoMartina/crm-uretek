@@ -346,33 +346,33 @@ export default function LeadForm({
               }
             />
           </div>
-          <div className="md:col-span-2">
+          <div>
             <label className="text-[10px] font-bold uppercase text-slate-400">
-              Observaciones del Cliente
+              Problema del Cliente
             </label>
             <textarea
               className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-              value={formData.observations}
+              value={formData.problemDescription}
               onChange={(e) =>
-                setFormData({ ...formData, observations: e.target.value })
+                setFormData({ ...formData, problemDescription: e.target.value })
               }
-              rows={3}
             />
           </div>
         </>
       )}
 
       {/* Input Group 2 */}
-      <div>
+      <div className="md:col-span-2">
         <label className="text-[10px] font-bold uppercase text-slate-400">
-          Problema del Cliente
+          Observaciones del Cliente
         </label>
         <textarea
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-          value={formData.problemDescription}
+          value={formData.observations}
           onChange={(e) =>
-            setFormData({ ...formData, problemDescription: e.target.value })
+            setFormData({ ...formData, observations: e.target.value })
           }
+          rows={3}
         />
       </div>
 
