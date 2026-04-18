@@ -1,5 +1,6 @@
 export interface Lead {
-  id: number;
+  consultaId: number;
+  customerId?: number;
   name?: string;
   email?: string;
   phoneNumber?: string;

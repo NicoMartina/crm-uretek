@@ -11,7 +11,6 @@ interface LeadsTableProps {
   onScheduleVisit: (consulta: Lead) => void;
   onQuote: (consulta: Lead) => void;
 }
-
 export const LeadsTable = ({
   leads,
   onView,
@@ -20,6 +19,12 @@ export const LeadsTable = ({
   onScheduleVisit,
   onQuote,
 }: LeadsTableProps) => {
+  console.log("FIRST LEAD", leads[0]);
+  console.log("FIRST LEAD ID", leads[0]?.customerId);
+  console.log(
+    "ALL IDS",
+    leads.map((l) => l.customerId)
+  );
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
@@ -43,7 +48,7 @@ export const LeadsTable = ({
           <tbody className="divide-y divide-slate-100">
             {leads.map((consulta) => (
               <tr
-                key={consulta.id}
+                key={consulta.consultaId}
                 className="hover:bg-slate-50/50 transition-colors group"
               >
                 <td className="p-4 text-xs font-medium text-slate-400">
@@ -93,7 +98,7 @@ export const LeadsTable = ({
                       <Edit size={18} />
                     </button>
                     <button
-                      onClick={() => onDelete(consulta.id)}
+                      onClick={() => onDelete(consulta.consultaId)}
                       className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
                       <Trash2 size={18} />
