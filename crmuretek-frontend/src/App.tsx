@@ -30,6 +30,7 @@ import type { Lead } from "./types/Lead";
 import type { Job } from "./types/Job";
 import type { Visit } from "./types/Visit";
 import type { StatsData } from "./types/StatsData";
+import type { LeadFormData } from "./types/LeadFormData";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -142,7 +143,7 @@ export default function App() {
       ]);
 
       if (res[0].status === "fulfilled") {
-        const sorted = (res[0].value || []).sort((a: any, b: any) => {
+        const sorted = (res[0].value || []).sort((a: Job, b: Job) => {
           const order: Record<string, number> = {
             QUOTED: 0,
             DEPOSIT_PAID: 1,
@@ -154,7 +155,7 @@ export default function App() {
         setJobs(sorted);
       }
       if (res[1].status === "fulfilled") {
-        const sorted = (res[1].value || []).sort((a: any, b: any) => {
+        const sorted = (res[1].value || []).sort((a: Visit, b: Visit) => {
           const order: Record<string, number> = {
             SOLICITADA: 0,
             SCHEDULED: 1,
@@ -462,18 +463,18 @@ export default function App() {
                   setIsAddingLead(false);
                   setSelectedLead(null);
                 }}
-                onSubmit={async (formData: any) => {
+                onSubmit={async (formData: LeadFormData) => {
                   try {
                     if (selectedLead?.id) {
                       // Update consulta
                       await leadsService.update(selectedLead.id, {
                         problemDescription: formData.problemDescription,
-                        customer: { id: formData.customer.id },
+                        customer: { id: selectedLead.customerId },
                       });
                       // Also update customer
                       await customerService.update(
-                        formData.customer.id,
-                        formData.customer
+                        selectedLead.customerId,
+                        formData
                       );
                     } else {
                       await leadsService.create(formData);

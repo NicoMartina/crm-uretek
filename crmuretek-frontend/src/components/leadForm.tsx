@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import type { LeadFormData } from "../types/LeadFormData";
 
 interface LeadFormProps {
   initialData?: any;
   customers: any[];
   onCancel: () => void;
-  onSubmit: (formData: any) => Promise<void>;
+  onSubmit: (formData: LeadFormData) => Promise<void>;
   onRefresh: () => Promise<void> | void;
 }
 
