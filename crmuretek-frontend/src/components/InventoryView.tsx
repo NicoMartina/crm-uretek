@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { inventoryService, type Inventory } from "../services/inventoryService";
+import { inventoryService } from "../services/inventoryService";
+import type { Inventory } from "../types/Inventory";
 
 export const InventoryView = () => {
   const [data, setData] = useState<Inventory | null>(null);
@@ -13,8 +14,8 @@ export const InventoryView = () => {
   return (
     <div className="inventory-card">
       <h2>Stock de Materiales</h2>
-      <p>ISO: {data.isoStock} kg</p>
-      <p>Resina: {data.resinaStock} kg</p>
+      <p>ISO: {data.iso_stock} kg</p>
+      <p>Resina: {data.resina_stock} kg</p>
     </div>
   );
 };

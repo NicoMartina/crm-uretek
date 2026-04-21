@@ -29,6 +29,7 @@ import { formatDisplayDate } from "./utils/date";
 import type { Lead } from "./types/Lead";
 import type { Job } from "./types/Job";
 import type { Visit } from "./types/Visit";
+import type { StatsData } from "./types/StatsData";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -59,7 +60,7 @@ export default function App() {
   const [leadSearch, setLeadSearch] = useState("");
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
-  const [statsData, setStatsData] = useState<any>(null);
+  const [statsData, setStatsData] = useState<StatsData | null>(null);
   const [viewingJob, setViewingJob] = useState<any>(null);
   const [viewingVisit, setViewingVisit] = useState<any>(null);
   const [visitObservations, setVisitObservations] = useState("");
@@ -226,8 +227,8 @@ export default function App() {
           (dashboardData ? (
             <DashboardView
               inventory={{
-                isoStock: dashboardData.isoStock || 0,
-                resinaStock: dashboardData.resinaStock || 0,
+                iso_stock: dashboardData.isoStock || 0,
+                resina_stock: dashboardData.resinaStock || 0,
               }}
               totalPossibleMix={dashboardData.possibleMix || 0}
               onAddStock={(type) => {

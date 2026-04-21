@@ -11,13 +11,15 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
+import type { Inventory } from "../types/Inventory";
+import type { StatsData } from "../types/StatsData";
 
 interface DashboardViewProps {
-  inventory: any;
+  inventory: Inventory | null;
   totalPossibleMix: number;
   onAddStock: (type: "iso" | "resina") => void;
   materialTotal: number;
-  statsData?: any;
+  statsData: StatsData | null;
 }
 
 export const DashboardView = ({
@@ -108,7 +110,7 @@ export const DashboardView = ({
               Stock ISO (63%)
             </p>
             <p className="text-xl font-black text-blue-400">
-              {inventory?.isoStock?.toLocaleString() || 0} kg
+              {inventory?.iso_stock?.toLocaleString() || 0} kg
             </p>
           </div>
           <div>
@@ -116,7 +118,7 @@ export const DashboardView = ({
               Stock Resina (37%)
             </p>
             <p className="text-xl font-black text-emerald-400">
-              {inventory?.resinaStock?.toLocaleString() || 0} kg
+              {inventory?.resina_stock?.toLocaleString() || 0} kg
             </p>
           </div>
         </div>

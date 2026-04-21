@@ -1,9 +1,6 @@
 import api from "./api"; // Import our central Axios config
+import type { Inventory } from "../types/Inventory"; // Import the Inventory type
 
-export interface Inventory {
-  isoStock: number;
-  resinaStock: number;
-}
 export const inventoryService = {
   // GET current stock
   getInventory: async (): Promise<Inventory> => {
