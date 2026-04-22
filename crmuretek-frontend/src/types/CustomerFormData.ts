@@ -1,11 +1,11 @@
 export interface CustomerFormData {
   name?: string;
   phoneNumber?: string;
-  email?: string | null;
-  address?: string | null;
-  title?: string | null;
-  source?: string | null;
-  contactChannel?: string | null;
+  email?: string;
+  address?: string;
+  title?: string;
+  source?: string;
+  contactChannel?: string;
   contactDate?: string;
-  observations?: string | null;
+  observations?: string;
 }

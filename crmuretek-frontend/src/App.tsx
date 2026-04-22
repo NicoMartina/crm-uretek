@@ -480,10 +480,16 @@ export default function App() {
                         customer: { id: selectedLead.customerId },
                       });
                       // Also update customer
-                      await customerService.update(
-                        selectedLead?.consultaId,
-                        formData
-                      );
+                      await customerService.update(selectedLead?.consultaId, {
+                        ...formData,
+                        email: formData.email ?? "",
+                        address: formData.address ?? "",
+                        title: formData.title ?? "",
+                        source: formData.source ?? "",
+                        contactChannel: formData.contactChannel ?? "",
+                        contactDate: formData.contactDate ?? "",
+                        observations: formData.observations ?? "",
+                      });
                     } else {
                       await leadsService.create(formData);
                     }

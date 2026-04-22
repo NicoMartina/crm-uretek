@@ -20,9 +20,9 @@ export default function CustomerForm({
     phoneNumber: initialData?.phoneNumber || "",
     email: initialData?.email || "",
     address: initialData?.address || "",
-    title: initialData?.title || null,
-    source: initialData?.source || "WHATSAPP",
-    contactChannel: initialData?.contactChannel || null,
+    title: initialData?.title || "",
+    source: initialData?.source || "",
+    contactChannel: initialData?.contactChannel || "",
     contactDate:
       initialData?.contactDate || new Date().toISOString().split("T")[0],
     observations: initialData?.observations || "",
@@ -35,9 +35,9 @@ export default function CustomerForm({
         phoneNumber: initialData.phoneNumber || "",
         email: initialData.email || "",
         address: initialData.address || "",
-        title: initialData.title || null,
-        source: initialData.source || null,
-        contactChannel: initialData.contactChannel || null,
+        title: initialData.title || "",
+        source: initialData.source || "",
+        contactChannel: initialData.contactChannel || "",
         contactDate:
           initialData.contactDate || new Date().toISOString().split("T")[0],
         observations: initialData.observations || "",
@@ -50,9 +50,9 @@ export default function CustomerForm({
     try {
       const dataToSend = {
         ...formData,
-        title: formData.title || null,
-        source: formData.source || null,
-        contactChannel: formData.contactChannel || null,
+        title: formData.title || "",
+        source: formData.source || "",
+        contactChannel: formData.contactChannel || "",
       };
       await onSubmit(dataToSend);
       onRefresh();
@@ -101,7 +101,7 @@ export default function CustomerForm({
         </label>
         <input
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-          value={formData.email}
+          value={formData.email || ""}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
       </div>
