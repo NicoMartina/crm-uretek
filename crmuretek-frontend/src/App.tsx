@@ -33,6 +33,7 @@ import type { StatsData } from "./types/StatsData";
 import type { LeadFormData } from "./types/LeadFormData";
 import type { Customer } from "./types/Customer";
 import type { SelectedLead } from "./types/SelectedLead";
+import type { DashboardSummary } from "./types/DashboardSummary";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -49,14 +50,16 @@ export default function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(
+    null
+  );
 
   // Modal Controls
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [isAddingQuote, setIsAddingQuote] = useState(false);
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [selectedLead, setSelectedLead] = useState<SelectedLead | null>(null);
-  const [viewingLead, setViewingLead] = useState<any>(null);
+  const [viewingLead, setViewingLead] = useState<Lead | null>(null);
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [stockType, setStockType] = useState<"iso" | "resina">("iso");
   const [stockAmount, setStockAmount] = useState("");
@@ -64,14 +67,16 @@ export default function App() {
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
   const [statsData, setStatsData] = useState<StatsData | null>(null);
-  const [viewingJob, setViewingJob] = useState<any>(null);
-  const [viewingVisit, setViewingVisit] = useState<any>(null);
+  const [viewingJob, setViewingJob] = useState<Job | null>(null);
+  const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
   const [visitObservations, setVisitObservations] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
 
   // Filter customers based on search input
   const filteredCustomers = customers.filter(
@@ -509,8 +514,7 @@ export default function App() {
               </h2>
               <div className="space-y-3 text-sm">
                 <p>
-                  <strong>Titulo:</strong>{" "}
-                  {viewingLead.customer?.title || "Sin título"}
+                  <strong>Titulo:</strong> {viewingLead.title || "Sin título"}
                 </p>
                 <p>
                   <strong>Nombre:</strong> {viewingLead.name}
