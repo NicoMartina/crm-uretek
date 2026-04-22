@@ -11,5 +11,5 @@ export interface Lead {
   source?: string;
   observations?: string;
   problemDescription?: string;
-  requestDate?: string;
+  requestDate?: string | null;
 }
