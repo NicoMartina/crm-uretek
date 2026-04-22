@@ -33,9 +33,6 @@ import type { StatsData } from "./types/StatsData";
 import type { LeadFormData } from "./types/LeadFormData";
 import type { Customer } from "./types/Customer";
 import type { SelectedLead } from "./types/SelectedLead";
-import type { DashboardSummary } from "./types/DashboardSummary";
-import type { CustomerFormData } from "./types/CustomerFormData";
-import type { JobFormData } from "./types/JobFormData";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -52,16 +49,14 @@ export default function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(
-    null
-  );
+  const [dashboardData, setDashboardData] = useState<any>(null);
 
   // Modal Controls
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [isAddingQuote, setIsAddingQuote] = useState(false);
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [selectedLead, setSelectedLead] = useState<SelectedLead | null>(null);
-  const [viewingLead, setViewingLead] = useState<Lead | null>(null);
+  const [viewingLead, setViewingLead] = useState<any>(null);
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [stockType, setStockType] = useState<"iso" | "resina">("iso");
   const [stockAmount, setStockAmount] = useState("");
@@ -69,16 +64,14 @@ export default function App() {
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
   const [statsData, setStatsData] = useState<StatsData | null>(null);
-  const [viewingJob, setViewingJob] = useState<Job | null>(null);
-  const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
+  const [viewingJob, setViewingJob] = useState<any>(null);
+  const [viewingVisit, setViewingVisit] = useState<any>(null);
   const [visitObservations, setVisitObservations] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
   // Filter customers based on search input
   const filteredCustomers = customers.filter(
@@ -339,20 +332,7 @@ export default function App() {
                 setVisitObservations(v.observations || "");
               }}
               onConvert={(cust) => {
-                setSelectedLead({
-                  consultaId: cust.id,
-                  id: cust.id,
-                  problemDescription: cust.problemDescription,
-                  customerId: cust.customer.id,
-                  customer: {
-                    id: cust.customer.id,
-                    name: cust.customer.name,
-                    phoneNumber: cust.customer.phoneNumber,
-                    title: cust.customer.title,
-                  },
-                  name: cust.customer.name,
-                  phoneNumber: cust.customer.phoneNumber,
-                });
+                setSelectedLead(cust);
                 setIsAddingQuote(true);
               }}
               onUpdateStatus={async (id, s) => {
@@ -410,30 +390,11 @@ export default function App() {
               }}
               onEdit={(id) => {
                 const jobToEdit = jobs.find((j) => j.id === id);
-                if (jobToEdit?.consulta) {
+                if (jobToEdit) {
                   setSelectedLead({
                     jobId: jobToEdit.id,
-                    consultaId: jobToEdit.consulta.id,
-                    id: jobToEdit.consulta.id,
-                    customerId: jobToEdit.consulta.customer.id,
-                    customer: {
-                      id: jobToEdit.consulta.customer.id,
-                      name: jobToEdit.consulta.customer.name,
-                      phoneNumber: jobToEdit.consulta.customer.phoneNumber,
-                      title: jobToEdit.consulta.customer.title,
-                    },
-                    problemDescription: jobToEdit.consulta.problemDescription,
-                    requestDate: jobToEdit.consulta.requestDate || undefined,
-                    name: jobToEdit.consulta.customer.name,
-                    email: jobToEdit.consulta.customer.email,
-                    phoneNumber: jobToEdit.consulta.customer.phoneNumber,
-                    address: jobToEdit.consulta.customer.address,
-                    source: jobToEdit.consulta.customer.source,
-                    contactDate: jobToEdit.consulta.customer.contactDate,
-                    title: jobToEdit.consulta.customer.title || undefined,
-                    observations: jobToEdit.consulta.customer.observations || undefined,
                     existingDescription: jobToEdit.observations,
-                    existingMaterial: jobToEdit.estimateMaterialKg,
+                    ...jobToEdit.consulta,
                   });
                   setIsAddingQuote(true);
                 }
@@ -484,7 +445,7 @@ export default function App() {
                 }
               }}
               onAddConsulta={(c) => {
-                setSelectedLead({ customerId: c.id });
+                setSelectedLead({ customer: { id: c.id }, customerId: c.id });
                 setIsAddingLead(true);
               }}
             />
@@ -506,30 +467,18 @@ export default function App() {
                 }}
                 onSubmit={async (formData: LeadFormData) => {
                   try {
-                    if (selectedLead?.consultaId) {
+                    if (selectedLead?.id) {
                       // Update consulta
+                      if (!selectedLead?.consultaId) return;
                       await leadsService.update(selectedLead.consultaId, {
                         problemDescription: formData.problemDescription,
                         customer: { id: selectedLead.customerId },
                       });
                       // Also update customer
-                      if (selectedLead.customerId) {
-                        const customerFormData: CustomerFormData = {
-                          name: formData.name,
-                          phoneNumber: formData.phoneNumber,
-                          email: formData.email || "",
-                          address: formData.address || "",
-                          title: formData.title || null,
-                          source: formData.source || null,
-                          contactChannel: formData.contactChannel || null,
-                          contactDate: formData.contactDate,
-                          observations: formData.observations || "",
-                        };
-                        await customerService.update(
-                          selectedLead.customerId,
-                          customerFormData
-                        );
-                      }
+                      await customerService.update(
+                        selectedLead?.consultaId,
+                        formData
+                      );
                     } else {
                       await leadsService.create(formData);
                     }
@@ -561,7 +510,7 @@ export default function App() {
               <div className="space-y-3 text-sm">
                 <p>
                   <strong>Titulo:</strong>{" "}
-                  {viewingLead.title || "Sin título"}
+                  {viewingLead.customer?.title || "Sin título"}
                 </p>
                 <p>
                   <strong>Nombre:</strong> {viewingLead.name}
@@ -874,7 +823,7 @@ export default function App() {
                   setIsEditingCustomer(false);
                   setSelectedCustomer(null);
                 }}
-                onSubmit={async (formData: CustomerFormData) => {
+                onSubmit={async (formData) => {
                   if (selectedCustomer?.id) {
                     await customerService.update(selectedCustomer.id, formData);
                   } else {
@@ -897,13 +846,13 @@ export default function App() {
               setIsAddingQuote(false);
               setSelectedLead(null);
             }}
-            onCreate={async (data: JobFormData) => {
+            onCreate={async (data) => {
               if (selectedLead.jobId) {
                 await jobService.update(selectedLead.jobId, data);
               } else {
                 await jobService.create({
                   ...data,
-                  consulta: { id: selectedLead.consultaId ?? selectedLead.id },
+                  consulta: { id: selectedLead.consultaId },
                 });
               }
               setIsAddingQuote(false);
@@ -923,11 +872,10 @@ export default function App() {
             onClose={() => setIsSchedulingVisit(false)}
             onConsultaSelect={(c) => setSelectedLead(c)}
             onConfirm={async () => {
-              if (!selectedLead?.consultaId) {
-                return;
-              }
+              console.log(selectedLead);
+              if (!selectedLead?.consultaId) return;
               const visitData = {
-                consulta: { id: selectedLead.consultaId },
+                consulta: { id: selectedLead?.consultaId },
                 observations: visitNotes,
                 ...(visitDate ? { visitDate } : {}),
               };
