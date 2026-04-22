@@ -31,6 +31,7 @@ import type { Job } from "./types/Job";
 import type { Visit } from "./types/Visit";
 import type { StatsData } from "./types/StatsData";
 import type { LeadFormData } from "./types/LeadFormData";
+import type { Customer } from "./types/Customer";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -65,8 +66,8 @@ export default function App() {
   const [viewingJob, setViewingJob] = useState<any>(null);
   const [viewingVisit, setViewingVisit] = useState<any>(null);
   const [visitObservations, setVisitObservations] = useState("");
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [viewingCustomer, setViewingCustomer] = useState<any>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
@@ -778,11 +779,12 @@ export default function App() {
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
                   Consultas
                 </p>
-                {viewingCustomer.consulta?.length > 0 ? (
+                {viewingCustomer.consulta &&
+                viewingCustomer.consulta.length > 0 ? (
                   <div className="space-y-2">
-                    {viewingCustomer.consulta.map((c: any) => (
+                    {viewingCustomer.consulta.map((c) => (
                       <div
-                        key={c.id}
+                        key={c.consultaId}
                         className="bg-slate-50 rounded-xl p-3 text-sm"
                       >
                         <p>
