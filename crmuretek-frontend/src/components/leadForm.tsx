@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import type { LeadFormData } from "../types/LeadFormData";
+import type { Customer } from "../types/Customer";
+import type { SelectedLead } from "../types/SelectedLead";
 
 interface LeadFormProps {
-  initialData?: any;
-  customers: any[];
+  initialData?: SelectedLead | null;
+  customers: Customer[];
   onCancel: () => void;
   onSubmit: (formData: LeadFormData) => Promise<void>;
   onRefresh: () => Promise<void> | void;
@@ -16,29 +18,29 @@ export default function LeadForm({
   onCancel,
 }: LeadFormProps) {
   const [formData, setFormData] = useState({
-    customerId: initialData?.customer?.id || initialData?.customerId || "",
+    customerId: initialData?.customerId || "",
     problemDescription: initialData?.problemDescription || "", // Default to today's date
     // Customer fields for edit mode
-    name: initialData?.customer?.name || "",
-    phoneNumber: initialData?.customer?.phoneNumber || "",
-    email: initialData?.customer?.email || "",
-    address: initialData?.customer?.address || "",
-    contactChannel: initialData?.customer?.contactChannel || "",
-    source: initialData?.customer?.source || "",
-    title: initialData?.customer?.title || "",
-    contactDate: initialData?.customer?.contactDate || "", // Default to today's date
-    observations: initialData?.customer?.observations || "",
+    name: initialData?.name || "",
+    phoneNumber: initialData?.phoneNumber || "",
+    email: initialData?.email || "",
+    address: initialData?.address || "",
+    contactChannel: initialData?.contactChannel || "",
+    source: initialData?.source || "",
+    title: initialData?.title || "",
+    contactDate: initialData?.contactDate || "", // Default to today's date
+    observations: initialData?.observations || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Submitting formData:", JSON.stringify(formData, null, 2));
     try {
-      if (initialData?.id) {
+      if (initialData?.consultaId) {
         // Edit mode - send both customer and consulta data
         await onSubmit({
           problemDescription: formData.problemDescription,
-          id: initialData.customer.id,
+          id: initialData.customerId,
           name: formData.name,
           phoneNumber: formData.phoneNumber,
           email: formData.email,
@@ -78,7 +80,7 @@ export default function LeadForm({
       className="grid grid-cols-1 md:grid-cols-2 gap-4"
     >
       {/* Input Group 1 */}
-      {initialData?.id ? (
+      {initialData?.consultaId ? (
         // EDIT MODE - show customer fields
         <>
           <div>
@@ -383,7 +385,7 @@ export default function LeadForm({
           type="submit"
           className="w-full bg-orange-500 text-white font-bold py-3 rounded-xl hover:bg-orange-600 transition"
         >
-          {initialData?.id ? "Guardar Cambios" : "Crear Consulta"}
+          {initialData?.consultaId ? "Guardar Cambios" : "Crear Consulta"}
         </button>
         <button
           type="button"

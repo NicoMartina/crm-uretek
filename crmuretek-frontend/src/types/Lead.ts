@@ -7,6 +7,7 @@ export interface Lead {
   address?: string;
   contactDate?: string;
   title?: string;
+  contactChannel?: string;
   source?: string;
   observations?: string;
   problemDescription?: string;

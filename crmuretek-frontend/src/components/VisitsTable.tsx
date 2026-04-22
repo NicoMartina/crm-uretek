@@ -6,8 +6,8 @@ import type { Visit } from "../types/Visit";
 interface VisitsTableProps {
   visits: Visit[];
   onUpdateStatus: (id: number, status: string) => void;
-  onView: (visit: any) => void;
-  onConvert: (consulta: any) => void;
+  onView: (visit: Visit) => void;
+  onConvert: (consulta: NonNullable<Visit["consulta"]>) => void;
   onDelete: (id: number) => void;
 }
 
