@@ -1,13 +1,14 @@
 import { Edit, Trash2 } from "lucide-react";
 import { TITLE_MAP } from "../utils/Maps";
 import { formatDisplayDate } from "../utils/date";
+import type { Customer } from "../types/Customer";
 
 interface CustomerTableProps {
-  customers: any[];
-  onView: (customer: any) => void;
-  onEdit: (customer: any) => void;
+  customers: Customer[];
+  onView: (customer: Customer) => void;
+  onEdit: (customer: Customer) => void;
   onDelete: (id: number) => void;
-  onAddConsulta: (customer: any) => void;
+  onAddConsulta: (customer: Customer) => void;
 }
 
 export const CustomerTable = ({

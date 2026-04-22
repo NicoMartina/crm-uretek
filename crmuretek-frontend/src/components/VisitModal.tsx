@@ -1,13 +1,16 @@
+import type { Lead } from "../types/Lead";
+import type { SelectedLead } from "../types/SelectedLead";
+
 interface VisitModalProps {
-  allLeads?: any[];
-  consulta: any;
+  allLeads?: Lead[];
+  consulta: SelectedLead | null;
   visitDate: string;
   setVisitDate: (date: string) => void;
   visitNotes: string;
   setVisitNotes: (notes: string) => void;
   onClose: () => void;
   onConfirm: () => void;
-  onConsultaSelect?: (consulta: any) => void;
+  onConsultaSelect?: (consulta: Lead | null) => void;
 }
 
 export const VisitModal = ({
@@ -28,7 +31,7 @@ export const VisitModal = ({
 
         {consulta ? (
           <p className="text-slate-500 mb-6">
-            Cliente: {consulta.customer?.name}
+            Cliente: {consulta.customer?.name ?? consulta.name}
           </p>
         ) : (
           <div className="mb-6">
@@ -39,15 +42,15 @@ export const VisitModal = ({
               className="w-full p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-orange-500"
               onChange={(e) => {
                 const found = allLeads?.find(
-                  (l) => l.id === Number(e.target.value)
+                  (l) => l.consultaId === Number(e.target.value)
                 );
                 onConsultaSelect?.(found || null);
               }}
             >
               <option value="">Seleccione un cliente</option>
               {(allLeads || []).map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.customer?.name} - {l.customer?.phoneNumber}
+                <option key={l.consultaId} value={l.consultaId}>
+                  {l.name} - {l.phoneNumber}
                 </option>
               ))}
             </select>

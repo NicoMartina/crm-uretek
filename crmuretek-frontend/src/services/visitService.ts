@@ -1,21 +1,23 @@
 import api from "./api";
+import type { Visit } from "../types/Visit";
+import type { VisitCreateData } from "../types/VisitCreateData";
 
 export const visitService = {
   // This handles: GET /api/visits
   getAll: async () => {
-    const response = await api.get("/visits");
+    const response = await api.get<Visit[]>("/visits");
     return response.data;
   },
 
   // This handles: POST /api/visits
-  create: async (visitData: any) => {
-    const response = await api.post("/visits", visitData);
+  create: async (visitData: VisitCreateData) => {
+    const response = await api.post<Visit>("/visits", visitData);
     return response.data;
   },
 
   // This handles: PUT /api/visits/{id}/date
 
-  updateDate: async (id: number, visitDate: any) => {
+  updateDate: async (id: number, visitDate: string) => {
     const response = await api.patch(`/visits/${id}/date`, { visitDate });
     return response.data;
   },

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
+import type { Customer } from "../types/Customer";
+import type { CustomerFormData } from "../types/CustomerFormData";
 
-interface customerFormProps {
-  initialData?: any;
+interface CustomerFormProps {
+  initialData?: Customer | null;
   onCancel: () => void;
-  onSubmit: (formData: any) => Promise<void>; // Add this line
-  // If you have onRefresh, you can keep it or remove it if we use onSubmit
+  onSubmit: (formData: CustomerFormData) => Promise<void>;
   onRefresh: () => Promise<void> | void;
 }
 
@@ -13,31 +14,40 @@ export default function CustomerForm({
   onRefresh,
   onSubmit,
   onCancel,
-}: customerFormProps) {
-  const [formData, setFormData] = useState({
+}: CustomerFormProps) {
+  const [formData, setFormData] = useState<CustomerFormData>({
     name: initialData?.name || "",
     phoneNumber: initialData?.phoneNumber || "",
     email: initialData?.email || "",
     address: initialData?.address || "",
-    title: initialData?.title || "",
+    title: initialData?.title || null,
     source: initialData?.source || "WHATSAPP",
-    contactChannel: initialData?.contactChannel || "",
+    contactChannel: initialData?.contactChannel || null,
     contactDate:
       initialData?.contactDate || new Date().toISOString().split("T")[0],
-    observations: initialData?.observations || "", // Default to today's date
+    observations: initialData?.observations || "",
   });
 
-  // When the component opens, if we have initialData, fill the form
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      setFormData({
+        name: initialData.name || "",
+        phoneNumber: initialData.phoneNumber || "",
+        email: initialData.email || "",
+        address: initialData.address || "",
+        title: initialData.title || null,
+        source: initialData.source || null,
+        contactChannel: initialData.contactChannel || null,
+        contactDate:
+          initialData.contactDate || new Date().toISOString().split("T")[0],
+        observations: initialData.observations || "",
+      });
     }
   }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // We call the function passed down from App.tsx
       const dataToSend = {
         ...formData,
         title: formData.title || null,
@@ -45,8 +55,6 @@ export default function CustomerForm({
         contactChannel: formData.contactChannel || null,
       };
       await onSubmit(dataToSend);
-
-      // We tell App to refresh the list
       onRefresh();
 
       alert("✅ Procesado con éxito");
@@ -117,7 +125,7 @@ export default function CustomerForm({
         </label>
         <select
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-          value={formData.title}
+          value={formData.title || ""}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
         >
           <option value="">Seleccione una opción</option>
@@ -134,7 +142,7 @@ export default function CustomerForm({
         </label>
         <select
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
-          value={formData.source}
+          value={formData.source || ""}
           onChange={(e) => setFormData({ ...formData, source: e.target.value })}
         >
           <option value="">Seleccione una opción</option>
@@ -158,7 +166,7 @@ export default function CustomerForm({
         </label>
         <select
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
-          value={formData.contactChannel}
+          value={formData.contactChannel || ""}
           onChange={(e) =>
             setFormData({ ...formData, contactChannel: e.target.value })
           }

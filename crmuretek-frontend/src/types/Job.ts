@@ -1,6 +1,8 @@
 export interface Job {
   id: number;
+  estimateMaterialKg?: number;
   consulta?: {
+    id: number;
     problemDescription?: string;
     customer: {
       id: number;

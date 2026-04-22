@@ -17,7 +17,7 @@ import { DashboardView } from "./components/DashboardView";
 import { LeadsTable } from "./components/LeadsTable";
 import { VisitsTable } from "./components/VisitsTable";
 import { JobsTable } from "./components/JobsTable";
-import LeadForm from "./components/leadForm";
+import LeadForm from "./components/LeadForm";
 import { QuoteForm } from "./components/QuoteForm";
 import { VisitModal } from "./components/VisitModal";
 import { inventoryService } from "./services/inventoryService";
@@ -29,6 +29,11 @@ import { formatDisplayDate } from "./utils/date";
 import type { Lead } from "./types/Lead";
 import type { Job } from "./types/Job";
 import type { Visit } from "./types/Visit";
+import type { StatsData } from "./types/StatsData";
+import type { LeadFormData } from "./types/LeadFormData";
+import type { Customer } from "./types/Customer";
+import type { SelectedLead } from "./types/SelectedLead";
+import type { DashboardSummary } from "./types/DashboardSummary";
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -45,29 +50,33 @@ export default function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [visits, setVisits] = useState<Visit[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(
+    null
+  );
 
   // Modal Controls
   const [isAddingLead, setIsAddingLead] = useState(false);
   const [isAddingQuote, setIsAddingQuote] = useState(false);
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
-  const [selectedLead, setSelectedLead] = useState<any>(null);
-  const [viewingLead, setViewingLead] = useState<any>(null);
+  const [selectedLead, setSelectedLead] = useState<SelectedLead | null>(null);
+  const [viewingLead, setViewingLead] = useState<Lead | null>(null);
   const [isAddingStock, setIsAddingStock] = useState(false);
   const [stockType, setStockType] = useState<"iso" | "resina">("iso");
   const [stockAmount, setStockAmount] = useState("");
   const [leadSearch, setLeadSearch] = useState("");
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
-  const [statsData, setStatsData] = useState<any>(null);
-  const [viewingJob, setViewingJob] = useState<any>(null);
-  const [viewingVisit, setViewingVisit] = useState<any>(null);
+  const [statsData, setStatsData] = useState<StatsData | null>(null);
+  const [viewingJob, setViewingJob] = useState<Job | null>(null);
+  const [viewingVisit, setViewingVisit] = useState<Visit | null>(null);
   const [visitObservations, setVisitObservations] = useState("");
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [viewingCustomer, setViewingCustomer] = useState<any>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [viewingCustomer, setViewingCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
   const [isEditingCustomer, setIsEditingCustomer] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
 
   // Filter customers based on search input
   const filteredCustomers = customers.filter(
@@ -141,7 +150,7 @@ export default function App() {
       ]);
 
       if (res[0].status === "fulfilled") {
-        const sorted = (res[0].value || []).sort((a: any, b: any) => {
+        const sorted = (res[0].value || []).sort((a: Job, b: Job) => {
           const order: Record<string, number> = {
             QUOTED: 0,
             DEPOSIT_PAID: 1,
@@ -153,7 +162,7 @@ export default function App() {
         setJobs(sorted);
       }
       if (res[1].status === "fulfilled") {
-        const sorted = (res[1].value || []).sort((a: any, b: any) => {
+        const sorted = (res[1].value || []).sort((a: Visit, b: Visit) => {
           const order: Record<string, number> = {
             SOLICITADA: 0,
             SCHEDULED: 1,
@@ -226,8 +235,8 @@ export default function App() {
           (dashboardData ? (
             <DashboardView
               inventory={{
-                isoStock: dashboardData.isoStock || 0,
-                resinaStock: dashboardData.resinaStock || 0,
+                iso_stock: dashboardData.isoStock || 0,
+                resina_stock: dashboardData.resinaStock || 0,
               }}
               totalPossibleMix={dashboardData.possibleMix || 0}
               onAddStock={(type) => {
@@ -461,18 +470,19 @@ export default function App() {
                   setIsAddingLead(false);
                   setSelectedLead(null);
                 }}
-                onSubmit={async (formData: any) => {
+                onSubmit={async (formData: LeadFormData) => {
                   try {
                     if (selectedLead?.id) {
                       // Update consulta
-                      await leadsService.update(selectedLead.id, {
+                      if (!selectedLead?.consultaId) return;
+                      await leadsService.update(selectedLead.consultaId, {
                         problemDescription: formData.problemDescription,
-                        customer: { id: formData.customer.id },
+                        customer: { id: selectedLead.customerId },
                       });
                       // Also update customer
                       await customerService.update(
-                        formData.customer.id,
-                        formData.customer
+                        selectedLead?.consultaId,
+                        formData
                       );
                     } else {
                       await leadsService.create(formData);
@@ -504,8 +514,7 @@ export default function App() {
               </h2>
               <div className="space-y-3 text-sm">
                 <p>
-                  <strong>Titulo:</strong>{" "}
-                  {viewingLead.customer?.title || "Sin título"}
+                  <strong>Titulo:</strong> {viewingLead.title || "Sin título"}
                 </p>
                 <p>
                   <strong>Nombre:</strong> {viewingLead.name}
@@ -776,11 +785,12 @@ export default function App() {
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
                   Consultas
                 </p>
-                {viewingCustomer.consulta?.length > 0 ? (
+                {viewingCustomer.consulta &&
+                viewingCustomer.consulta.length > 0 ? (
                   <div className="space-y-2">
-                    {viewingCustomer.consulta.map((c: any) => (
+                    {viewingCustomer.consulta.map((c) => (
                       <div
-                        key={c.id}
+                        key={c.consultaId}
                         className="bg-slate-50 rounded-xl p-3 text-sm"
                       >
                         <p>
@@ -846,7 +856,7 @@ export default function App() {
               } else {
                 await jobService.create({
                   ...data,
-                  consulta: { id: selectedLead.id },
+                  consulta: { id: selectedLead.consultaId },
                 });
               }
               setIsAddingQuote(false);
@@ -867,8 +877,9 @@ export default function App() {
             onConsultaSelect={(c) => setSelectedLead(c)}
             onConfirm={async () => {
               console.log(selectedLead);
+              if (!selectedLead?.consultaId) return;
               const visitData = {
-                consulta: { id: selectedLead.consultaId },
+                consulta: { id: selectedLead?.consultaId },
                 observations: visitNotes,
                 ...(visitDate ? { visitDate } : {}),
               };
