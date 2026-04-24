@@ -1,24 +1,34 @@
 package com.crmuretek.crmuretek.services;
 
+import com.crmuretek.crmuretek.dto.VisitRequestDTO;
+import com.crmuretek.crmuretek.dto.VisitResponseDTO;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
+import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.models.VisitStatus;
 import com.crmuretek.crmuretek.repositories.ConsultaRepository;
+import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VisitService {
     private VisitRepository visitRepository;
     private ConsultaRepository consultaRepository;
+    private JobRepository jobRepository;
 
-    public VisitService(VisitRepository visitRepository, ConsultaRepository consultaRepository) {
+
+    public VisitService(VisitRepository visitRepository, ConsultaRepository consultaRepository, JobRepository jobRepository) {
         this.visitRepository = visitRepository;
         this.consultaRepository = consultaRepository;
+        this.jobRepository = jobRepository;
     }
 
     public List<Visit> findAllByVisitDesc(){
@@ -26,16 +36,36 @@ public class VisitService {
     }
 
     @Transactional
-    public  Visit scheduleVisitFromLead(Long leadId, Visit visitDetails){
+    public  VisitResponseDTO scheduleVisitFromLead(VisitRequestDTO request){
         //Find the lead first
-        Consulta consulta = consultaRepository.findById(leadId)
+        Consulta consulta = consultaRepository.findById(request.getConsultaId())
                 .orElseThrow(()-> new ResourceNotFoundException("Lead Not Found."));
 
         // Automatically pull the customer from the Lead!
-        visitDetails.setConsulta(consulta);
-        visitDetails.setStatus(VisitStatus.SCHEDULED);
+        Visit visit = new Visit();
+        visit.setConsulta(consulta);
+        visit.setStatus(VisitStatus.SCHEDULED);
+        visit.setVisitDate(request.getVisitDate());
+        visit.setObservations(request.getObservations());
 
-        return visitRepository.save(visitDetails);
+        Visit savedVisit = visitRepository.save(visit);
+        return toResponseDTO(savedVisit);
+    }
+
+    private VisitResponseDTO toResponseDTO(Visit visit){
+        VisitResponseDTO response = new VisitResponseDTO();
+        response.setConsultaId(visit.getConsulta().getId());
+        response.setCustomerId(visit.getConsulta().getCustomer().getId());
+        response.setVisitId(visit.getId());
+        response.setVisitDate(visit.getVisitDate());
+        response.setHasPaidVisitFee(visit.isHasPaidVisitFee());
+        response.setVisitFeeAmount(visit.getVisitFeeAmount());
+        response.setPaymentMethod(visit.getPaymentMethod());
+        response.setInvoiceNumber(visit.getInvoiceNumber());
+        response.setStatus(visit.getStatus());
+        response.setObservations(visit.getObservations());
+
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -46,9 +76,32 @@ public class VisitService {
     }
 
     @Transactional
-    public Visit updateStatus(Long id, String status){
+    public List<VisitResponseDTO> findAllOrderedByStatusThenDate(){
+        return  visitRepository.findAllOrderedByStatusThenDate().stream()
+                .map(visit -> toResponseDTO(visit)).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public VisitResponseDTO updateStatus(Long id, String status){
         Visit visit = visitRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Visit not found."));
         visit.setStatus(VisitStatus.valueOf(status.toUpperCase()));
-        return visitRepository.save(visit);
+        Visit saved = visitRepository.save(visit);
+        return toResponseDTO(saved);
+    }
+
+    @Transactional
+    public VisitResponseDTO updateObservations(Long id, String observations){
+        Visit visit = visitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Visit not found."));
+        visit.setObservations(observations);
+        Visit saved = visitRepository.save(visit);
+        return toResponseDTO(saved);
+    }
+
+    @Transactional
+    public void delete(Long id){
+        if (jobRepository.existsByVisitId(id)){
+            throw new ResourceNotFoundException("cannot delete lead with existing jobs");
+        }
+        visitRepository.deleteById(id);
     }
 }

@@ -1,6 +1,8 @@
 package com.crmuretek.crmuretek.controllers;
 
 
+import com.crmuretek.crmuretek.dto.VisitRequestDTO;
+import com.crmuretek.crmuretek.dto.VisitResponseDTO;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Visit;
 import com.crmuretek.crmuretek.models.VisitStatus;
@@ -28,25 +30,9 @@ public class VisitController {
     }
 
     @PostMapping
-    public ResponseEntity<Visit> createVisit(@RequestBody Visit visit){
-
-        System.out.println("Visit consulta object: " + visit.getConsulta());
-        System.out.println("Visit consulta id: " +
-                (visit.getConsulta() != null ? visit.getConsulta().getId() : null));
-        if (visit.getConsulta() != null && visit.getConsulta().getId() != null){
-            Consulta realConsulta = consultaRepository
-                    .findById(visit.getConsulta().getId())
-                    .orElseThrow(() -> new RuntimeException("Consulta Not Found"));
-
-            visit.setConsulta(realConsulta);
-        }
-
-        if (visit.getVisitDate() == null) {
-            visit.setStatus(VisitStatus.SOLICITADA);
-        } else {
-            visit.setStatus(VisitStatus.SCHEDULED);
-        }
-        return ResponseEntity.ok(visitRepository.save(visit));
+    public ResponseEntity<VisitResponseDTO> createVisit(@RequestBody VisitRequestDTO visit){
+        VisitResponseDTO created = visitService.scheduleVisitFromLead(visit);
+        return ResponseEntity.ok(created);
     }
 
     @PatchMapping("/{id}/date")
@@ -58,34 +44,23 @@ public class VisitController {
     }
 
     @GetMapping
-    public List<Visit> getAllVisits(){
-        return visitRepository.findAllOrderedByStatusThenDate();
+    public List<VisitResponseDTO> getAllVisits(){
+        return visitService.findAllOrderedByStatusThenDate();
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Visit> updateVisitStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
-        Visit updated = visitService.updateStatus(id, body.get("status"));
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<VisitResponseDTO> updateVisitStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
+        return ResponseEntity.ok(visitService.updateStatus(id, body.get("status")));
     }
 
     @PatchMapping("/{id}/observations")
-    public ResponseEntity<Visit> updateObservations(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
-        return visitRepository.findById(id).map(visit -> {
-            visit.setObservations(body.get("observations"));
-            return ResponseEntity.ok(visitRepository.save(visit));
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<VisitResponseDTO> updateObservations(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        return ResponseEntity.ok(visitService.updateObservations(id, body.get("observations")));
     }
 
     @DeleteMapping("/{id}")
     public  ResponseEntity<Void> deleteVisit(@PathVariable Long id){
-        if (visitRepository.existsById(id)) {
-            visitRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        visitService.delete(id);
+        return ResponseEntity.noContent().build();
     }
-
-
-
-
 }
