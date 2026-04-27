@@ -11,6 +11,7 @@ import java.util.List;
 public interface JobRepository extends JpaRepository<Job, Long> {
 
     boolean existsByConsultaId(Long consultaId);
+    boolean existsByVisitId(long visitId);
     List<Job> findAllByOrderByIdDesc();
 
     @Query(value = "SELECT TO_CHAR(work_date, 'YYYY-MM'), COUNT(*) FROM jobs GROUP BY TO_CHAR(work_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
