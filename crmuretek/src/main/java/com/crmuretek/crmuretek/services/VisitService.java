@@ -90,6 +90,15 @@ public class VisitService {
     }
 
     @Transactional
+    public VisitResponseDTO updateDate(Long id, LocalDate date){
+        Visit visit = visitRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Visit not found."));
+        visit.setVisitDate(date);
+        Visit saved = visitRepository.save(visit);
+        return toResponseDTO(saved);
+    }
+
+
+    @Transactional
     public VisitResponseDTO updateObservations(Long id, String observations){
         Visit visit = visitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Visit not found."));
         visit.setObservations(observations);

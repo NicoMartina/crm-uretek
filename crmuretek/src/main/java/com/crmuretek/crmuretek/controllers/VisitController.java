@@ -19,14 +19,10 @@ import java.util.List;
 @RequestMapping("/api/visits")
 public class VisitController {
 
-    private final VisitRepository visitRepository;
     private final VisitService visitService;
-    private final ConsultaRepository consultaRepository;
 
-    public VisitController(VisitRepository visitRepository, VisitService visitService, ConsultaRepository consultaRepository) {
-        this.visitRepository = visitRepository;
+    public VisitController(VisitService visitService) {
         this.visitService = visitService;
-        this.consultaRepository = consultaRepository;
     }
 
     @PostMapping
@@ -36,11 +32,8 @@ public class VisitController {
     }
 
     @PatchMapping("/{id}/date")
-    public ResponseEntity<Visit> updateVisitDate(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
-        return visitRepository.findById(id).map(visit -> {
-            visit.setVisitDate(LocalDate.parse(body.get("visitDate")));
-            return ResponseEntity.ok(visitRepository.save(visit));
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<VisitResponseDTO> updateVisitDate(@PathVariable Long id, @RequestBody java.util.Map<String, String> body){
+        return ResponseEntity.ok(visitService.updateDate(id, LocalDate.parse(body.get("visitDate"))));
     }
 
     @GetMapping
