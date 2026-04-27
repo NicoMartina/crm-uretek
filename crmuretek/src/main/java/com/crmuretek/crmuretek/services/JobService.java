@@ -1,34 +1,36 @@
 package com.crmuretek.crmuretek.services;
 
+import com.crmuretek.crmuretek.dto.JobRequestDTO;
+import com.crmuretek.crmuretek.dto.JobResponseDTO;
+import com.crmuretek.crmuretek.dto.MaterialUsageDTO;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.*;
-import com.crmuretek.crmuretek.repositories.InventoryRepository;
-import com.crmuretek.crmuretek.repositories.JobRepository;
-import com.crmuretek.crmuretek.repositories.MaterialUsageRepository;
-import com.crmuretek.crmuretek.repositories.VisitRepository;
+import com.crmuretek.crmuretek.repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class JobService {
 
 
     private JobRepository jobRepository;
-    private InventoryRepository inventoryRepository;
     private VisitRepository visitRepository;
-    private MaterialUsageRepository materialUsageRepository;
+    private ConsultaRepository consultaRepository;
 
-    public JobService(JobRepository jobRepository, InventoryRepository inventoryRepository, VisitRepository visitRepository, MaterialUsageRepository materialUsageRepository) {
+    public JobService(JobRepository jobRepository, VisitRepository visitRepository, ConsultaRepository consultaRepository) {
         this.jobRepository = jobRepository;
-        this.inventoryRepository = inventoryRepository;
         this.visitRepository = visitRepository;
-        this.materialUsageRepository = materialUsageRepository;
+        this.consultaRepository = consultaRepository;
     }
 
-    public List<Job> findAllByOrderByIdDesc(){
-        return jobRepository.findAllByOrderByIdDesc();
+    public List<JobResponseDTO> findAllByOrderByIdDesc(){
+        return jobRepository.findAllByOrderByIdDesc().stream()
+                .map(this::toResponseDTO).collect(Collectors.toList());
     }
 
     @Transactional
@@ -41,36 +43,98 @@ public class JobService {
 
     // We use this in the Controller  with POST  and PUT
     @Transactional
-    public Job createJobFromVisit(Long visitId, Job  jobDetails){
-        Visit visit = visitRepository.findById(visitId)
-                .orElseThrow(() -> new ResourceNotFoundException("Visit Not Found"));
+    public JobResponseDTO createJobFromVisit(JobRequestDTO request){
+        // find lead
+        Consulta consulta = consultaRepository.findById(request.getConsultaId())
+                .orElseThrow(() -> new ResourceNotFoundException("Lead Not Found."));
 
-        jobDetails.setVisit(visit);
-        jobDetails.setConsulta(visit.getConsulta());
-        jobDetails.setJobStatus(JobStatus.QUOTED);
+        Job job = new Job();
+        if (request.getVisitId() != null){
+            Visit visit = visitRepository.findById(request.getVisitId())
+                    .orElseThrow(()-> new ResourceNotFoundException("Visit Not Found"));
 
-        return jobRepository.save(jobDetails);
+            job.setVisit(visit);
+        }
+        job.setConsulta(consulta);
+        job.setEstimateMaterialKg(request.getEstimateMaterialKg());
+        job.setJobStatus(JobStatus.QUOTED);
+        job.setWorkDate(request.getWorkDate());
+        job.setObservations(request.getObservations());
+
+        Job savedJob = jobRepository.save(job);
+
+
+        return toResponseDTO(savedJob);
     }
 
+
+
     @Transactional
-    public Job updateJobStatus(Long id, String statusName){
+    public JobResponseDTO updateJobStatus(Long id, String statusName){
         System.out.println(">>> Updating job " + id + " to status: " + statusName);
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
         JobStatus newStatus = JobStatus.valueOf(statusName.toUpperCase());
         System.out.println(">>> New status enum: " + newStatus);
         job.setJobStatus(newStatus);
-        return jobRepository.save(job);
+        Job savedJob = jobRepository.save(job);
+        return toResponseDTO(job);
     }
 
     @Transactional
-    public Job update(Long id, Job details){
-        return jobRepository.findById(id)
-                .map(job -> {
-                    job.setObservations(details.getObservations());
-                    job.setEstimateMaterialKg(details.getEstimateMaterialKg());
-                    return jobRepository.save(job);
-                })
+    public JobResponseDTO update(Long id, JobRequestDTO details){
+        Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
+        Consulta consulta = consultaRepository.findById(details.getConsultaId())
+                .orElseThrow(()-> new ResourceNotFoundException("No lead found with ID" + id));
+
+        job.setConsulta(consulta);
+
+
+        if (details.getVisitId() != null){
+            Visit visit = visitRepository.findById(details.getVisitId())
+                    .orElseThrow(()-> new ResourceNotFoundException("Visit Not Found"));
+            job.setVisit(visit);
+        }
+
+        job.setObservations(details.getObservations());
+        job.setWorkDate(details.getWorkDate());
+        job.setEstimateMaterialKg(details.getEstimateMaterialKg());
+
+        Job savedJob = jobRepository.save(job);
+        return toResponseDTO(savedJob);
+
+    }
+
+    public void delete(Long id){
+        jobRepository.deleteById(id);
+    }
+
+    private JobResponseDTO toResponseDTO(Job job){
+
+        JobResponseDTO response = new JobResponseDTO();
+
+        response.setConsultaId(job.getConsulta().getId());
+        response.setCustomerId(job.getConsulta().getCustomer().getId());
+        response.setJobId(job.getId());
+        response.setWorkDate(job.getWorkDate());
+        response.setEstimateMaterialKg(job.getEstimateMaterialKg());
+        response.setMaterialUsages(job.getMaterialUsages() != null ? job.getMaterialUsages().stream().map(this::toMaterialUsageDTO).collect(Collectors.toList()) : List.of());
+        response.setQuoteNumber(job.getQuoteNumber());
+        response.setObservations(job.getObservations());
+        response.setJobStatus(job.getJobStatus());
+
+        return response;
+    }
+
+    private MaterialUsageDTO toMaterialUsageDTO(MaterialUsage m) {
+
+        MaterialUsageDTO material = new MaterialUsageDTO();
+
+        material.setUsageDate(m.getUsageDate());
+        material.setIsoQuantity(m.getIsoQuantity());
+        material.setResinQuantity(m.getResinQuantity());
+
+        return material;
     }
 }
