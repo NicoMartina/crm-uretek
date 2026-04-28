@@ -19,14 +19,12 @@
     public class JobController {
 
 
-        private final JobRepository jobRepository;
-        private final JobService jobService;
-        private final ConsultaService consultaService;
 
-        public JobController(JobRepository jobRepository, JobService jobService, ConsultaService consultaService){
-            this.jobRepository = jobRepository;
+        private final JobService jobService;
+
+
+        public JobController(JobService jobService){
             this.jobService = jobService;
-            this.consultaService = consultaService;
         }
 
         @PostMapping
