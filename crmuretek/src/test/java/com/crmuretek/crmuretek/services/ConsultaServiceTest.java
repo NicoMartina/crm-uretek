@@ -2,6 +2,7 @@ package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.dto.ConsultaRequestDTO;
 import com.crmuretek.crmuretek.dto.ConsultaResponseDTO;
+import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.repositories.ConsultaRepository;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,6 +41,9 @@ class ConsultaServiceTest {
     // This is the REAL service — but injected with the fake repos above
     @InjectMocks
     private ConsultaService consultaService;
+
+    @InjectMocks
+    private JobService jobService;
 
     private ConsultaRequestDTO validRequest;
     private Customer savedCustomer;
@@ -67,6 +72,20 @@ class ConsultaServiceTest {
         savedConsulta.setId(10L);
         savedConsulta.setProblemDescription("Water leak in basement");
         savedConsulta.setCustomer(savedCustomer);
+    }
+
+    @Test
+    void delete_shouldNotDeleteConsulta_whenJobsAttached(){
+        // ARRANGE
+        when(jobRepository.existsByConsultaId(any())).thenReturn(true);
+        // ACT and ASSERT
+        assertThrows(ResourceNotFoundException.class, () -> consultaService.delete(1L));
+    }
+
+    @Test
+    void  delete_shouldNotDeleteConsulta_whenVisitsAttached(){
+        when(visitRepository.existsByConsultaId(any())).thenReturn(true);
+        assertThrows(RuntimeException.class, () -> consultaService.delete(1L));
     }
 
     @Test
