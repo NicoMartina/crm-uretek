@@ -6,7 +6,7 @@ WORKDIR /crmuretek
 # idk
 COPY . .
 # create the container
-RUN ./mvnw -Dmaven.test.skip=true clean package
+RUN mvn -Dmaven.test.skip=true clean package
 
 # Stage 2 - Run
 FROM eclipse-temurin:21-jre-alpine
