@@ -6,6 +6,7 @@ WORKDIR /crmuretek
 # idk
 COPY . .
 # create the container
+RUN ls -la
 RUN mvn -Dmaven.test.skip=true clean package
 
 # Stage 2 - Run
