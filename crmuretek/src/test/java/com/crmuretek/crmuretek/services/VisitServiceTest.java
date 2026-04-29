@@ -3,6 +3,7 @@ package com.crmuretek.crmuretek.services;
 import com.crmuretek.crmuretek.dto.ConsultaRequestDTO;
 import com.crmuretek.crmuretek.dto.VisitRequestDTO;
 import com.crmuretek.crmuretek.dto.VisitResponseDTO;
+import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.models.Visit;
@@ -23,7 +24,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -101,6 +104,19 @@ public class VisitServiceTest {
         assertThat(result.getVisitDate()).isEqualTo(date);
         assertThat(result.getObservations()).isEqualTo("No tocar timbre");
 
+    }
+
+    @Test
+    void delete_shouldNotDeleteVisit_whenAttachedJob(){
+        when(jobRepository.existsByVisitId(anyLong())).thenReturn(true);
+        assertThrows(ResourceNotFoundException.class, () -> visitService.delete(1L));
+    }
+
+    @Test
+    void findAllOrderedByStatusThenDate(){
+        when(visitRepository.findAllOrderedByStatusThenDate()).thenReturn(List.of(savedVisit));
+        List<VisitResponseDTO> list = visitService.findAllOrderedByStatusThenDate();
+        assertThat(list).isNotEmpty();
     }
 
 }
