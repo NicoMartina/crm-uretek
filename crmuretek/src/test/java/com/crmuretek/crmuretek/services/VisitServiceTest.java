@@ -113,7 +113,7 @@ public class VisitServiceTest {
     }
 
     @Test
-    void findAllOrderedByStatusThenDate(){
+    void findAllOrderedByStatusThenDate_shouldReturnResults_whenVisitsExist(){
         when(visitRepository.findAllOrderedByStatusThenDate()).thenReturn(List.of(savedVisit));
         List<VisitResponseDTO> list = visitService.findAllOrderedByStatusThenDate();
         assertThat(list).isNotEmpty();

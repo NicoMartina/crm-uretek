@@ -129,18 +129,20 @@ class ConsultaServiceTest {
 
     }
 
+
     @Test
-    void findAllByOrderByIdDesc_shouldReturnEmptyList_whenNoConsultasExist() {
+    void findAllByOrderByIdDesc_shouldReturnResults_whenConsultasExist() {
         // ARRANGE
-        when(consultaRepository.findAllByOrderByIdDesc()).thenReturn(List.of());
+        when(consultaRepository.findAllByOrderByIdDesc()).thenReturn(List.of(savedConsulta));
 
         // ACT
         List<ConsultaResponseDTO> result = consultaService.findAllByOrderByIdDesc();
 
         // ASSERT
-        assertThat(result).isEmpty();
+        assertThat(result).isNotEmpty();
 
     }
+
 
     @Test
     void create_shouldSaveCustomerWithCorrectEmail_whenEmailProvided() {
