@@ -83,8 +83,13 @@ public class VisitService {
 
     @Transactional
     public VisitResponseDTO updateStatus(Long id, String status){
+
         Visit visit = visitRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Visit not found."));
-        visit.setStatus(VisitStatus.valueOf(status.toUpperCase()));
+        try {
+            visit.setStatus(VisitStatus.valueOf(status.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new ResourceNotFoundException(status + " isn't a valid status.");
+        }
         Visit saved = visitRepository.save(visit);
         return toResponseDTO(saved);
     }

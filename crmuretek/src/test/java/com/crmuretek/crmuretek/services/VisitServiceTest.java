@@ -7,6 +7,7 @@ import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.models.Visit;
+import com.crmuretek.crmuretek.models.VisitStatus;
 import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.CustomerRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,6 +69,7 @@ public class VisitServiceTest {
         validConsultaRequest.setPhoneNumber("1134567890");
         validConsultaRequest.setAddress("Av. Corrientes 1234");
         validConsultaRequest.setProblemDescription("Water leak in basement");
+        date = LocalDate.of(2026, 4, 29);
 
         // What the fake customerRepository.save() will return
         savedCustomer = new Customer();
@@ -84,6 +88,7 @@ public class VisitServiceTest {
         // What the fake visitRepository.save() will return
         savedVisit = new Visit();
         savedVisit.setId(100L);
+        savedVisit.setStatus(VisitStatus.SCHEDULED);
         savedVisit.setConsulta(savedConsulta);
         savedVisit.setVisitDate(date);
         savedVisit.setObservations("No tocar timbre");
@@ -113,11 +118,113 @@ public class VisitServiceTest {
     }
 
     @Test
+    void delete_shouldDeleteVisit_whenNoJobsExist(){
+        when(jobRepository.existsByVisitId(anyLong())).thenReturn(false);
+
+        visitService.delete(1L);
+        verify(visitRepository).deleteById(1L);
+    }
+
+    @Test
     void findAllOrderedByStatusThenDate_shouldReturnResults_whenVisitsExist(){
         when(visitRepository.findAllOrderedByStatusThenDate()).thenReturn(List.of(savedVisit));
         List<VisitResponseDTO> list = visitService.findAllOrderedByStatusThenDate();
         assertThat(list).isNotEmpty();
     }
 
+    @Test
+    void updateStatus_shouldChangeStatusToCompleted(){
+        // ARRANGE
+        Visit visit = new Visit();
+        visit.setId(1L);
+        visit.setStatus(VisitStatus.SCHEDULED);
+
+        Customer customer = new Customer();
+        customer.setId(5L);
+
+        Consulta consulta = new Consulta();
+        consulta.setId(10L);
+        consulta.setCustomer(customer);
+
+        visit.setConsulta(consulta);
+
+
+        when(visitRepository.findById(1L))
+                .thenReturn(Optional.of(savedVisit));
+
+        when(visitRepository.save(any(Visit.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+
+        // ACT
+        VisitResponseDTO result =
+                visitService.updateStatus(1L, "VISITED");
+
+
+        // ASSERT
+        assertThat(result.getStatus())
+                .isEqualTo(VisitStatus.VISITED);
+    }
+
+
+    @Test
+    void updateStatus_shouldThrowException_whenStatusIsInvalid(){
+
+        // arrange
+        Customer customer = new Customer();
+        customer.setId(1L);
+
+        Consulta consulta = new Consulta();
+        consulta.setId(5L);
+        consulta.setCustomer(customer);
+
+        Visit visit = new Visit();
+        visit.setId(10L);
+        visit.setStatus(VisitStatus.SCHEDULED);
+        visit.setConsulta(consulta);
+
+
+        when(visitRepository.findById(10L))
+                .thenReturn(Optional.of(visit));
+
+
+        // act + assert
+        assertThrows(ResourceNotFoundException.class, () ->
+                visitService.updateStatus(10L, "invalid_visited"));
+
+    }
+
+
+    @Test
+    void updateStatus_shouldThrowException_whenVisitDoesNotExist(){
+        // arrange
+        when(visitRepository.findById(10L))
+                .thenReturn(Optional.empty());
+        // act + assert
+        assertThrows(ResourceNotFoundException.class, () ->
+                visitService.updateStatus(10L, "visited"));
+
+
+    }
+
+    @Test
+    void updateDate_shouldThrowException_whenVisitDoesNotExist(){
+        //arrange
+        when(visitRepository.findById(10L))
+                .thenReturn(Optional.empty());
+
+        //act + assert
+        assertThrows(ResourceNotFoundException.class, () -> visitService.updateDate(10L, LocalDate.of(2026,4,10)));
+    }
+
+    @Test
+    void updateObservations_shouldThrowException_whenVisitNotExist(){
+        // arrange
+        when(visitRepository.findById(10L))
+                .thenReturn(Optional.empty());
+
+        // act + assert
+        assertThrows(ResourceNotFoundException.class, () -> visitService.updateObservations(10L, "Im changing the observations"));
+    }
 }
 
