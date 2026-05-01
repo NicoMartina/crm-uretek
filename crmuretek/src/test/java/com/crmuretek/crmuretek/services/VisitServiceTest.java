@@ -206,5 +206,25 @@ public class VisitServiceTest {
 
 
     }
+
+    @Test
+    void updateDate_shouldThrowException_whenVisitDoesNotExist(){
+        //arrange
+        when(visitRepository.findById(10L))
+                .thenReturn(Optional.empty());
+
+        //act + assert
+        assertThrows(ResourceNotFoundException.class, () -> visitService.updateDate(10L, LocalDate.of(2026,4,10)));
+    }
+
+    @Test
+    void updateObservations_shouldThrowException_whenVisitNotExist(){
+        // arrange
+        when(visitRepository.findById(10L))
+                .thenReturn(Optional.empty());
+
+        // act + assert
+        assertThrows(ResourceNotFoundException.class, () -> visitService.updateObservations(10L, "Im changing the observations"));
+    }
 }
 
