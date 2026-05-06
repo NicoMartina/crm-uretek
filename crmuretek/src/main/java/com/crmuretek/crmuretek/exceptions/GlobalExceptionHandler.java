@@ -18,15 +18,20 @@ public class GlobalExceptionHandler {
     }
 
     // 2. Specifically handle  "Business Logic"  failures  (like no material)
-    @ExceptionHandler(InsuffcientMaterialException.class)
-    public ResponseEntity<Object> handleBusinessError(InsuffcientMaterialException exception){
-        return buildResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(InsufficientMaterialException.class)
+    public ResponseEntity<Object> handleBusinessError(InsufficientMaterialException exception){
+        return buildResponse(exception.getMessage(), HttpStatus.CONFLICT);
     }
 
     // 3. Fallback for everything  else (The "safety net")
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneralError(Exception exception){
-        return buildResponse("An unexpected erro occurred: " + exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<Object> handleInputError(InvalidInputException exception){
+        return buildResponse(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<Object> buildResponse(String message, HttpStatus status){
