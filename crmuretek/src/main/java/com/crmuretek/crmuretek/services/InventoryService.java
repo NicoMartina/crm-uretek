@@ -1,5 +1,7 @@
 package com.crmuretek.crmuretek.services;
 
+import com.crmuretek.crmuretek.exceptions.InsufficientMaterialException;
+import com.crmuretek.crmuretek.exceptions.InvalidInputException;
 import com.crmuretek.crmuretek.models.*;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
@@ -94,11 +96,11 @@ public class InventoryService {
 
         // 1. VALIDATE
         if (iso > currentIso || resina > currentResina) {
-            throw new RuntimeException("Not enough stock");
+            throw new InsufficientMaterialException("Not enough stock");
         }
 
         if (totalKg <= 0) {
-            throw new IllegalArgumentException("Total kg must be positive");
+            throw new InvalidInputException("Total kg must be positive");
         }
 
         // 2. UPDATE INVENTORY
