@@ -120,7 +120,7 @@ public class InventoryServiceTest {
         when(inventoryRepository.findById(1L))
                 .thenReturn(Optional.empty());
     }*/
-    
+
 
 
 }

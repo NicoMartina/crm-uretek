@@ -1,5 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
-import { TITLE_MAP } from "../utils/Maps";
+import { TITLE_LABEL_MAP } from "../utils/Maps";
 import { formatDisplayDate } from "../utils/date";
 import type { Customer } from "../types/Customer";
 
@@ -28,7 +28,10 @@ export const CustomerTable = ({
                 Fecha
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Nombre
+                Nombre y Apellido
+              </th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Categoria
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Teléfono
@@ -52,10 +55,11 @@ export const CustomerTable = ({
                     onClick={() => onView(customer)}
                     className="font-black text-slate-700 hover:text-orange-500 transition-colors text-left"
                   >
-                    {customer.title
-                      ? `${TITLE_MAP[customer.title]} ${customer.name}`
-                      : customer.name || "Sin nombre"}
+                    {customer.name || "Sin nombre"}
                   </button>
+                </td>
+                <td className="p-4 text-slate-500 font-medium">
+                  {customer.title ? TITLE_LABEL_MAP[customer.title] : "-"}
                 </td>
                 <td className="p-4 text-slate-500 font-medium">
                   {customer.phoneNumber || "-"}

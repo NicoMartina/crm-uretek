@@ -1,6 +1,6 @@
-export const TITLE_MAP: Record<string, string> = {
-  ARQUITECTO: "Arq.",
-  INGENIERO: "Ing.",
+export const TITLE_LABEL_MAP: Record<string, string> = {
+  ARQUITECTO: "Arquitecto",
+  INGENIERO: "Ingeniero",
   DUENO: "Dueño",
-  OTRO: "",
+  OTRO: "Otro",
 };
