@@ -2,6 +2,7 @@ package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.dto.ConsultaRequestDTO;
 import com.crmuretek.crmuretek.dto.ConsultaResponseDTO;
+import com.crmuretek.crmuretek.exceptions.InvalidInputException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
@@ -125,7 +126,7 @@ public class ConsultaService {
         }
 
         if (visitRepository.existsByConsultaId(id)){
-            throw new RuntimeException("cannot delete lead with existing visits");
+            throw new InvalidInputException("cannot delete lead with existing visits");
         }
 
         consultaRepository.deleteById(id);
