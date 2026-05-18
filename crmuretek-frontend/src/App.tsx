@@ -49,6 +49,16 @@ type VisitApiResponse = {
   observations?: string;
 };
 
+type JobApiResponse = {
+  jobId: number;
+  consultaId: number;
+  customerId?: number;
+  workDate?: string;
+  estimateMaterialKg?: number;
+  observations?: string;
+  jobStatus: Job["jobStatus"];
+};
+
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
   DEPOSIT_PAID: {
@@ -198,6 +208,43 @@ export default function App() {
     };
   };
 
+  const mapJobResponseToJob = (job: JobApiResponse, allLeads: Lead[]): Job => {
+    const matchingLead = allLeads.find(
+      (lead) => lead.consultaId === job.consultaId
+    );
+
+    return {
+      id: job.jobId,
+      workDate: job.workDate,
+      estimateMaterialKg: job.estimateMaterialKg,
+      observations: job.observations,
+      jobStatus: job.jobStatus,
+      consulta: matchingLead
+        ? {
+            id: matchingLead.consultaId,
+            problemDescription: matchingLead.problemDescription,
+            requestDate: matchingLead.requestDate || "",
+            customer: {
+              id: matchingLead.customerId || job.customerId || 0,
+              name: matchingLead.name,
+              email: matchingLead.email,
+              phoneNumber: matchingLead.phoneNumber,
+              address: matchingLead.address,
+              source: matchingLead.source,
+              contactDate: matchingLead.contactDate,
+              title: matchingLead.title ?? null,
+              observations: matchingLead.observations ?? null,
+            },
+          }
+        : {
+            id: job.consultaId,
+            customer: {
+              id: job.customerId || 0,
+            },
+          },
+    };
+  };
+
   const syncAllData = async () => {
     try {
       const res = await Promise.allSettled([
@@ -209,8 +256,12 @@ export default function App() {
         customerService.getAll(),
       ]);
 
+      const allLeads = res[2].status === "fulfilled" ? res[2].value || [] : [];
       if (res[0].status === "fulfilled") {
-        const sorted = (res[0].value || []).sort((a: Job, b: Job) => {
+        const normalizedJobs = (res[0].value as unknown as JobApiResponse[]).map(
+          (job) => mapJobResponseToJob(job, allLeads)
+        );
+        const sorted = normalizedJobs.sort((a: Job, b: Job) => {
           const order: Record<string, number> = {
             QUOTED: 0,
             DEPOSIT_PAID: 1,
@@ -221,7 +272,6 @@ export default function App() {
         });
         setJobs(sorted);
       }
-      const allLeads = res[2].status === "fulfilled" ? res[2].value || [] : [];
       if (res[1].status === "fulfilled") {
         const normalizedVisits = (res[1].value as unknown as VisitApiResponse[]).map(
           (visit) => mapVisitResponseToVisit(visit, allLeads)
