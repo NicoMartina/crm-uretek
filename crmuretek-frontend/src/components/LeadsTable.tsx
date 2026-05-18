@@ -1,5 +1,5 @@
 import { Calendar, Trash2, Edit } from "lucide-react";
-import { TITLE_MAP } from "../utils/Maps";
+import { TITLE_LABEL_MAP } from "../utils/Maps";
 import { formatDisplayDate } from "../utils/date";
 import type { Lead } from "../types/Lead";
 
@@ -35,7 +35,10 @@ export const LeadsTable = ({
                 Fecha
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Nombre
+                Nombre y Apellido
+              </th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Categoria
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Teléfono
@@ -59,10 +62,11 @@ export const LeadsTable = ({
                     onClick={() => onView(consulta)}
                     className="font-black text-slate-800 hover:text-orange-500 text-left transition-colors"
                   >
-                    {consulta.title
-                      ? `${TITLE_MAP[consulta.title]} ${consulta?.name}`
-                      : consulta.name || "Sin nombre"}
+                    {consulta.name || "Sin nombre"}
                   </button>
+                </td>
+                <td className="p-4 text-slate-500 font-medium">
+                  {consulta.title ? TITLE_LABEL_MAP[consulta.title] : "-"}
                 </td>
                 <td className="p-4 text-slate-500 font-medium">
                   {consulta.phoneNumber}

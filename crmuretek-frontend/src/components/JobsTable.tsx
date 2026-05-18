@@ -1,5 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
-import { TITLE_MAP } from "../utils/Maps";
+import { TITLE_LABEL_MAP } from "../utils/Maps";
 import { formatDisplayDate } from "../utils/date";
 import type { Job } from "../types/Job";
 
@@ -32,7 +32,10 @@ export const JobsTable = ({
                 Fecha
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Cliente
+                Nombre y Apellido
+              </th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Categoria
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Estado
@@ -54,16 +57,17 @@ export const JobsTable = ({
                 <td className="p-4">
                   <button onClick={() => onView(job)} className="text-left">
                     <div className="font-bold text-slate-800 hover:text-orange-500 transition-colors">
-                      {job.consulta?.customer?.title
-                        ? `${TITLE_MAP[job.consulta?.customer?.title]} ${
-                            job.consulta?.customer?.name
-                          }`
-                        : job.consulta?.customer?.name || "Sin nombre"}
+                      {job.consulta?.customer?.name || "Sin nombre"}
                     </div>
                     <div className="text-[10px] text-slate-500">
                       {job.consulta?.problemDescription}
                     </div>
                   </button>
+                </td>
+                <td className="p-4 text-slate-500 font-medium">
+                  {job.consulta?.customer?.title
+                    ? TITLE_LABEL_MAP[job.consulta.customer.title]
+                    : "-"}
                 </td>
                 <td className="p-4">
                   <select
