@@ -3,6 +3,7 @@ package com.crmuretek.crmuretek.services;
 import com.crmuretek.crmuretek.dto.ConsultaRequestDTO;
 import com.crmuretek.crmuretek.dto.VisitRequestDTO;
 import com.crmuretek.crmuretek.dto.VisitResponseDTO;
+import com.crmuretek.crmuretek.exceptions.InvalidInputException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
@@ -70,6 +71,9 @@ public class VisitServiceTest {
         validConsultaRequest.setAddress("Av. Corrientes 1234");
         validConsultaRequest.setProblemDescription("Water leak in basement");
         date = LocalDate.of(2026, 4, 29);
+        validVisitRequest.setConsultaId(10L);
+        validVisitRequest.setVisitDate(date);
+        validVisitRequest.setObservations("No tocar timbre");
 
         // What the fake customerRepository.save() will return
         savedCustomer = new Customer();
@@ -109,6 +113,15 @@ public class VisitServiceTest {
         assertThat(result.getVisitDate()).isEqualTo(date);
         assertThat(result.getObservations()).isEqualTo("No tocar timbre");
 
+    }
+
+    @Test
+    void create_shouldThrowException_whenConsultaIdIsMissing() {
+        VisitRequestDTO invalidRequest = new VisitRequestDTO();
+        invalidRequest.setObservations("No tocar timbre");
+        invalidRequest.setVisitDate(date);
+
+        assertThrows(InvalidInputException.class, () -> visitService.scheduleVisitFromLead(invalidRequest));
     }
 
     @Test
@@ -227,4 +240,3 @@ public class VisitServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> visitService.updateObservations(10L, "Im changing the observations"));
     }
 }
-
