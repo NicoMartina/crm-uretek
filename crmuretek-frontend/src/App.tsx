@@ -34,6 +34,20 @@ import type { LeadFormData } from "./types/LeadFormData";
 import type { Customer } from "./types/Customer";
 import type { SelectedLead } from "./types/SelectedLead";
 import type { DashboardSummary } from "./types/DashboardSummary";
+import type { VisitCreateData } from "./types/VisitCreateData";
+
+type VisitApiResponse = {
+  visitId: number;
+  consultaId: number;
+  customerId?: number;
+  visitDate?: string;
+  hasPaidVisitFee?: boolean;
+  visitFeeAmount?: number;
+  paymentMethod?: string;
+  invoiceNumber?: string;
+  status: Visit["status"];
+  observations?: string;
+};
 
 const JOB_STATUS_MAP = {
   QUOTED: { label: "Presupuestado", color: "bg-orange-100 text-orange-700" },
@@ -138,6 +152,52 @@ export default function App() {
   const [visitDate, setVisitDate] = useState("");
   const [visitNotes, setVisitNotes] = useState("");
 
+  const mapVisitResponseToVisit = (
+    visit: VisitApiResponse,
+    allLeads: Lead[]
+  ): Visit => {
+    const matchingLead = allLeads.find(
+      (lead) => lead.consultaId === visit.consultaId
+    );
+
+    return {
+      id: visit.visitId,
+      visitDate: visit.visitDate,
+      hasPaidVisitFee: visit.hasPaidVisitFee,
+      visitFeeAmount: visit.visitFeeAmount,
+      paymentMethod: visit.paymentMethod,
+      invoiceNumber: visit.invoiceNumber,
+      status: visit.status,
+      observations: visit.observations,
+      visited: visit.status === "VISITED",
+      consulta: matchingLead
+        ? {
+            id: matchingLead.consultaId,
+            problemDescription: matchingLead.problemDescription,
+            requestDate: matchingLead.requestDate || "",
+            customer: {
+              id: matchingLead.customerId || visit.customerId || 0,
+              name: matchingLead.name,
+              email: matchingLead.email,
+              phoneNumber: matchingLead.phoneNumber,
+              address: matchingLead.address,
+              contactChannel: matchingLead.contactChannel,
+              source: matchingLead.source,
+              contactDate: matchingLead.contactDate,
+              title: matchingLead.title ?? null,
+              observations: matchingLead.observations ?? null,
+            },
+          }
+        : {
+            id: visit.consultaId,
+            requestDate: "",
+            customer: {
+              id: visit.customerId || 0,
+            },
+          },
+    };
+  };
+
   const syncAllData = async () => {
     try {
       const res = await Promise.allSettled([
@@ -161,8 +221,12 @@ export default function App() {
         });
         setJobs(sorted);
       }
+      const allLeads = res[2].status === "fulfilled" ? res[2].value || [] : [];
       if (res[1].status === "fulfilled") {
-        const sorted = (res[1].value || []).sort((a: Visit, b: Visit) => {
+        const normalizedVisits = (res[1].value as unknown as VisitApiResponse[]).map(
+          (visit) => mapVisitResponseToVisit(visit, allLeads)
+        );
+        const sorted = normalizedVisits.sort((a: Visit, b: Visit) => {
           const order: Record<string, number> = {
             SOLICITADA: 0,
             SCHEDULED: 1,
@@ -173,9 +237,8 @@ export default function App() {
         setVisits(sorted);
       }
       if (res[2].status === "fulfilled") {
-        const all = res[2].value || [];
         // Filtering leads that don't have active jobs
-        setLeads(all);
+        setLeads(allLeads);
       }
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
       if (res[4].status === "fulfilled") setStatsData(res[4].value);
@@ -884,7 +947,7 @@ export default function App() {
             onConfirm={async () => {
               console.log(selectedLead);
               if (!selectedLead?.consultaId) return;
-              const visitData = {
+              const visitData: VisitCreateData = {
                 consultaId: selectedLead.consultaId,
                 observations: visitNotes,
                 ...(visitDate ? { visitDate } : {}),
