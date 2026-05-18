@@ -885,7 +885,7 @@ export default function App() {
               console.log(selectedLead);
               if (!selectedLead?.consultaId) return;
               const visitData = {
-                consulta: { id: selectedLead?.consultaId },
+                consultaId: selectedLead.consultaId,
                 observations: visitNotes,
                 ...(visitDate ? { visitDate } : {}),
               };

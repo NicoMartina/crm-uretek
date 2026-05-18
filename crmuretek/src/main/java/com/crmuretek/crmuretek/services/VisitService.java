@@ -2,6 +2,7 @@ package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.dto.VisitRequestDTO;
 import com.crmuretek.crmuretek.dto.VisitResponseDTO;
+import com.crmuretek.crmuretek.exceptions.InvalidInputException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
@@ -37,6 +38,10 @@ public class VisitService {
 
     @Transactional
     public  VisitResponseDTO scheduleVisitFromLead(VisitRequestDTO request){
+        if (request.getConsultaId() == null) {
+            throw new InvalidInputException("consultaId is required to create a visit.");
+        }
+
         //Find the lead first
         Consulta consulta = consultaRepository.findById(request.getConsultaId())
                 .orElseThrow(()-> new ResourceNotFoundException("Lead Not Found."));

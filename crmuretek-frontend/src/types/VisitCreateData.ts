@@ -1,7 +1,5 @@
 export interface VisitCreateData {
-  consulta: {
-    id: number;
-  };
+  consultaId: number;
   observations: string;
   visitDate?: string;
 }

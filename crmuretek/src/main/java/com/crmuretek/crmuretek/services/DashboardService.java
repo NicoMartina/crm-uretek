@@ -75,7 +75,7 @@ public class DashboardService {
             leadsPerMonth.put(month, leads);
         }
 
-        for (Object[] row : consultaRepository.countLeadsBySource()) {
+        for (Object[] row :  consultaRepository.countLeadsBySource()) {
             String month = row[0] != null ? row[0].toString() : "Sin Fecha";
             String source = row[1] != null ? row[1].toString() : "Sin fuente";
             Long count = ((Number) row[2]).longValue();

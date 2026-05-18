@@ -4,7 +4,6 @@ import com.crmuretek.crmuretek.exceptions.InsufficientMaterialException;
 import com.crmuretek.crmuretek.exceptions.InvalidInputException;
 import com.crmuretek.crmuretek.models.*;
 import com.crmuretek.crmuretek.repositories.InventoryRepository;
-import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.StockMovementRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
