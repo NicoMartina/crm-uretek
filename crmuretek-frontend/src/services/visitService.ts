@@ -40,4 +40,16 @@ export const visitService = {
     });
     return response.data;
   },
+
+  updatePayment: async (
+    id: number,
+    paymentData: {
+      visitFeeStatus?: "SI" | "NO" | "NO_SE_LE_COBRA" | "CANCELADA";
+      visitFeeAmount?: number | null;
+      paymentMethod?: string | null;
+    }
+  ) => {
+    const response = await api.patch(`/visits/${id}/payment`, paymentData);
+    return response.data;
+  },
 };

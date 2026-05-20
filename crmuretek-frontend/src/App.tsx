@@ -42,6 +42,7 @@ type VisitApiResponse = {
   customerId?: number;
   visitDate?: string;
   hasPaidVisitFee?: boolean;
+  visitFeeStatus?: Visit["visitFeeStatus"];
   visitFeeAmount?: number;
   paymentMethod?: string;
   invoiceNumber?: string;
@@ -174,6 +175,7 @@ export default function App() {
       id: visit.visitId,
       visitDate: visit.visitDate,
       hasPaidVisitFee: visit.hasPaidVisitFee,
+      visitFeeStatus: visit.visitFeeStatus,
       visitFeeAmount: visit.visitFeeAmount,
       paymentMethod: visit.paymentMethod,
       invoiceNumber: visit.invoiceNumber,
@@ -455,6 +457,10 @@ export default function App() {
               }}
               onUpdateStatus={async (id, s) => {
                 await visitService.updateStatus(id, s);
+                syncAllData();
+              }}
+              onUpdatePayment={async (id, paymentData) => {
+                await visitService.updatePayment(id, paymentData);
                 syncAllData();
               }}
               onDelete={async (id) => {

@@ -6,6 +6,14 @@ import type { Visit } from "../types/Visit";
 interface VisitsTableProps {
   visits: Visit[];
   onUpdateStatus: (id: number, status: string) => void;
+  onUpdatePayment: (
+    id: number,
+    paymentData: {
+      visitFeeStatus?: "SI" | "NO" | "NO_SE_LE_COBRA" | "CANCELADA";
+      visitFeeAmount?: number | null;
+      paymentMethod?: string | null;
+    }
+  ) => void;
   onView: (visit: Visit) => void;
   onConvert: (consulta: NonNullable<Visit["consulta"]>) => void;
   onDelete: (id: number) => void;
@@ -14,6 +22,7 @@ interface VisitsTableProps {
 export const VisitsTable = ({
   visits,
   onUpdateStatus,
+  onUpdatePayment,
   onView,
   onConvert,
   onDelete,
@@ -21,7 +30,7 @@ export const VisitsTable = ({
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[800px]">
+        <table className="w-full text-left border-collapse min-w-[1250px]">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
@@ -35,6 +44,15 @@ export const VisitsTable = ({
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Estado
+              </th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Pago la Visita?
+              </th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Monto de la Visita
+              </th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                Metodo de Pago
               </th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500 text-right">
                 Acciones Rápidas
@@ -80,6 +98,71 @@ export const VisitsTable = ({
                     <option value="SOLICITADA">Solicitada</option>
                     <option value="SCHEDULED">Programada</option>
                     <option value="VISITED">Visitada</option>
+                  </select>
+                </td>
+                <td className="p-4">
+                  <select
+                    value={visit.visitFeeStatus || "NO"}
+                    onChange={(e) =>
+                      onUpdatePayment(visit.id, {
+                        visitFeeAmount: visit.visitFeeAmount ?? null,
+                        paymentMethod: visit.paymentMethod ?? null,
+                        visitFeeStatus: e.target.value as
+                          | "SI"
+                          | "NO"
+                          | "NO_SE_LE_COBRA"
+                          | "CANCELADA",
+                      })
+                    }
+                    className="text-[10px] font-black uppercase px-2 py-1 rounded-md outline-none cursor-pointer border border-slate-200 bg-white"
+                  >
+                    <option value="SI">Si</option>
+                    <option value="NO">No</option>
+                    <option value="NO_SE_LE_COBRA">No se le cobra</option>
+                    <option value="CANCELADA">Cancelada</option>
+                  </select>
+                </td>
+                <td className="p-4">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    defaultValue={visit.visitFeeAmount ?? ""}
+                    onBlur={(e) =>
+                      onUpdatePayment(visit.id, {
+                        visitFeeStatus: visit.visitFeeStatus || "NO",
+                        paymentMethod: visit.paymentMethod ?? null,
+                        visitFeeAmount:
+                          e.target.value === "" ? null : Number(e.target.value),
+                      })
+                    }
+                    disabled={
+                      visit.visitFeeStatus === "NO_SE_LE_COBRA" ||
+                      visit.visitFeeStatus === "CANCELADA"
+                    }
+                    className="w-28 rounded-md border border-slate-200 px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-orange-500 disabled:bg-slate-100 disabled:text-slate-400"
+                    placeholder="Monto"
+                  />
+                </td>
+                <td className="p-4">
+                  <select
+                    value={visit.paymentMethod || ""}
+                    onChange={(e) =>
+                      onUpdatePayment(visit.id, {
+                        visitFeeStatus: visit.visitFeeStatus || "NO",
+                        visitFeeAmount: visit.visitFeeAmount ?? null,
+                        paymentMethod: e.target.value || null,
+                      })
+                    }
+                    disabled={
+                      visit.visitFeeStatus === "NO_SE_LE_COBRA" ||
+                      visit.visitFeeStatus === "CANCELADA"
+                    }
+                    className="rounded-md border border-slate-200 px-2 py-1 text-sm outline-none cursor-pointer bg-white focus:ring-2 focus:ring-orange-500 disabled:bg-slate-100 disabled:text-slate-400"
+                  >
+                    <option value="">Seleccione</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Efectivo">Efectivo</option>
                   </select>
                 </td>
                 <td className="p-4">

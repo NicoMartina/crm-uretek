@@ -20,6 +20,8 @@ public class Visit {
 
     private LocalDate visitDate;
     private boolean hasPaidVisitFee;
+    @Enumerated(EnumType.STRING)
+    private VisitFeeStatus visitFeeStatus = VisitFeeStatus.NO;
     private Double visitFeeAmount;
     private String paymentMethod;
     private String invoiceNumber;
