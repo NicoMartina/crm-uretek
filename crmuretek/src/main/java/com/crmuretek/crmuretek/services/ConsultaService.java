@@ -37,7 +37,7 @@ public class ConsultaService {
     }
 
     public List<ConsultaResponseDTO> findAllByOrderByIdDesc(){
-        return consultaRepository.findAllByOrderByIdDesc()
+        return consultaRepository.findAllByOrderByRequestDateDescIdDesc()
                 .stream()
                 .map(consulta -> toResponseDTO(consulta, consulta.getCustomer()))
                 .collect(Collectors.toList());
