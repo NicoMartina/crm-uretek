@@ -7,6 +7,7 @@ import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
 import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.models.Visit;
+import com.crmuretek.crmuretek.models.VisitFeeStatus;
 import com.crmuretek.crmuretek.models.VisitStatus;
 import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
@@ -64,6 +65,7 @@ public class VisitService {
         response.setVisitId(visit.getId());
         response.setVisitDate(visit.getVisitDate());
         response.setHasPaidVisitFee(visit.isHasPaidVisitFee());
+        response.setVisitFeeStatus(visit.getVisitFeeStatus());
         response.setVisitFeeAmount(visit.getVisitFeeAmount());
         response.setPaymentMethod(visit.getPaymentMethod());
         response.setInvoiceNumber(visit.getInvoiceNumber());
@@ -112,6 +114,43 @@ public class VisitService {
     public VisitResponseDTO updateObservations(Long id, String observations){
         Visit visit = visitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Visit not found."));
         visit.setObservations(observations);
+        Visit saved = visitRepository.save(visit);
+        return toResponseDTO(saved);
+    }
+
+    @Transactional
+    public VisitResponseDTO updatePaymentDetails(Long id, String visitFeeStatus, Double visitFeeAmount, String paymentMethod) {
+        Visit visit = visitRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Visit not found."));
+
+        if (visitFeeStatus != null) {
+            try {
+                VisitFeeStatus parsedStatus = VisitFeeStatus.valueOf(visitFeeStatus.toUpperCase().trim());
+                visit.setVisitFeeStatus(parsedStatus);
+                visit.setHasPaidVisitFee(parsedStatus == VisitFeeStatus.SI);
+
+                if (parsedStatus == VisitFeeStatus.NO_SE_LE_COBRA || parsedStatus == VisitFeeStatus.CANCELADA) {
+                    visit.setVisitFeeAmount(null);
+                    visit.setPaymentMethod(null);
+                }
+            } catch (IllegalArgumentException e) {
+                throw new InvalidInputException("Invalid visit fee status.");
+            }
+        }
+
+        if (visitFeeAmount != null || visit.getVisitFeeStatus() == VisitFeeStatus.NO || visit.getVisitFeeStatus() == VisitFeeStatus.SI) {
+            visit.setVisitFeeAmount(visitFeeAmount);
+        }
+
+        if (paymentMethod != null) {
+            String normalizedPaymentMethod = paymentMethod.trim();
+            if (!normalizedPaymentMethod.equals("Transferencia") && !normalizedPaymentMethod.equals("Efectivo")) {
+                throw new InvalidInputException("Invalid payment method.");
+            }
+            visit.setPaymentMethod(normalizedPaymentMethod);
+        } else if (visit.getVisitFeeStatus() == VisitFeeStatus.NO_SE_LE_COBRA || visit.getVisitFeeStatus() == VisitFeeStatus.CANCELADA) {
+            visit.setPaymentMethod(null);
+        }
+
         Visit saved = visitRepository.save(visit);
         return toResponseDTO(saved);
     }

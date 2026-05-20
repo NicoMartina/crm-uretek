@@ -51,6 +51,15 @@ public class VisitController {
         return ResponseEntity.ok(visitService.updateObservations(id, body.get("observations")));
     }
 
+    @PatchMapping("/{id}/payment")
+    public ResponseEntity<VisitResponseDTO> updatePaymentDetails(@PathVariable Long id, @RequestBody java.util.Map<String, Object> body) {
+        String visitFeeStatus = body.get("visitFeeStatus") != null ? body.get("visitFeeStatus").toString() : null;
+        Double visitFeeAmount = body.get("visitFeeAmount") instanceof Number number ? number.doubleValue() : null;
+        String paymentMethod = body.get("paymentMethod") != null ? body.get("paymentMethod").toString() : null;
+
+        return ResponseEntity.ok(visitService.updatePaymentDetails(id, visitFeeStatus, visitFeeAmount, paymentMethod));
+    }
+
     @DeleteMapping("/{id}")
     public  ResponseEntity<Void> deleteVisit(@PathVariable Long id){
         visitService.delete(id);

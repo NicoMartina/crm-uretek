@@ -1,6 +1,7 @@
 package com.crmuretek.crmuretek.dto;
 
 import com.crmuretek.crmuretek.models.VisitStatus;
+import com.crmuretek.crmuretek.models.VisitFeeStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,7 @@ public class VisitResponseDTO {
     private Long visitId;
     private LocalDate visitDate;
     private boolean hasPaidVisitFee;
+    private VisitFeeStatus visitFeeStatus;
     private Double visitFeeAmount;
     private String paymentMethod;
     private String invoiceNumber;

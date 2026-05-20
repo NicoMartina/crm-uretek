@@ -26,6 +26,7 @@ export interface Visit {
   visitDate?: string; // ISO date string from Java LocalDate
   visited: boolean;
   hasPaidVisitFee?: boolean;
+  visitFeeStatus?: "SI" | "NO" | "NO_SE_LE_COBRA" | "CANCELADA";
   visitFeeAmount?: number;
   paymentMethod?: string;
   invoiceNumber?: string;
