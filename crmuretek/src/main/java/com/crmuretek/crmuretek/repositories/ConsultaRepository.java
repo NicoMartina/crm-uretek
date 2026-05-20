@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
 
-    List<Consulta> findAllByOrderByRequestDateDescIdDesc();
+    @Query("SELECT c FROM Consulta c ORDER BY c.customer.contactDate DESC, c.id DESC")
+    List<Consulta> findAllByOrderByCustomerContactDateDescIdDesc();
 
     @Query(value = "SELECT TO_CHAR(c.contact_date, 'YYYY-MM'), COUNT(*) FROM leads l JOIN customers c ON l.customer_id = c.id GROUP BY TO_CHAR(c.contact_date, 'YYYY-MM') ORDER BY 1", nativeQuery = true)
     List<Object[]> countLeadsPerMonth();
