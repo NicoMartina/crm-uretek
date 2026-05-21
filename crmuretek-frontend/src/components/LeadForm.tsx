@@ -227,7 +227,7 @@ export default function LeadForm({
         <>
           <div>
             <label className="text-[10px] font-bold uppercase text-slate-400">
-              Nombre
+              Nombre y Apellido
             </label>
             <input
               className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
@@ -275,7 +275,7 @@ export default function LeadForm({
           </div>
           <div>
             <label className="text-[10px] font-bold uppercase text-slate-400">
-              Título
+              Categoria
             </label>
             <select
               className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
