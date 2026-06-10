@@ -19,4 +19,7 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
     List<Object[]> countLeadsBySource();
 
     boolean existsByCustomer_Id(Long id);
+
+
+    List<ConsultaResponseDTO> findAllByOrderByIdDesc();
 }

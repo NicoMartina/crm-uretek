@@ -35,12 +35,7 @@ public class ConsultaService {
         return consultaRepository.findById(id);
     }
 
-    public List<ConsultaResponseDTO> findAllByOrderByIdDesc(){
-        return consultaRepository.findAllByOrderByCustomerContactDateDescIdDesc()
-                .stream()
-                .map(consulta -> toResponseDTO(consulta, consulta.getCustomer()))
-                .collect(Collectors.toList());
-    }
+
 
     @Transactional
     public ConsultaResponseDTO create(ConsultaRequestDTO request) {
@@ -132,7 +127,7 @@ public class ConsultaService {
     }
 
 
-
-
-
+    public List<ConsultaResponseDTO> findAllByOrderByIdDesc() {
+        return consultaRepository.findAllByOrderByIdDesc();
+    }
 }

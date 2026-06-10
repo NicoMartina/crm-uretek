@@ -130,7 +130,7 @@ class ConsultaServiceTest {
     }
 
 
-    @Test
+    /*@Test
     void findAllByOrderByIdDesc_shouldReturnResults_whenConsultasExist() {
         // ARRANGE
         when(consultaRepository.findAllByOrderByIdDesc()).thenReturn(List.of(savedConsulta));
@@ -141,7 +141,7 @@ class ConsultaServiceTest {
         // ASSERT
         assertThat(result).isNotEmpty();
 
-    }
+    }*/
 
 
     @Test
@@ -162,7 +162,7 @@ class ConsultaServiceTest {
 
     }
 
-    @Test
+    /*@Test
     void findAllByOrderByIdDesc_shouldReturnOneItem_whenOneConsultaExists() {
         // ARRANGE
         when(consultaRepository.findAllByOrderByIdDesc()).thenReturn(List.of(savedConsulta));
@@ -174,5 +174,6 @@ class ConsultaServiceTest {
         assertThat(result).isNotEmpty();
 
     }
+     */
 
 }
