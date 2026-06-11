@@ -21,5 +21,5 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
     boolean existsByCustomer_Id(Long id);
 
 
-    List<ConsultaResponseDTO> findAllByOrderByIdDesc();
+    List<Consulta> findAllByOrderByIdDesc();
 }
