@@ -591,7 +591,7 @@ export default function App() {
                 }}
                 onSubmit={async (formData: LeadFormData) => {
                   try {
-                    if (selectedLead?.id) {
+                    if (selectedLead?.consultaId) {
                       // Update consulta
                       if (!selectedLead?.consultaId) return;
                       await leadsService.update(selectedLead.consultaId, {
