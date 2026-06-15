@@ -22,6 +22,7 @@ export const leadsService = {
 
   // Update a customer (for scheduling visits, etc.)
   update: async (id: number, data: LeadUpdateData) => {
+    console.log("Updating lead with id:", id, "data:", data);
     const response = await api.put<Lead>(`/leads/${id}`, data);
     return response.data;
   },
