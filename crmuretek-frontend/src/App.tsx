@@ -260,9 +260,9 @@ export default function App() {
 
       const allLeads = res[2].status === "fulfilled" ? res[2].value || [] : [];
       if (res[0].status === "fulfilled") {
-        const normalizedJobs = (res[0].value as unknown as JobApiResponse[]).map(
-          (job) => mapJobResponseToJob(job, allLeads)
-        );
+        const normalizedJobs = (
+          res[0].value as unknown as JobApiResponse[]
+        ).map((job) => mapJobResponseToJob(job, allLeads));
         const sorted = normalizedJobs.sort((a: Job, b: Job) => {
           const order: Record<string, number> = {
             QUOTED: 0,
@@ -275,9 +275,9 @@ export default function App() {
         setJobs(sorted);
       }
       if (res[1].status === "fulfilled") {
-        const normalizedVisits = (res[1].value as unknown as VisitApiResponse[]).map(
-          (visit) => mapVisitResponseToVisit(visit, allLeads)
-        );
+        const normalizedVisits = (
+          res[1].value as unknown as VisitApiResponse[]
+        ).map((visit) => mapVisitResponseToVisit(visit, allLeads));
         const sorted = normalizedVisits.sort((a: Visit, b: Visit) => {
           const order: Record<string, number> = {
             SOLICITADA: 0,
@@ -595,11 +595,6 @@ export default function App() {
                       // Update consulta
                       if (!selectedLead?.consultaId) return;
                       await leadsService.update(selectedLead.consultaId, {
-                        problemDescription: formData.problemDescription,
-                        customer: { id: selectedLead.customerId },
-                      });
-                      // Also update customer
-                      await customerService.update(selectedLead?.consultaId, {
                         ...formData,
                         email: formData.email ?? "",
                         address: formData.address ?? "",
@@ -608,6 +603,8 @@ export default function App() {
                         contactChannel: formData.contactChannel ?? "",
                         contactDate: formData.contactDate ?? "",
                         observations: formData.observations ?? "",
+                        problemDescription: formData.problemDescription,
+                        customer: { id: selectedLead.customerId },
                       });
                     } else {
                       await leadsService.create(formData);
