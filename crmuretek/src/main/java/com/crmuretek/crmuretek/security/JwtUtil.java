@@ -10,13 +10,13 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
-    private final long EXPERIENCE_MS = 1000 * 60 * 60 * 10; // 10 hrs
+    private final long EXPIRATION_MS = 1000 * 60 * 60 * 10; // 10 hrs
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() +  EXPERIENCE_MS))
+                .expiration(new Date(System.currentTimeMillis() +  EXPIRATION_MS))
                 .signWith(secretKey)
                 .compact();
     }
