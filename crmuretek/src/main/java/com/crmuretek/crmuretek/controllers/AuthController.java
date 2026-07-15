@@ -23,7 +23,7 @@ public class AuthController {
 
     public AuthController(UserRepository userRepository, JwtUtil jwtUtil){ this.userRepository = userRepository; this.jwtUtil = jwtUtil; }
 
-    @PostMapping
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDTO request){
         Optional<User> optionalUser = userRepository.findByUsername(request.getUsername());
 
