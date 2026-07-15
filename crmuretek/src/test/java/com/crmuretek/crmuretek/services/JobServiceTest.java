@@ -1,7 +1,9 @@
 package com.crmuretek.crmuretek.services;
 
 import com.crmuretek.crmuretek.dto.JobResponseDTO;
+import com.crmuretek.crmuretek.models.Customer;
 import com.crmuretek.crmuretek.models.Job;
+import com.crmuretek.crmuretek.models.Consulta;
 import com.crmuretek.crmuretek.models.JobStatus;
 import com.crmuretek.crmuretek.repositories.ConsultaRepository;
 import com.crmuretek.crmuretek.repositories.JobRepository;
@@ -34,6 +36,15 @@ public class JobServiceTest {
     @Test
     void updateJobStatusSuccessfully(){
         Job job = new Job();
+
+        Consulta consulta = new Consulta();
+        consulta.setId(1L);
+        job.setConsulta(consulta);
+
+        Customer customer = new Customer();
+        customer.setId(1L);
+        consulta.setCustomer(customer);
+
         job.setJobStatus(JobStatus.QUOTED);
 
         when(jobRepository.findById(1L)).thenReturn(Optional.of(job));
