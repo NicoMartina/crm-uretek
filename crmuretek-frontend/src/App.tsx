@@ -35,6 +35,7 @@ import type { Customer } from "./types/Customer";
 import type { SelectedLead } from "./types/SelectedLead";
 import type { DashboardSummary } from "./types/DashboardSummary";
 import type { VisitCreateData } from "./types/VisitCreateData";
+import { authService } from "./services/authService";
 
 type VisitApiResponse = {
   visitId: number;
@@ -102,6 +103,28 @@ export default function App() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
+
+  // login state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      await authService.login(loginUsername, loginPassword);
+      setIsAuthenticated(true);
+    } catch (e) {
+      setLoginError("Usuario o contraseña incorrectos");
+    }
+  };
+
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
   // Filter customers based on search input
   const filteredCustomers = customers.filter(
@@ -301,8 +324,45 @@ export default function App() {
   };
 
   useEffect(() => {
-    syncAllData();
-  }, []);
+    if (isAuthenticated) {
+      syncAllData();
+    }
+  }, [isAuthenticated]);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-100">
+        <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
+          <h1 className="text-2xl font-black text-orange-500 mb-6">
+            URETEK CRM
+          </h1>
+          <input
+            type="text"
+            placeholder="Usuario"
+            className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-3"
+            value={loginUsername}
+            onChange={(e) => setLoginUsername(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-3"
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
+          />
+          {loginError && (
+            <p className="text-red-500 text-sm mb-3">{loginError}</p>
+          )}
+          <button
+            onClick={handleLogin}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold"
+          >
+            Ingresar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-slate-100 w-full overflow-hidden">
