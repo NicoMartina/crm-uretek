@@ -18,8 +18,6 @@
     @RequestMapping("/api/jobs")
     public class JobController {
 
-
-
         private final JobService jobService;
 
 
