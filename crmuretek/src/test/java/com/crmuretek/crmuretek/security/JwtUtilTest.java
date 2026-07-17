@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JwtUtilTest {
 
-    private JwtUtil jwtUtil = new JwtUtil();
+    private JwtUtil jwtUtil = new JwtUtil("dGhpcyBpcyBhIHNlY3JldCBrZXkgZm9yIHVyZXRlayBjcm0gYXBwbGljYXRpb24h");;
 
     @Test
     void generateTokenSuccessfully(){
