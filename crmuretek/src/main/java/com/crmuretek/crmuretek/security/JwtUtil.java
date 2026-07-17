@@ -7,10 +7,19 @@ import javax.crypto.SecretKey;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+
 @Component
 public class JwtUtil {
-    private final SecretKey secretKey = Jwts.SIG.HS256.key().build();
     private final long EXPIRATION_MS = 1000 * 60 * 60 * 10; // 10 hrs
+
+    private final SecretKey secretKey;
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()
