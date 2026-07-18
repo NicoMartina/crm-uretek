@@ -6,8 +6,9 @@ import com.crmuretek.crmuretek.dto.PresupuestoResponseDTO;
 import com.crmuretek.crmuretek.dto.VisitResponseDTO;
 import com.crmuretek.crmuretek.exceptions.InvalidInputException;
 import com.crmuretek.crmuretek.exceptions.ResourceNotFoundException;
-import com.crmuretek.crmuretek.models.Presupuesto;
-import com.crmuretek.crmuretek.models.Visit;
+import com.crmuretek.crmuretek.models.*;
+import com.crmuretek.crmuretek.repositories.ConsultaRepository;
+import com.crmuretek.crmuretek.repositories.JobRepository;
 import com.crmuretek.crmuretek.repositories.PresupuestoRepository;
 import com.crmuretek.crmuretek.repositories.VisitRepository;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,11 @@ public class PresupuestoService {
 
     private VisitRepository visitRepository;
     private PresupuestoRepository presupuestoRepository;
+    private JobRepository jobRepository;
 
-    public PresupuestoService(VisitRepository visitRepository, PresupuestoRepository presupuestoRepository) {
+    public PresupuestoService(VisitRepository visitRepository, JobRepository jobRepository, PresupuestoRepository presupuestoRepository) {
         this.visitRepository = visitRepository;
+        this.jobRepository = jobRepository;
         this.presupuestoRepository = presupuestoRepository;
     }
 
@@ -62,6 +65,17 @@ public class PresupuestoService {
             case "received" -> presupuesto.setReceived(value);
             case "accepted" -> presupuesto.setAccepted(value);
             default -> throw new InvalidInputException("Invalid input: " + field);
+        }
+
+        if (field.equals("accepted") && value) {
+            Job job = new Job();
+            job.setConsulta(presupuesto.getVisit().getConsulta());
+            job.setVisit(presupuesto.getVisit());
+            job.setQuoteNumber(presupuesto.getPresupuestoNumber());
+            job.setObservations(presupuesto.getObservations());
+            job.setJobStatus(JobStatus.QUOTED);
+            jobRepository.save(job);
+
         }
 
         Presupuesto savedPresupuesto = presupuestoRepository.save(presupuesto);
