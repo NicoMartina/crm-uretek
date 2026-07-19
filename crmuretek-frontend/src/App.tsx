@@ -5,12 +5,14 @@ import {
   Calendar,
   Briefcase,
   Plus,
+  FileText,
 } from "lucide-react";
 
 // Services
 import { jobService } from "./services/jobService";
 import { visitService } from "./services/visitService";
 import { leadsService } from "./services/leadsService";
+import { presupuestoService } from "./services/presupuestoService";
 
 // Components
 import { DashboardView } from "./components/DashboardView";
@@ -36,6 +38,7 @@ import type { SelectedLead } from "./types/SelectedLead";
 import type { DashboardSummary } from "./types/DashboardSummary";
 import type { VisitCreateData } from "./types/VisitCreateData";
 import { authService } from "./services/authService";
+import type { Presupuesto } from "./types/Presupuesto";
 
 type VisitApiResponse = {
   visitId: number;
@@ -103,6 +106,8 @@ export default function App() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
+
+  const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
 
   // login state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -279,6 +284,7 @@ export default function App() {
         jobService.getDashboardSummary(),
         jobService.getStats(),
         customerService.getAll(),
+        presupuestoService.getAll(),
       ]);
 
       const allLeads = res[2].status === "fulfilled" ? res[2].value || [] : [];
@@ -318,6 +324,7 @@ export default function App() {
       if (res[3].status === "fulfilled") setDashboardData(res[3].value);
       if (res[4].status === "fulfilled") setStatsData(res[4].value);
       if (res[5].status === "fulfilled") setCustomers(res[5].value || []);
+      if (res[6].status === "fulfilled") setPresupuestos(res[6].value || []);
     } catch (e) {
       console.error("Sync Error:", e);
     }
@@ -393,6 +400,16 @@ export default function App() {
           }`}
         >
           <Calendar className="mr-2" /> Visitas
+        </button>
+        <button
+          onClick={() => setActiveTab("presupuestos")}
+          className={`flex p-3 rounded text-left transition ${
+            activeTab === "presupuestos"
+              ? "bg-orange-600"
+              : "hover:bg-slate-800"
+          }`}
+        >
+          <FileText className="mr-2" /> Presupuestos
         </button>
         <button
           onClick={() => setActiveTab("jobs")}
@@ -530,6 +547,94 @@ export default function App() {
                 }
               }}
             />
+          </div>
+        )}
+
+        {activeTab === "presupuestos" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-black text-slate-800">
+                Presupuestos
+              </h2>
+            </div>
+            <div className="bg-white rounded-2xl shadow overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+                  <tr>
+                    <th className="p-4 text-left">N° Presupuesto</th>
+                    <th className="p-4 text-left">Cliente</th>
+                    <th className="p-4 text-left">Fecha</th>
+                    <th className="p-4 text-left">Monto</th>
+                    <th className="p-4 text-left">Enviado</th>
+                    <th className="p-4 text-left">Recibido</th>
+                    <th className="p-4 text-left">Aceptado</th>
+                    <th className="p-4 text-left">Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {presupuestos.map((p) => (
+                    <tr
+                      key={p.presupuestoId}
+                      className="border-t hover:bg-slate-50"
+                    >
+                      <td className="p-4">{p.presupuestoNumber}</td>
+                      <td className="p-4">{p.customerName}</td>
+                      <td className="p-4">{p.visitDate}</td>
+                      <td className="p-4">${p.amount?.toLocaleString()}</td>
+                      <td className="p-4">
+                        <button
+                          onClick={() =>
+                            presupuestoService
+                              .update(p.presupuestoId, "sent", !p.sent)
+                              .then(syncAllData)
+                          }
+                          className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            p.sent
+                              ? "bg-green-100 text-green-700"
+                              : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {p.sent ? "Sí" : "No"}
+                        </button>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          onClick={() =>
+                            presupuestoService
+                              .update(p.presupuestoId, "received", !p.received)
+                              .then(syncAllData)
+                          }
+                          className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            p.received
+                              ? "bg-green-100 text-green-700"
+                              : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {p.received ? "Sí" : "No"}
+                        </button>
+                      </td>
+                      <td className="p-4">
+                        <button
+                          onClick={() =>
+                            presupuestoService
+                              .update(p.presupuestoId, "accepted", !p.accepted)
+                              .then(syncAllData)
+                          }
+                          className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            p.accepted
+                              ? "bg-green-100 text-green-700"
+                              : "bg-slate-100 text-slate-500"
+                          }`}
+                        >
+                          {p.accepted ? "Sí" : "No"}
+                        </button>
+                      </td>
+                      <td className="p-4">{p.observations || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
