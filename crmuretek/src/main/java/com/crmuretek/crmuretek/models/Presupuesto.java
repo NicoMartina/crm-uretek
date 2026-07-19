@@ -34,7 +34,7 @@ public class Presupuesto {
 
     private String observations;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "visit_id")
     private Visit visit;
 
