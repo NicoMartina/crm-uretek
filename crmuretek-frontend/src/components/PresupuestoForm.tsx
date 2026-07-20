@@ -32,10 +32,10 @@ export default function PresupuestoForm({
       setFormData({
         presupuestoNumber: initialData.presupuestoNumber || "",
         visitId: initialData.visitId || undefined,
-        date: "",
-        amount: undefined,
-        acceptanceForm: "",
-        observations: "",
+        date: initialData.visitDate || "",
+        amount: initialData.amount || undefined,
+        acceptanceForm: initialData.acceptanceForm || "",
+        observations: initialData.observations || "",
       });
     }
   }, [initialData]);
