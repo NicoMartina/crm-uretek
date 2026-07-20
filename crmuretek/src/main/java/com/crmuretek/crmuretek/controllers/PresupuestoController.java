@@ -37,6 +37,18 @@ public class PresupuestoController {
         String field = (String) body.get("field");
         boolean value = (Boolean) body.get("value");
 
-        return ResponseEntity.ok(presupuestoService.update(id, field, value));
+        return ResponseEntity.ok(presupuestoService.updateStatus(id, field, value));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PresupuestoResponseDTO> updateInfo(@PathVariable Long id, @RequestBody PresupuestoRequestDTO details){
+        PresupuestoResponseDTO presupuesto = presupuestoService.updateInfo(id, details);
+        return ResponseEntity.ok(presupuesto);
+    }
+
+    @DeleteMapping("/{id}")
+    public  ResponseEntity<Void> delete(@PathVariable Long id){
+        presupuestoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
