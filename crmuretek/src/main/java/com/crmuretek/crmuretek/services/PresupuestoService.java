@@ -56,7 +56,7 @@ public class PresupuestoService {
     }
 
     @Transactional
-    public PresupuestoResponseDTO update(Long id, String field, boolean value){
+    public PresupuestoResponseDTO updateStatus(Long id, String field, boolean value){
         Presupuesto presupuesto = presupuestoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Presupuesto not found"));
 
@@ -80,6 +80,26 @@ public class PresupuestoService {
 
         Presupuesto savedPresupuesto = presupuestoRepository.save(presupuesto);
         return toResponseDTO(savedPresupuesto);
+    }
+
+    @Transactional
+    public PresupuestoResponseDTO updateInfo(Long id, PresupuestoRequestDTO request) {
+        Presupuesto presupuesto = presupuestoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Presupuesto not found" + id));
+
+
+        presupuesto.setPresupuestoNumber(request.getPresupuestoNumber());
+        presupuesto.setVisitDate(request.getVisitDate());
+        presupuesto.setAmount(request.getAmount());
+        presupuesto.setAcceptanceForm(request.getAcceptanceForm());
+        presupuesto.setObservations(request.getObservations());
+
+        Presupuesto savedPresupuesto = presupuestoRepository.save(presupuesto);
+        return toResponseDTO(savedPresupuesto);
+    }
+
+    public void delete(Long id){
+        presupuestoRepository.deleteById(id);
     }
 
 
