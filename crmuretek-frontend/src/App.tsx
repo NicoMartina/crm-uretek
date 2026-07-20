@@ -39,6 +39,7 @@ import type { DashboardSummary } from "./types/DashboardSummary";
 import type { VisitCreateData } from "./types/VisitCreateData";
 import { authService } from "./services/authService";
 import type { Presupuesto } from "./types/Presupuesto";
+import PresupuestoForm from "./components/PresupuestoForm";
 
 type VisitApiResponse = {
   visitId: number;
@@ -106,6 +107,9 @@ export default function App() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
+  const [isAddingPresupuesto, setIsAddingPresupuesto] = useState(false);
+  const [selectedPresupuesto, setSelectedPresupuesto] =
+    useState<Presupuesto | null>(null);
 
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
 
@@ -556,6 +560,15 @@ export default function App() {
               <h2 className="text-2xl font-black text-slate-800">
                 Presupuestos
               </h2>
+              <button
+                onClick={() => {
+                  setSelectedPresupuesto(null);
+                  setIsAddingPresupuesto(true);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-lg transition-all active:scale-95"
+              >
+                <Plus size={20} /> Nuevo Presupuesto
+              </button>
             </div>
             <div className="bg-white rounded-2xl shadow overflow-hidden">
               <table className="w-full text-sm">
@@ -569,6 +582,7 @@ export default function App() {
                     <th className="p-4 text-left">Recibido</th>
                     <th className="p-4 text-left">Aceptado</th>
                     <th className="p-4 text-left">Observaciones</th>
+                    <th className="p-4 text-left">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -585,7 +599,7 @@ export default function App() {
                         <button
                           onClick={() =>
                             presupuestoService
-                              .update(p.presupuestoId, "sent", !p.sent)
+                              .updateStatus(p.presupuestoId, "sent", !p.sent)
                               .then(syncAllData)
                           }
                           className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -601,7 +615,11 @@ export default function App() {
                         <button
                           onClick={() =>
                             presupuestoService
-                              .update(p.presupuestoId, "received", !p.received)
+                              .updateStatus(
+                                p.presupuestoId,
+                                "received",
+                                !p.received
+                              )
                               .then(syncAllData)
                           }
                           className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -617,7 +635,11 @@ export default function App() {
                         <button
                           onClick={() =>
                             presupuestoService
-                              .update(p.presupuestoId, "accepted", !p.accepted)
+                              .updateStatus(
+                                p.presupuestoId,
+                                "accepted",
+                                !p.accepted
+                              )
                               .then(syncAllData)
                           }
                           className={`px-3 py-1 rounded-full text-xs font-bold ${
@@ -630,6 +652,28 @@ export default function App() {
                         </button>
                       </td>
                       <td className="p-4">{p.observations || "—"}</td>
+                      <td className="p-4 flex gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedPresupuesto(p);
+                            setIsAddingPresupuesto(true);
+                          }}
+                          className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-100 text-blue-700"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm("¿Borrar presupuesto?")) {
+                              await presupuestoService.delete(p.presupuestoId);
+                              syncAllData();
+                            }
+                          }}
+                          className="px-3 py-1 rounded-lg text-xs font-bold bg-red-100 text-red-700"
+                        >
+                          Borrar
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1211,6 +1255,39 @@ export default function App() {
                   Confirmar
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {isAddingPresupuesto && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl overflow-y-auto max-h-[90vh]">
+              <h2 className="text-2xl font-black mb-4">
+                {selectedPresupuesto
+                  ? "Editar Presupuesto"
+                  : "Nuevo Presupuesto"}
+              </h2>
+              <PresupuestoForm
+                initialData={selectedPresupuesto}
+                onCancel={() => {
+                  setIsAddingPresupuesto(false);
+                  setSelectedPresupuesto(null);
+                }}
+                onSubmit={async (formData) => {
+                  if (selectedPresupuesto) {
+                    await presupuestoService.update(
+                      selectedPresupuesto.presupuestoId,
+                      formData
+                    );
+                  } else {
+                    await presupuestoService.create(formData);
+                  }
+                  await syncAllData();
+                  setIsAddingPresupuesto(false);
+                  setSelectedPresupuesto(null);
+                }}
+                onRefresh={syncAllData}
+              />
             </div>
           </div>
         )}
