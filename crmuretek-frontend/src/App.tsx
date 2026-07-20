@@ -1269,6 +1269,7 @@ export default function App() {
               </h2>
               <PresupuestoForm
                 initialData={selectedPresupuesto}
+                visits={visits}
                 onCancel={() => {
                   setIsAddingPresupuesto(false);
                   setSelectedPresupuesto(null);

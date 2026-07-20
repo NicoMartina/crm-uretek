@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import type { Presupuesto } from "../types/Presupuesto";
 import type { PresupuestoFormData } from "../types/PresupuestoFormData";
+import type { Visit } from "../types/Visit";
 
 interface PresupuestoFormProps {
   initialData?: Presupuesto | null;
+  visits: Visit[];
   onCancel: () => void;
   onSubmit: (formData: PresupuestoFormData) => Promise<void>;
   onRefresh: () => Promise<void> | void;
@@ -11,6 +13,7 @@ interface PresupuestoFormProps {
 
 export default function PresupuestoForm({
   initialData,
+  visits,
   onRefresh,
   onSubmit,
   onCancel,
@@ -74,13 +77,14 @@ export default function PresupuestoForm({
           }
         />
       </div>
+
       {/* Input Group 2 */}
       <div>
         <label className="text-[10px] font-bold uppercase text-slate-400">
-          Visit ID
+          Visita
         </label>
-        <input
-          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+        <select
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
           value={formData.visitId || ""}
           onChange={(e) =>
             setFormData({
@@ -90,7 +94,15 @@ export default function PresupuestoForm({
                 : undefined,
             })
           }
-        />
+        >
+          <option value="">Seleccione una visita</option>
+          {visits.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.consulta?.customer?.name || "Sin nombre"} -{" "}
+              {v.visitDate || "Sin fecha"}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Input Group 3 */}
