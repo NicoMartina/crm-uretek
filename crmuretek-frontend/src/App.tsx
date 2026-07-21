@@ -347,6 +347,7 @@ export default function App() {
           <h1 className="text-2xl font-black text-orange-500 mb-6">
             URETEK CRM
           </h1>
+
           <input
             type="text"
             placeholder="Usuario"
@@ -380,6 +381,15 @@ export default function App() {
       {/* Sidebar Navigation */}
       <nav className="w-64 bg-slate-900 text-white p-4 flex flex-col gap-2">
         <h1 className="text-xl font-bold p-4 text-orange-500">URETEK CRM</h1>
+        <button
+          onClick={() => {
+            localStorage.clear();
+            setIsAuthenticated(false);
+          }}
+          className="flex p-3 rounded text-left transition text-red-400 hover:bg-slate-800"
+        >
+          Cerrar Sesión
+        </button>
         <button
           onClick={() => setActiveTab("dashboard")}
           className={`flex p-3 rounded text-left transition ${
