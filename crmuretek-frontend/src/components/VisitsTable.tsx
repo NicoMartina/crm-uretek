@@ -15,7 +15,7 @@ interface VisitsTableProps {
     }
   ) => void;
   onView: (visit: Visit) => void;
-  onConvert: (consulta: NonNullable<Visit["consulta"]>) => void;
+  onConvert: (Visit: Visit) => void;
   onDelete: (id: number) => void;
 }
 
@@ -168,9 +168,7 @@ export const VisitsTable = ({
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <button
-                      onClick={() =>
-                        visit.consulta && onConvert(visit.consulta)
-                      }
+                      onClick={() => visit.consulta && onConvert(visit)}
                       className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-[10px] uppercase hover:bg-emerald-700 transition-all flex items-center gap-1"
                     >
                       <Briefcase size={12} /> Convertir
