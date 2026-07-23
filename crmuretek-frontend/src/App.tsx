@@ -542,9 +542,9 @@ export default function App() {
                 setViewingVisit(v);
                 setVisitObservations(v.observations || "");
               }}
-              onConvert={(cust) => {
-                setSelectedLead(cust);
-                setIsAddingQuote(true);
+              onConvert={(visit) => {
+                setSelectedPresupuesto({ visitId: visit.id } as any);
+                setIsAddingPresupuesto(true);
               }}
               onUpdateStatus={async (id, s) => {
                 await visitService.updateStatus(id, s);
