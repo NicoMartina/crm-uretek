@@ -1197,7 +1197,7 @@ export default function App() {
               } else {
                 await jobService.create({
                   ...data,
-                  consulta: { id: selectedLead.consultaId || selectedLead.id },
+                  consultaId: selectedLead.consultaId || selectedLead.id,
                 });
               }
               setIsAddingQuote(false);
