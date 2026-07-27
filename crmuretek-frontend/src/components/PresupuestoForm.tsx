@@ -5,6 +5,7 @@ import type { Visit } from "../types/Visit";
 
 interface PresupuestoFormProps {
   initialData?: Presupuesto | null;
+  defaultVisitId?: number | null;
   visits: Visit[];
   onCancel: () => void;
   onSubmit: (formData: PresupuestoFormData) => Promise<void>;
@@ -17,13 +18,14 @@ export default function PresupuestoForm({
   onRefresh,
   onSubmit,
   onCancel,
+  defaultVisitId,
 }: PresupuestoFormProps) {
   const [formData, setFormData] = useState<PresupuestoFormData>({
     presupuestoNumber: initialData?.presupuestoNumber || "",
-    visitId: initialData?.visitId || undefined,
-    date: "",
-    amount: undefined,
-    acceptanceForm: "",
+    visitId: initialData?.visitId || defaultVisitId || undefined,
+    date: initialData?.visitDate || "",
+    amount: initialData?.amount || undefined,
+    acceptanceForm: initialData?.acceptanceForm || "",
     observations: "",
   });
 
