@@ -112,6 +112,7 @@ export default function App() {
     useState<Presupuesto | null>(null);
 
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
+  const [convertingVisit, setConvertingVisit] = useState<number | null>(null);
 
   // login state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -545,6 +546,7 @@ export default function App() {
               onConvert={(visit) => {
                 setSelectedPresupuesto({ visitId: visit.id } as any);
                 setIsAddingPresupuesto(true);
+                setConvertingVisit(visit.id);
               }}
               onUpdateStatus={async (id, s) => {
                 await visitService.updateStatus(id, s);
@@ -1279,10 +1281,12 @@ export default function App() {
               </h2>
               <PresupuestoForm
                 initialData={selectedPresupuesto}
+                defaultVisitId={convertingVisit}
                 visits={visits}
                 onCancel={() => {
                   setIsAddingPresupuesto(false);
                   setSelectedPresupuesto(null);
+                  setConvertingVisit(null);
                 }}
                 onSubmit={async (formData) => {
                   if (selectedPresupuesto) {
