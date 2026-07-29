@@ -68,13 +68,16 @@ public class PresupuestoService {
         }
 
         if (field.equals("accepted") && value && presupuesto.getVisit() != null) {
-            Job job = new Job();
-            job.setConsulta(presupuesto.getVisit().getConsulta());
-            job.setVisit(presupuesto.getVisit());
-            job.setQuoteNumber(presupuesto.getPresupuestoNumber());
-            job.setObservations(presupuesto.getObservations());
-            job.setJobStatus(JobStatus.QUOTED);
-            jobRepository.save(job);
+            boolean jobAlreadyExists = jobRepository.existsByVisit(presupuesto.getVisit());
+            if (!jobAlreadyExists) {
+                Job job = new Job();
+                job.setConsulta(presupuesto.getVisit().getConsulta());
+                job.setVisit(presupuesto.getVisit());
+                job.setQuoteNumber(presupuesto.getPresupuestoNumber());
+                job.setObservations(presupuesto.getObservations());
+                job.setJobStatus(JobStatus.QUOTED);
+                jobRepository.save(job);
+            }
         }
 
         Presupuesto savedPresupuesto = presupuestoRepository.save(presupuesto);
