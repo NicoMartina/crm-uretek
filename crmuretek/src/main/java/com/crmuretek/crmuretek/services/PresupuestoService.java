@@ -67,7 +67,7 @@ public class PresupuestoService {
             default -> throw new InvalidInputException("Invalid input: " + field);
         }
 
-        if (field.equals("accepted") && value) {
+        if (field.equals("accepted") && value && presupuesto.getVisit() != null) {
             Job job = new Job();
             job.setConsulta(presupuesto.getVisit().getConsulta());
             job.setVisit(presupuesto.getVisit());
@@ -75,7 +75,6 @@ public class PresupuestoService {
             job.setObservations(presupuesto.getObservations());
             job.setJobStatus(JobStatus.QUOTED);
             jobRepository.save(job);
-
         }
 
         Presupuesto savedPresupuesto = presupuestoRepository.save(presupuesto);
