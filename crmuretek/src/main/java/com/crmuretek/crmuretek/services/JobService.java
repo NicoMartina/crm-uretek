@@ -85,10 +85,7 @@ public class JobService {
     public JobResponseDTO update(Long id, JobRequestDTO details){
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found with id: " + id));
-        Consulta consulta = consultaRepository.findById(details.getConsultaId())
-                .orElseThrow(()-> new ResourceNotFoundException("No lead found with ID" + id));
 
-        job.setConsulta(consulta);
 
 
         if (details.getVisitId() != null){
