@@ -38,7 +38,7 @@
         @GetMapping
         public List<JobResponseDTO> getAllJobs(){
             return jobService.findAllByOrderByIdDesc();
-        }
+        }   
 
         @PutMapping("/{id}")
         public ResponseEntity<JobResponseDTO> updateJob(@PathVariable Long id, @RequestBody JobRequestDTO details) {

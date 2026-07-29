@@ -50,7 +50,7 @@ public class VisitService {
         // Automatically pull the customer from the Lead!
         Visit visit = new Visit();
         visit.setConsulta(consulta);
-        visit.setStatus(VisitStatus.SCHEDULED);
+        visit.setStatus(VisitStatus.SOLICITADA);
         visit.setVisitDate(request.getVisitDate());
         visit.setObservations(request.getObservations());
 
