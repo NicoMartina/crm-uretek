@@ -26,6 +26,7 @@ public class GlobalExceptionHandler {
     // 3. Fallback for everything  else (The "safety net")
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneralError(Exception exception){
+        exception.printStackTrace();
         return buildResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
