@@ -442,19 +442,55 @@ export default function App() {
       <main className="flex-1 p-8 overflow-auto">
         {activeTab === "dashboard" &&
           (dashboardData ? (
-            <DashboardView
-              inventory={{
-                iso_stock: dashboardData.isoStock || 0,
-                resina_stock: dashboardData.resinaStock || 0,
-              }}
-              totalPossibleMix={dashboardData.possibleMix || 0}
-              onAddStock={(type) => {
-                setStockType(type);
-                setIsAddingStock(true);
-              }}
-              materialTotal={dashboardData.materialNeededTotal || 0}
-              statsData={statsData}
-            />
+            <>
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="bg-white rounded-2xl p-6 shadow">
+                  <p className="text-xs font-black uppercase text-slate-400 mb-1">
+                    Consultas
+                  </p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {leads.length}
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow">
+                  <p className="text-xs font-black uppercase text-slate-400 mb-1">
+                    Visitas
+                  </p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {visits.length}
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow">
+                  <p className="text-xs font-black uppercase text-slate-400 mb-1">
+                    Presupuestos
+                  </p>
+                  <p className="text-3xl font-black text-slate-800">
+                    {presupuestos.length}
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow">
+                  <p className="text-xs font-black uppercase text-slate-400 mb-1">
+                    Obras Completadas
+                  </p>
+                  <p className="text-3xl font-black text-orange-500">
+                    {jobs.filter((j) => j.jobStatus === "COMPLETED").length}
+                  </p>
+                </div>
+              </div>
+              <DashboardView
+                inventory={{
+                  iso_stock: dashboardData.isoStock || 0,
+                  resina_stock: dashboardData.resinaStock || 0,
+                }}
+                totalPossibleMix={dashboardData.possibleMix || 0}
+                onAddStock={(type) => {
+                  setStockType(type);
+                  setIsAddingStock(true);
+                }}
+                materialTotal={dashboardData.materialNeededTotal || 0}
+                statsData={statsData}
+              />
+            </>
           ) : (
             <div className="text-slate-500 font-bold p-10 text-center">
               Cargando Dashboard...
