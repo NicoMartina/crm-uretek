@@ -98,6 +98,7 @@ export const VisitsTable = ({
                     <option value="SOLICITADA">Solicitada</option>
                     <option value="SCHEDULED">Programada</option>
                     <option value="VISITED">Visitada</option>
+                    <option value="CANCELLED">Cancelada</option>
                   </select>
                 </td>
                 <td className="p-4">
