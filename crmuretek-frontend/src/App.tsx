@@ -22,7 +22,6 @@ import { JobsTable } from "./components/JobsTable";
 import LeadForm from "./components/LeadForm";
 import { QuoteForm } from "./components/QuoteForm";
 import { VisitModal } from "./components/VisitModal";
-import { inventoryService } from "./services/inventoryService";
 import { customerService } from "./services/customerService";
 import { CustomerTable } from "./components/CustomerTable";
 import CustomerForm from "./components/CustomerForm";
@@ -90,9 +89,6 @@ export default function App() {
   const [isSchedulingVisit, setIsSchedulingVisit] = useState(false);
   const [selectedLead, setSelectedLead] = useState<SelectedLead | null>(null);
   const [viewingLead, setViewingLead] = useState<Lead | null>(null);
-  const [isAddingStock, setIsAddingStock] = useState(false);
-  const [stockType, setStockType] = useState<"iso" | "resina">("iso");
-  const [stockAmount, setStockAmount] = useState("");
   const [leadSearch, setLeadSearch] = useState("");
   const [visitSearch, setVisitSearch] = useState("");
   const [jobSearch, setJobSearch] = useState("");
@@ -114,6 +110,10 @@ export default function App() {
   const [presupuestos, setPresupuestos] = useState<Presupuesto[]>([]);
   const [convertingVisitId, setConvertingVisitId] = useState<number | null>(
     null
+  );
+
+  const [selectedStatsMonth, setSelectedStatsMonth] = useState(
+    new Date().toISOString().slice(0, 7) // "2026-07"
   );
 
   // login state
@@ -443,13 +443,25 @@ export default function App() {
         {activeTab === "dashboard" &&
           (dashboardData ? (
             <>
+              <div className="mb-4">
+                <input
+                  type="month"
+                  value={selectedStatsMonth}
+                  onChange={(e) => setSelectedStatsMonth(e.target.value)}
+                  className="border p-2 rounded-xl outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
               <div className="grid grid-cols-4 gap-4 mb-6">
                 <div className="bg-white rounded-2xl p-6 shadow">
                   <p className="text-xs font-black uppercase text-slate-400 mb-1">
                     Consultas
                   </p>
                   <p className="text-3xl font-black text-slate-800">
-                    {leads.length}
+                    {
+                      leads.filter((l) =>
+                        l.contactDate?.startsWith(selectedStatsMonth)
+                      ).length
+                    }
                   </p>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow">
@@ -457,7 +469,11 @@ export default function App() {
                     Visitas
                   </p>
                   <p className="text-3xl font-black text-slate-800">
-                    {visits.length}
+                    {
+                      visits.filter((v) =>
+                        v.visitDate?.startsWith(selectedStatsMonth)
+                      ).length
+                    }
                   </p>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow">
@@ -465,7 +481,11 @@ export default function App() {
                     Presupuestos
                   </p>
                   <p className="text-3xl font-black text-slate-800">
-                    {presupuestos.length}
+                    {
+                      presupuestos.filter((p) =>
+                        p.visitDate?.startsWith(selectedStatsMonth)
+                      ).length
+                    }
                   </p>
                 </div>
                 <div className="bg-white rounded-2xl p-6 shadow">
@@ -473,23 +493,17 @@ export default function App() {
                     Obras Completadas
                   </p>
                   <p className="text-3xl font-black text-orange-500">
-                    {jobs.filter((j) => j.jobStatus === "COMPLETED").length}
+                    {
+                      jobs.filter(
+                        (j) =>
+                          j.jobStatus === "COMPLETED" &&
+                          j.workDate?.startsWith(selectedStatsMonth)
+                      ).length
+                    }
                   </p>
                 </div>
               </div>
-              <DashboardView
-                inventory={{
-                  iso_stock: dashboardData.isoStock || 0,
-                  resina_stock: dashboardData.resinaStock || 0,
-                }}
-                totalPossibleMix={dashboardData.possibleMix || 0}
-                onAddStock={(type) => {
-                  setStockType(type);
-                  setIsAddingStock(true);
-                }}
-                materialTotal={dashboardData.materialNeededTotal || 0}
-                statsData={statsData}
-              />
+              <DashboardView statsData={statsData} />
             </>
           ) : (
             <div className="text-slate-500 font-bold p-10 text-center">
@@ -1269,44 +1283,6 @@ export default function App() {
               syncAllData();
             }}
           />
-        )}
-        {isAddingStock && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
-              <h2 className="text-2xl font-black mb-4">
-                Cargar {stockType === "iso" ? "ISO" : "Resina"}
-              </h2>
-              <input
-                type="number"
-                className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500"
-                placeholder="Cantidad en kg"
-                value={stockAmount}
-                onChange={(e) => setStockAmount(e.target.value)}
-              />
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setIsAddingStock(false)}
-                  className="flex-1 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={async () => {
-                    await inventoryService.addStock(
-                      stockType,
-                      Number(stockAmount)
-                    );
-                    setIsAddingStock(false);
-                    setStockAmount("");
-                    syncAllData();
-                  }}
-                  className="flex-1 py-3 bg-orange-500 text-white font-bold rounded-xl"
-                >
-                  Confirmar
-                </button>
-              </div>
-            </div>
-          </div>
         )}
 
         {isAddingPresupuesto && (
