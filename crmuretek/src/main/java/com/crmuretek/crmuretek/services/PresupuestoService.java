@@ -45,6 +45,7 @@ public class PresupuestoService {
             presupuesto.setVisit(visit);
         }
 
+        presupuesto.setCustomerName(request.getCustomerName());
         presupuesto.setPresupuestoNumber(request.getPresupuestoNumber());
         presupuesto.setVisitDate(request.getVisitDate());
         presupuesto.setAmount(request.getAmount());
@@ -124,6 +125,8 @@ public class PresupuestoService {
             response.setCustomerId(presupuesto.getVisit().getConsulta().getCustomer().getId());
             response.setConsultaId(presupuesto.getVisit().getConsulta().getId());
             response.setCustomerName(presupuesto.getVisit().getConsulta().getCustomer().getName());
+        } else {
+            response.setCustomerName(presupuesto.getCustomerName());
         }
 
         return response;

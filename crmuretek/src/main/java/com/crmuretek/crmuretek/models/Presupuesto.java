@@ -18,6 +18,8 @@ public class Presupuesto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String customerName;
+
     private String presupuestoNumber;
 
     private LocalDate visitDate;

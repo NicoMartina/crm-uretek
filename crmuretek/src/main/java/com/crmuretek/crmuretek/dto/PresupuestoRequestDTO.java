@@ -10,6 +10,8 @@ import java.time.LocalDate;
 public class PresupuestoRequestDTO {
 
     //the visit that belongs to the presupuesto
+    String customerName;
+
     private Long visitId;
 
     private String presupuestoNumber;
