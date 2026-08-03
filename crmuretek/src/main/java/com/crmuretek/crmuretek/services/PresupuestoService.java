@@ -109,17 +109,17 @@ public class PresupuestoService {
     private PresupuestoResponseDTO toResponseDTO(Presupuesto presupuesto){
         PresupuestoResponseDTO response = new PresupuestoResponseDTO();
 
-        if (presupuesto.getVisit()  != null){
-            response.setPresupuestoId(presupuesto.getId());
-            response.setVisitDate(presupuesto.getVisitDate());
-            response.setSent(presupuesto.isSent());
-            response.setReceived(presupuesto.isReceived());
-            response.setAccepted(presupuesto.isAccepted());
-            response.setAmount(presupuesto.getAmount());
-            response.setAcceptanceForm(presupuesto.getAcceptanceForm());
-            response.setObservations(presupuesto.getObservations());
+        response.setPresupuestoId(presupuesto.getId());
+        response.setVisitDate(presupuesto.getVisitDate());
+        response.setSent(presupuesto.isSent());
+        response.setReceived(presupuesto.isReceived());
+        response.setAccepted(presupuesto.isAccepted());
+        response.setAmount(presupuesto.getAmount());
+        response.setAcceptanceForm(presupuesto.getAcceptanceForm());
+        response.setObservations(presupuesto.getObservations());
+        response.setPresupuestoNumber(presupuesto.getPresupuestoNumber());
 
-            response.setPresupuestoNumber(presupuesto.getPresupuestoNumber());
+        if (presupuesto.getVisit()  != null){
             response.setVisitId(presupuesto.getVisit().getId());
             response.setCustomerId(presupuesto.getVisit().getConsulta().getCustomer().getId());
             response.setConsultaId(presupuesto.getVisit().getConsulta().getId());
