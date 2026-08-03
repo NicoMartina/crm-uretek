@@ -92,6 +92,7 @@ public class PresupuestoService {
 
 
         presupuesto.setPresupuestoNumber(request.getPresupuestoNumber());
+        presupuesto.setCustomerName(request.getCustomerName());
         presupuesto.setVisitDate(request.getVisitDate());
         presupuesto.setAmount(request.getAmount());
         presupuesto.setAcceptanceForm(request.getAcceptanceForm());
