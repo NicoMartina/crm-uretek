@@ -23,7 +23,7 @@ export default function PresupuestoForm({
   const [formData, setFormData] = useState<PresupuestoFormData>({
     presupuestoNumber: initialData?.presupuestoNumber || "",
     visitId: initialData?.visitId || defaultVisitId || undefined,
-    date: initialData?.visitDate || "",
+    visitDate: initialData?.visitDate || "",
     amount: initialData?.amount || undefined,
     acceptanceForm: initialData?.acceptanceForm || "",
     observations: "",
@@ -34,7 +34,7 @@ export default function PresupuestoForm({
       setFormData({
         presupuestoNumber: initialData.presupuestoNumber || "",
         visitId: initialData.visitId || undefined,
-        date: initialData.visitDate || "",
+        visitDate: initialData.visitDate || "",
         amount: initialData.amount || undefined,
         acceptanceForm: initialData.acceptanceForm || "",
         observations: initialData.observations || "",
@@ -132,11 +132,11 @@ export default function PresupuestoForm({
         <input
           type="date"
           className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
-          value={formData.date || ""}
+          value={formData.visitDate || ""}
           onChange={(e) =>
             setFormData({
               ...formData,
-              date: e.target.value,
+              visitDate: e.target.value,
             })
           }
         />

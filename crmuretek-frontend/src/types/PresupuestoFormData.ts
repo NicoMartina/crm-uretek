@@ -2,7 +2,7 @@ export interface PresupuestoFormData {
   customerName?: string;
   presupuestoNumber?: string;
   visitId?: number;
-  date?: string;
+  visitDate?: string;
   amount?: number;
   acceptanceForm?: string;
   observations?: string;
