@@ -110,6 +110,23 @@ export default function PresupuestoForm({
       {/* Input Group 3 */}
       <div>
         <label className="text-[10px] font-bold uppercase text-slate-400">
+          Nombre del Cliente
+        </label>
+        <input
+          className="w-full border p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500"
+          value={formData.customerName || ""}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              customerName: e.target.value,
+            })
+          }
+        />
+      </div>
+
+      {/* Input Group 4 */}
+      <div>
+        <label className="text-[10px] font-bold uppercase text-slate-400">
           Fecha
         </label>
         <input
@@ -124,7 +141,7 @@ export default function PresupuestoForm({
           }
         />
       </div>
-      {/* Input Group 4 */}
+      {/* Input Group 5 */}
       <div>
         <label className="text-[10px] font-bold uppercase text-slate-400">
           Monto
@@ -140,7 +157,7 @@ export default function PresupuestoForm({
           }
         />
       </div>
-      {/* Input Group 5 */}
+      {/* Input Group 6 */}
       <div>
         <label className="text-[10px] font-bold uppercase text-slate-400">
           Formulario de Aceptación
@@ -157,7 +174,7 @@ export default function PresupuestoForm({
         />
       </div>
 
-      {/* Input Group 5 */}
+      {/* Input Group 7 */}
       <div>
         <label className="text-[10px] font-bold uppercase text-slate-400">
           Observaciones
