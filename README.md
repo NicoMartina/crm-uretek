@@ -19,6 +19,12 @@ The focus of this project is backend design, clean layering, and real-world busi
 
 ---
 
+## 📖 Background
+
+Before this system, Uretek Argentina managed all customer data across multiple Google Sheets spreadsheets. Data was duplicated, hard to track, and impossible to analyze. This CRM centralized everything into one system
+
+---
+
 ## 🏗 Architecture
 
 The application follows a layered architecture:
@@ -62,7 +68,8 @@ the result flows back through the controller to the client.
 - Maven
 
 ### Frontend
-(Specify your framework here: React / Next.js / etc.)
+- TypeScript
+- React
 
 ### Database
 - PostgreSQL
@@ -155,7 +162,6 @@ cd crm-uretek
 
   
 ### 📈 Future Improvements
-- Add Spring Security + JWT authentication
 - Add unit and integration tests
 - Add Docker support
 - Add Swagger/OpenAPI documentation
