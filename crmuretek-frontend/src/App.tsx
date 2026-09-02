@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
-import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  Briefcase,
-  Plus,
-  FileText,
-} from "lucide-react";
+import { Plus } from "lucide-react";
 
 // Services
 import { jobService } from "./services/jobService";
 import { visitService } from "./services/visitService";
 import { leadsService } from "./services/leadsService";
 import { presupuestoService } from "./services/presupuestoService";
+import { authService } from "./services/authService";
 
 // Components
 import { DashboardView } from "./components/DashboardView";
@@ -25,6 +19,11 @@ import { VisitModal } from "./components/VisitModal";
 import { customerService } from "./services/customerService";
 import { CustomerTable } from "./components/CustomerTable";
 import CustomerForm from "./components/CustomerForm";
+import PresupuestoForm from "./components/PresupuestoForm";
+import { Login } from "./components/Login";
+import { Sidebar } from "./components/SideBar";
+
+//utils
 import { formatDisplayDate } from "./utils/date";
 
 // Types
@@ -35,16 +34,9 @@ import type { StatsData } from "./types/StatsData";
 import type { LeadFormData } from "./types/LeadFormData";
 import type { Customer } from "./types/Customer";
 import type { SelectedLead } from "./types/SelectedLead";
-
-// Login Component
-import { Login } from "./components/Login";
-
-// Additional Types
 import type { DashboardSummary } from "./types/DashboardSummary";
 import type { VisitCreateData } from "./types/VisitCreateData";
-import { authService } from "./services/authService";
 import type { Presupuesto } from "./types/Presupuesto";
-import PresupuestoForm from "./components/PresupuestoForm";
 
 type VisitApiResponse = {
   visitId: number;
@@ -365,61 +357,11 @@ export default function App() {
   return (
     <div className="flex h-screen bg-slate-100 w-full overflow-hidden">
       {/* Sidebar Navigation */}
-      <nav className="w-64 bg-slate-900 text-white p-4 flex flex-col gap-2">
-        <h1 className="text-xl font-bold p-4 text-orange-500">URETEK CRM</h1>
-        <button
-          onClick={() => {
-            localStorage.clear();
-            setIsAuthenticated(false);
-          }}
-          className="flex p-3 rounded text-left transition text-red-400 hover:bg-slate-800"
-        >
-          Cerrar Sesión
-        </button>
-        <button
-          onClick={() => setActiveTab("dashboard")}
-          className={`flex p-3 rounded text-left transition ${
-            activeTab === "dashboard" ? "bg-orange-600" : "hover:bg-slate-800"
-          }`}
-        >
-          <LayoutDashboard className="mr-2" /> Inicio
-        </button>
-
-        <button
-          onClick={() => setActiveTab("leads")}
-          className={`flex p-3 rounded text-left transition ${
-            activeTab === "leads" ? "bg-orange-600" : "hover:bg-slate-800"
-          }`}
-        >
-          <Users className="mr-2" /> Consultas
-        </button>
-        <button
-          onClick={() => setActiveTab("visits")}
-          className={`flex p-3 rounded text-left transition ${
-            activeTab === "visits" ? "bg-orange-600" : "hover:bg-slate-800"
-          }`}
-        >
-          <Calendar className="mr-2" /> Visitas
-        </button>
-        <button
-          onClick={() => setActiveTab("presupuestos")}
-          className={`flex p-3 rounded text-left transition ${
-            activeTab === "presupuestos"
-              ? "bg-orange-600"
-              : "hover:bg-slate-800"
-          }`}
-        >
-          <FileText className="mr-2" /> Presupuestos
-        </button>
-        <button
-          onClick={() => setActiveTab("jobs")}
-          className={`flex p-3 rounded text-left transition ${
-            activeTab === "jobs" ? "bg-orange-600" : "hover:bg-slate-800"
-          }`}
-        >
-          <Briefcase className="mr-2" /> Obras
-        </button>
-      </nav>
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        setIsAuthenticated={setIsAuthenticated}
+      />
 
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-auto">
