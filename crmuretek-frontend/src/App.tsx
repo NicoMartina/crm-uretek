@@ -27,6 +27,7 @@ import { CustomerTable } from "./components/CustomerTable";
 import CustomerForm from "./components/CustomerForm";
 import { formatDisplayDate } from "./utils/date";
 
+// Types
 import type { Lead } from "./types/Lead";
 import type { Job } from "./types/Job";
 import type { Visit } from "./types/Visit";
@@ -34,6 +35,11 @@ import type { StatsData } from "./types/StatsData";
 import type { LeadFormData } from "./types/LeadFormData";
 import type { Customer } from "./types/Customer";
 import type { SelectedLead } from "./types/SelectedLead";
+
+// Login Component
+import { Login } from "./components/Login";
+
+// Additional Types
 import type { DashboardSummary } from "./types/DashboardSummary";
 import type { VisitCreateData } from "./types/VisitCreateData";
 import { authService } from "./services/authService";
@@ -345,37 +351,14 @@ export default function App() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-100">
-        <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl">
-          <h1 className="text-2xl font-black text-orange-500 mb-6">
-            URETEK CRM
-          </h1>
-
-          <input
-            type="text"
-            placeholder="Usuario"
-            className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-3"
-            value={loginUsername}
-            onChange={(e) => setLoginUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            className="w-full border p-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 mb-3"
-            value={loginPassword}
-            onChange={(e) => setLoginPassword(e.target.value)}
-          />
-          {loginError && (
-            <p className="text-red-500 text-sm mb-3">{loginError}</p>
-          )}
-          <button
-            onClick={handleLogin}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-bold"
-          >
-            Ingresar
-          </button>
-        </div>
-      </div>
+      <Login
+        loginUsername={loginUsername}
+        setLoginUsername={setLoginUsername}
+        loginPassword={loginPassword}
+        setLoginPassword={setLoginPassword}
+        loginError={loginError}
+        handleLogin={handleLogin}
+      />
     );
   }
 
